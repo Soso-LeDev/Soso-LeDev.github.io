@@ -7,6 +7,7 @@
     <title>Commande vocale avec IA</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
         body {
@@ -25,22 +26,89 @@
             background-size: cover;
             background-position: center;
             position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         h1 {
             color: #ffffff;
-            font-size: 2.5em;
-            margin-bottom: 20px;
+            font-size: 3em;
+            margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
         }
 
-        #userLogo {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: none;
-            align-items: center;
+        h1:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .info-section {
+            color: #ffffff;
+            font-size: 0.9em; /* Taille de police réduite */
+            margin: 10px 0; /* Marge pour espacer du titre */
+        }
+
+        #startButton {
+            margin-bottom: 20px;
+            padding: 15px 30px;
+            font-size: 1.5em;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: bounce 1.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-10px);
+            }
+        }
+
+        #responseBox {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 80%;
+            min-height: 150px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: opacity 0.3s;
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #status {
+            font-size: 1.5em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         #loader {
@@ -57,64 +125,66 @@
             z-index: 10; 
         }
 
-        #startButton {
-            margin-bottom: 20px;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            color: #fff;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #startButton:hover {
-            background-color: #45a049;
-        }
-
-        #responseBox {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 80%;
-            min-height: 150px;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        #status {
-            font-size: 1.5em;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
             }
-
             100% {
                 transform: rotate(360deg);
             }
+        }
+
+        footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .social-icons {
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            margin: 0 10px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.5em;
+            transition: color 0.3s;
+        }
+
+        .social-icons a:hover {
+            color: #4CAF50;
         }
     </style>
 </head>
 
 <body>
-    <h1>💖 𝒩𝒶𝓎𝒶 💖 </h1>
+
+    <h1>💖 𝒩𝒶𝓎𝒶 💖</h1>
 
     <button id="startButton">Commence une discussion avec Naya</button>
+
+    <div class="info-section">
+        Bienvenue sur Naya, votre assistant vocal personnel. Parlez simplement pour lancer des actions ou poser des questions !
+    </div>
 
     <div id="responseBox">
         <div id="loader"></div>
         <p id="status">Statut : En attente de votre action...</p>
     </div>
 
+    <div class="social-icons">
+        <a href="https://github.com/Soso-LeDev" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin"></i></a>
+    </div>
+
+    <footer>
+        &copy; 2024 Naya. Tous droits réservés.
+    </footer>
+
     <script>
-        // Commandes vocales et bouton d'interaction
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
 
@@ -162,21 +232,20 @@
 
         async function respondToQuestion(question) {
             loader.style.display = "block";
-            responseBox.style.display = "none";
+            responseBox.style.display = "flex";
+            responseBox.style.opacity = 0;
 
             try {
                 const response = await fetch('http://localhost:6259/ask', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        question: question
-                    })
+                    body: JSON.stringify({ question: question })
                 });
                 const result = await response.text();
                 statusDisplay.textContent = `Naya : ${result}`;
 
                 loader.style.display = "none";
-                responseBox.style.display = 'flex';
+                responseBox.style.opacity = 1;
             } catch (error) {
                 statusDisplay.textContent = `Erreur lors de la communication avec l'API : ${error.message}`;
                 loader.style.display = "none";
