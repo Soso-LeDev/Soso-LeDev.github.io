@@ -40,7 +40,7 @@
 
         h1 {
             color: #ffffff;
-            font-size: 3em;
+            font-size: 2.5em; /* Taille réduite pour mobile */
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s;
@@ -52,14 +52,15 @@
 
         .info-section {
             color: #ffffff;
-            font-size: 0.9em; /* Taille de police réduite */
-            margin: 10px 0; /* Marge pour espacer du titre */
+            font-size: 0.9em;
+            margin: 10px 0;
+            max-width: 90%; /* Pour mieux s'adapter à l'écran mobile */
         }
 
         #startButton {
             margin-bottom: 20px;
-            padding: 15px 30px;
-            font-size: 1.5em;
+            padding: 12px 25px; /* Réduire la taille du bouton */
+            font-size: 1.2em; /* Taille réduite pour mobile */
             color: #fff;
             background-color: #4CAF50;
             border: none;
@@ -81,10 +82,10 @@
 
         #responseBox {
             background-color: rgba(0, 0, 0, 0.8);
-            padding: 15px; /* Réduire le padding */
+            padding: 10px;
             border-radius: 15px;
-            max-width: 80%;
-            display: none; /* Masquer par défaut */
+            max-width: 90%; /* Ajuster pour mieux rentrer dans l'écran mobile */
+            display: none;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -105,7 +106,7 @@
         }
 
         #status {
-            font-size: 1.5em;
+            font-size: 1.2em; /* Taille réduite */
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
@@ -121,7 +122,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            z-index: 10; 
+            z-index: 10;
         }
 
         @keyframes spin {
@@ -135,25 +136,54 @@
 
         footer {
             position: absolute;
-            bottom: 20px;
-            font-size: 0.9em;
+            bottom: 10px; /* Position plus basse pour mobile */
+            font-size: 0.8em;
             color: rgba(255, 255, 255, 0.7);
         }
 
         .social-icons {
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .social-icons a {
             margin: 0 10px;
             color: #fff;
             text-decoration: none;
-            font-size: 1.5em;
+            font-size: 1.2em; /* Taille réduite */
             transition: color 0.3s;
         }
 
         .social-icons a:hover {
             color: #4CAF50;
+        }
+
+        /* Media Queries pour Mobile */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em; /* Réduire encore la taille du texte */
+            }
+
+            #startButton {
+                padding: 10px 20px;
+                font-size: 1em; /* Adapter la taille du bouton */
+            }
+
+            #status {
+                font-size: 1em;
+            }
+
+            footer {
+                bottom: 5px;
+                font-size: 0.7em;
+            }
+
+            .social-icons a {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -164,13 +194,13 @@
 
     <button id="startButton">Commence une discussion avec Naya</button>
 
-    <div class="info-section">
-        Bienvenue sur Naya, votre assistant vocal personnel. Parlez simplement pour lancer des actions ou poser des questions !
-    </div>
-
     <div id="responseBox">
         <div id="loader"></div>
         <p id="status">Statut : En attente de votre action...</p>
+    </div>
+
+    <div class="info-section">
+        Bienvenue sur Naya, votre assistant vocal personnel. Parlez simplement pour lancer des actions ou poser des questions !
     </div>
 
     <div class="social-icons">
