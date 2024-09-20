@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commande vocale avec IA</title>
+    <title>Chat avec Naya</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -16,7 +16,6 @@
             padding: 0;
             height: 100vh;
             overflow: hidden;
-            color: #fff;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -25,17 +24,8 @@
             background-image: url('https://th.bing.com/th/id/R.e283bfb57525f3ca15983f32d1648dab?rik=DxaL7348BRh5xQ&pid=ImgRaw&r=0');
             background-size: cover;
             background-position: center;
+            color: #fff;
             position: relative;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
         }
 
         h1 {
@@ -57,104 +47,76 @@
             max-width: 90%;
         }
 
-        #startButton {
-            margin-bottom: 20px;
-            padding: 12px 25px;
-            font-size: 1.2em;
-            color: #fff;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: bounce 1.5s infinite alternate;
-        }
-
-        @keyframes bounce {
-            from {
-                transform: translateY(0);
-            }
-            to {
-                transform: translateY(-10px);
-            }
-        }
-
-        #responseBox {
+        .chat-section {
+            display: block;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 600px;
             background-color: rgba(0, 0, 0, 0.8);
-            padding: 10px;
-            border-radius: 15px;
-            max-width: 90%;
-            display: none;
-            justify-content: center;
-            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
             position: relative;
-            transition: opacity 0.3s;
-            opacity: 0;
-            animation: slideIn 0.5s forwards;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        @keyframes slideIn {
+        #inputBox {
+            width: 80%;
+            padding: 10px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+            transition: border 0.3s;
+        }
+
+        #inputBox:focus {
+            border: 1px solid #4CAF50;
+            outline: none;
+        }
+
+        #sendButton {
+            padding: 10px 15px;
+            font-size: 1.2em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            height: 46px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        #sendButton:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+        }
+
+        #response {
+            margin-top: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            border: 1px solid #4CAF50;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            min-height: 50px;
+        }
+
+        /* Effet simple d'apparition */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
             from {
-                transform: translateY(20px);
                 opacity: 0;
             }
             to {
-                transform: translateY(0);
                 opacity: 1;
             }
-        }
-
-        #status {
-            font-size: 1.2em;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        #loader {
-            display: none;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #ffffff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        footer {
-            position: absolute;
-            bottom: 10px;
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .social-icons {
-            margin-top: 15px;
-        }
-
-        .social-icons a {
-            margin: 0 10px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.2em;
-            transition: color 0.3s;
-        }
-
-        .social-icons a:hover {
-            color: #4CAF50;
         }
 
         @media screen and (max-width: 768px) {
@@ -166,21 +128,16 @@
                 font-size: 2em;
             }
 
-            #startButton {
-                padding: 10px 20px;
-                font-size: 1em;
-            }
-
-            #status {
-                font-size: 1em;
-            }
-
             footer {
                 bottom: 5px;
                 font-size: 0.7em;
             }
 
-            .social-icons a {
+            #inputBox {
+                font-size: 1em;
+            }
+
+            #sendButton {
                 font-size: 1em;
             }
         }
@@ -191,20 +148,21 @@
 
     <h1>💖 𝒩𝒶𝓎𝒶 💖</h1>
 
-    <button id="startButton">Commence une discussion avec Naya</button>
-
-    <div id="responseBox">
-        <div id="loader"></div>
-        <p id="status">Statut : En attente de votre action...</p>
+    <div class="info-section">
+        Bienvenue sur Naya, votre assistant textuel. Tapez simplement votre message et Naya vous répondra !
     </div>
 
-    <div class="info-section">
-        Bienvenue sur Naya, votre assistant vocal personnel. Parlez simplement pour lancer des actions ou poser des questions !
+    <div class="chat-section" id="chatSection">
+        <div id="response"></div>
+        <div style="display: flex; align-items: center; margin-top: 10px;">
+            <input type="text" id="inputBox" placeholder="Tapez votre message ici...">
+            <button id="sendButton">Envoyer</button>
+        </div>
     </div>
 
     <div class="social-icons">
-        <a href="https://discord.gg/P2DfSba6ds" target="_blank"><i class="fab fa-discord"></i></a>
-        <a href="https://github.com/Soso-LeDev" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://discord.gg/P2DfSba6ds" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
+        <a href="https://github.com/Soso-LeDev" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
     </div>
 
     <footer>
@@ -212,89 +170,38 @@
     </footer>
 
     <script>
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
+        const inputBox = document.getElementById('inputBox');
+        const sendButton = document.getElementById('sendButton');
+        const responseDiv = document.getElementById('response');
 
-        recognition.lang = 'fr-FR';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-
-        const statusDisplay = document.getElementById('status');
-        const responseBox = document.getElementById('responseBox');
-        const loader = document.getElementById('loader');
-        const startButton = document.getElementById('startButton');
-        let recognitionRunning = false;
-
-        const commandes = {
-            "lance vallaud.": "file:///C:/Users/sosod/OneDrive/Bureau/TESTBOT/ExecuteServeur.html",
-            "lance la musique.": "https://www.youtube.com/watch?v=FZZogxdiJMA&list=RDFZZogxdiJMA&start_radio=1",
-            "lance la musique urus.": "https://www.youtube.com/watch?v=TFXfM3sFoyY",
-        };
-
-        function startRecognition() {
-            if (!recognitionRunning) {
-                recognition.start();
-                recognitionRunning = true;
-                statusDisplay.textContent = "Statut : Écoute en cours...";
-                responseBox.style.display = 'none';
-                startButton.textContent = "En écoute..."; // Changement du texte du bouton
+        sendButton.addEventListener('click', async () => {
+            const message = inputBox.value.trim();
+            if (!message) {
+                responseDiv.innerHTML = "<span class='fade-in'>Veuillez entrer un message avant d'envoyer.</span>";
+                return;
             }
-        }
 
-        recognition.addEventListener('result', async (event) => {
-            const commandeVocale = event.results[0][0].transcript.toLowerCase();
-            statusDisplay.textContent = `Commande reçue : ${commandeVocale}`;
-
-            if (commandes[commandeVocale]) {
-                const url = commandes[commandeVocale];
-                window.open(url, '_blank');
-                statusDisplay.textContent = `Ouverture de : ${url}`;
-            } else {
-                statusDisplay.textContent = `Je n'ai pas trouvé : ${commandeVocale}. Je vais essayer de répondre à votre question.`;
-                await respondToQuestion(commandeVocale);
-            }
-        });
-
-        recognition.addEventListener('end', () => {
-            recognitionRunning = false;
-            startButton.textContent = "Commence une discussion avec Naya"; // Remettre le texte initial du bouton
-        });
-
-        async function respondToQuestion(question) {
-            loader.style.display = "block";
-            responseBox.style.display = "flex";
-            responseBox.style.opacity = 0;
+            inputBox.value = ""; // Effacer la zone de saisie pour le prochain message
 
             try {
                 const response = await fetch('http://localhost:6259/ask', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question: question })
+                    body: JSON.stringify({ question: message })
                 });
                 const result = await response.text();
-                statusDisplay.textContent = `Naya : ${result}`;
-
-                loader.style.display = "none";
-                responseBox.style.opacity = 1;
+                responseDiv.innerHTML += `<span class="fade-in">Naya : ${result}</span>`;
             } catch (error) {
-                statusDisplay.textContent = `Erreur lors de la communication avec l'API : ${error.message}`;
-                loader.style.display = "none";
+                responseDiv.innerHTML = `<span class='fade-in'>Erreur : ${error.message}</span>`;
             }
-        }
-
-        recognition.addEventListener('error', (event) => {
-            statusDisplay.textContent = `Erreur : ${event.error}`;
-            setTimeout(() => {
-                startRecognition();
-            }, 1000);
         });
 
-        startButton.addEventListener('click', () => {
-            startRecognition();
-            statusDisplay.textContent = "Statut : Écoute en cours...";
+        inputBox.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendButton.click();
+            }
         });
     </script>
-
 </body>
 
 </html>
