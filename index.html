@@ -190,7 +190,7 @@
                     body: JSON.stringify({ question: message })
                 });
                 const result = await response.text();
-                responseDiv.innerHTML += `<span class="fade-in">Naya : ${result}</span>`;
+                responseDiv.innerHTML = `<span class="fade-in">Naya : ${result}</span>`; // Afficher uniquement la réponse de Naya
             } catch (error) {
                 responseDiv.innerHTML = `<span class='fade-in'>Erreur : ${error.message}</span>`;
             }
