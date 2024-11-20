@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stockage de Code JavaScript</title>
+    <title>Simulateur Microbit - Stockage et Exécution du Code</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,14 +21,42 @@
             margin-right: 10px;
             cursor: pointer;
         }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            height: 200px;
+            overflow-y: scroll;
+        }
+        #microbitDisplay {
+            margin-top: 20px;
+            width: 160px;
+            height: 160px;
+            border: 1px solid #ccc;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+        }
+        .pixel {
+            width: 30px;
+            height: 30px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+        .on {
+            background-color: #000;
+        }
     </style>
 </head>
 <body>
-    <h1>Stockage de Code JavaScript</h1>
-    <p>Ajoutez, modifiez ou supprimez votre code JavaScript :</p>
+    <h1>Simulateur Microbit - Code JavaScript</h1>
+    <p>Ajoutez, modifiez ou supprimez votre code JavaScript. Le résultat de l'exécution sera affiché ci-dessous.</p>
 
     <textarea id="codeArea">
-// Exemple de code JavaScript
+// Exemple de code JavaScript pour le Microbit
 let score = 0;
 let gameActive = false;
 
@@ -102,8 +130,38 @@ function endGame() {
     <button onclick="saveCode()">Sauvegarder</button>
     <button onclick="clearCode()">Supprimer</button>
     <button onclick="loadCode()">Charger</button>
+    <button onclick="runCode()">Exécuter</button>
+
+    <div id="output"></div>
+
+    <div id="microbitDisplay"></div>
 
     <script>
+        // Simuler l'affichage Microbit avec une grille
+        const microbitDisplay = document.getElementById("microbitDisplay");
+
+        function resetDisplay() {
+            microbitDisplay.innerHTML = '';
+            for (let i = 0; i < 25; i++) {
+                const pixel = document.createElement("div");
+                pixel.classList.add("pixel");
+                microbitDisplay.appendChild(pixel);
+            }
+        }
+
+        function showIcon(icon) {
+            resetDisplay();
+            const pixels = microbitDisplay.querySelectorAll('.pixel');
+            icon.forEach(index => {
+                pixels[index].classList.add("on");
+            });
+        }
+
+        function showString(str) {
+            const output = document.getElementById("output");
+            output.textContent = "Affichage: " + str;
+        }
+
         // Fonction pour sauvegarder le code
         function saveCode() {
             const code = document.getElementById('codeArea').value;
@@ -130,6 +188,20 @@ function endGame() {
                 alert('Code supprimé avec succès !');
             }
         }
+
+        // Fonction pour exécuter le code
+        function runCode() {
+            const code = document.getElementById('codeArea').value;
+            const output = document.getElementById("output");
+            try {
+                eval(code); // Exécute le code dans l'éditeur
+            } catch (e) {
+                output.textContent = 'Erreur d\'exécution : ' + e.message;
+            }
+        }
+
+        // Initialise l'affichage et la zone de texte
+        resetDisplay();
     </script>
 </body>
 </html>
