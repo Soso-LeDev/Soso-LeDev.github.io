@@ -68,6 +68,9 @@
             background: #f8f9fa;
             border: 1px solid #ddd;
             border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
@@ -101,7 +104,7 @@
 
 <script>
     // Définir le mot de passe correct
-    const correctPassword = "Wax.";
+    const correctPassword = "Fichier123";
 
     // Valider le mot de passe
     function validatePassword() {
@@ -120,25 +123,23 @@
 
     function addFiles() {
         const input = document.getElementById("fileInput");
-        const files = input.files;
+        const files = Array.from(input.files); // Convertit FileList en un tableau
 
-        for (let i = 0; i < files.length; i++) {
-            fileList.push(files[i]);
-        }
+        files.forEach(file => fileList.push(file)); // Ajoute les fichiers au tableau principal
 
         updateFileList();
     }
 
     // Mettre à jour la liste des fichiers affichée
     function updateFileList() {
-        fileListContainer.innerHTML = "";
+        fileListContainer.innerHTML = ""; // Efface la liste actuelle
 
         fileList.forEach((file, index) => {
             const fileItem = document.createElement("div");
             fileItem.classList.add("file-item");
             fileItem.innerHTML = `
-                <strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} Ko)
-                <button onclick="removeFile(${index})" style="margin-left: 10px;">Supprimer</button>
+                <span><strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} Ko)</span>
+                <button onclick="removeFile(${index})">Supprimer</button>
             `;
             fileListContainer.appendChild(fileItem);
         });
@@ -146,8 +147,8 @@
 
     // Supprimer un fichier de la liste
     function removeFile(index) {
-        fileList.splice(index, 1);
-        updateFileList();
+        fileList.splice(index, 1); // Supprime l'élément du tableau
+        updateFileList(); // Met à jour l'affichage
     }
 </script>
 
