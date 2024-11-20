@@ -220,7 +220,7 @@
         <section id="reservation" class="reservation">
             <div class="container">
                 <h2>Réservez votre prochain cours</h2>
-                <form action="#" method="post" class="reservation-form">
+                <form id="reservationForm" class="reservation-form">
                     <input type="text" name="name" placeholder="Votre Nom" required>
                     <input type="email" name="email" placeholder="Votre Email" required>
                     <select name="course" required>
@@ -239,5 +239,46 @@
     <footer class="footer">
         <p>&copy; 2024 Techno Academy. Tous droits réservés. | <a href="https://discord.gg/CPtZHY2VQC" target="_blank">Rejoignez-nous sur Discord</a></p>
     </footer>
+
+    <script>
+        // URL du Webhook Discord
+        const webhookURL = "https://discord.com/api/webhooks/1308584244125110372/eCtHxF38c6gAhSTgeZknMVY0ggsg9TXZwV7PiizM3AlmZd257WID0r08icYhCBf11w1I";
+
+        const form = document.getElementById("reservationForm");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault(); // Empêcher l'envoi classique du formulaire
+
+            const formData = new FormData(form);
+            const name = formData.get("name");
+            const email = formData.get("email");
+            const course = formData.get("course");
+            const date = formData.get("date");
+
+            const message = {
+                content: `🎉 **Nouvelle réservation !**\n**Nom :** ${name}\n**Email :** ${email}\n**Cours :** ${course}\n**Date :** ${date}`,
+            };
+
+            // Envoyer les données au Webhook Discord
+            try {
+                const response = await fetch(webhookURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(message),
+                });
+
+                if (response.ok) {
+                    alert("Réservation réussie ! Un message a été envoyé sur Discord.");
+                    form.reset(); // Réinitialiser le formulaire
+                } else {
+                    alert("Une erreur est survenue lors de l'envoi au Webhook.");
+                }
+            } catch (error) {
+                alert("Une erreur s'est produite : " + error.message);
+            }
+        });
+    </script>
 </body>
 </html>
