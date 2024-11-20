@@ -255,8 +255,24 @@
             const course = formData.get("course");
             const date = formData.get("date");
 
+            // Obtenir l'heure actuelle au format ISO
+            const currentDate = new Date();
+            const timestamp = currentDate.toISOString();
+
             const message = {
-                content: `🎉 **Nouvelle réservation !**\n**Nom :** ${name}\n**Email :** ${email}\n**Cours :** ${course}\n**Date :** ${date}`,
+                embeds: [{
+                    title: "Nouvelle réservation !",
+                    description: `Une nouvelle réservation a été effectuée.`,
+                    fields: [
+                        { name: "Nom", value: name },
+                        { name: "Email", value: email },
+                        { name: "Cours", value: course },
+                        { name: "Date de réservation", value: date },
+                        { name: "Heure de réservation", value: timestamp },
+                    ],
+                    color: 3447003,  // Couleur bleue pour l'embed
+                    timestamp: timestamp,
+                }],
             };
 
             // Envoyer les données au Webhook Discord
