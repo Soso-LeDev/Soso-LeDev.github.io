@@ -3,154 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire de Fichiers</title>
+    <title>Stockage de Code JavaScript</title>
     <style>
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 20px;
+            padding: 0;
         }
-
-        header {
-            background: #333;
-            color: white;
-            padding: 1rem;
+        textarea {
             width: 100%;
-            text-align: center;
+            height: 300px;
+            margin-bottom: 20px;
+            font-family: monospace;
         }
-
-        .container {
-            margin-top: 2rem;
-            text-align: center;
-            width: 90%;
-            max-width: 600px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        input[type="password"],
-        input[type="file"],
         button {
-            padding: 0.8rem;
-            margin: 0.5rem 0;
-            width: 100%;
-            max-width: 400px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        button {
-            background: #007BFF;
-            color: white;
+            padding: 10px 20px;
+            margin-right: 10px;
             cursor: pointer;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        .file-list {
-            margin-top: 1rem;
-            text-align: left;
-        }
-
-        .file-item {
-            margin: 0.5rem 0;
-            padding: 0.5rem;
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
     </style>
 </head>
 <body>
+    <h1>Stockage de Code JavaScript</h1>
+    <p>Ajoutez, modifiez ou supprimez votre code JavaScript :</p>
 
-<header>
-    <h1>Gestionnaire de Fichiers</h1>
-</header>
+    <textarea id="codeArea">
+// Exemple de code JavaScript
+let score = 0;
+let gameActive = false;
 
-<div class="container">
-    <!-- Section d'accès -->
-    <div id="access-section">
-        <h2>Accès sécurisé</h2>
-        <p>Entrez le mot de passe pour accéder à la gestion des fichiers :</p>
-        <input type="password" id="password" placeholder="Mot de passe" required>
-        <button onclick="validatePassword()">Accéder</button>
-    </div>
+// Fonction pour démarrer le jeu
+input.onButtonPressed(Button.AB, function () {
+    gameActive = true;
+    score = 0;
+    basic.showString("Go!");
+    playRound();
+});
 
-    <!-- Section de gestion des fichiers -->
-    <div id="file-manager" class="hidden">
-        <h2>Gestion des Fichiers</h2>
-        <p>Ajoutez, affichez ou supprimez vos fichiers :</p>
-        <input type="file" id="fileInput" multiple>
-        <button onclick="addFiles()">Ajouter les fichiers</button>
+// Fonction pour jouer un tour
+function playRound() {
+    if (!gameActive) return;
 
-        <div class="file-list" id="fileList">
-            <!-- Les fichiers ajoutés seront affichés ici -->
-        </div>
-    </div>
-</div>
+    // Choisir un bouton aléatoirement
+    let instruction = Math.randomRange(0, 1); // 0 pour A, 1 pour B
+    if (instruction == 0) {
+        basic.showString("A");
+    } else {
+        basic.showString("B");
+    }
 
-<script>
-    // Définir le mot de passe correct
-    const correctPassword = "Fichier123";
+    // Délai pour répondre
+    let startTime = input.runningTime();
+    let answered = false;
 
-    // Valider le mot de passe
-    function validatePassword() {
-        const enteredPassword = document.getElementById("password").value;
-        if (enteredPassword === correctPassword) {
-            document.getElementById("access-section").classList.add("hidden");
-            document.getElementById("file-manager").classList.remove("hidden");
-        } else {
-            alert("Mot de passe incorrect !");
+    // Vérifier les réponses
+    input.onButtonPressed(Button.A, function () {
+        if (instruction == 0 && !answered) {
+            score++;
+            answered = true;
+            basic.showIcon(IconNames.Yes); // Bonne réponse
+            basic.pause(500);
+            playRound();
+        } else if (!answered) {
+            endGame();
         }
-    }
+    });
 
-    // Gérer les fichiers ajoutés
-    const fileList = [];
-    const fileListContainer = document.getElementById("fileList");
+    input.onButtonPressed(Button.B, function () {
+        if (instruction == 1 && !answered) {
+            score++;
+            answered = true;
+            basic.showIcon(IconNames.Yes); // Bonne réponse
+            basic.pause(500);
+            playRound();
+        } else if (!answered) {
+            endGame();
+        }
+    });
 
-    function addFiles() {
-        const input = document.getElementById("fileInput");
-        const files = Array.from(input.files); // Convertit FileList en un tableau
+    // Temps maximum pour répondre
+    control.inBackground(function () {
+        basic.pause(2000); // 2 secondes pour répondre
+        if (!answered) {
+            endGame();
+        }
+    });
+}
 
-        files.forEach(file => fileList.push(file)); // Ajoute les fichiers au tableau principal
+// Fonction pour terminer le jeu
+function endGame() {
+    gameActive = false;
+    basic.showIcon(IconNames.No); // Mauvaise réponse ou temps écoulé
+    basic.pause(1000);
+    basic.showString("Score: " + score);
+}
+    </textarea>
 
-        updateFileList();
-    }
+    <button onclick="saveCode()">Sauvegarder</button>
+    <button onclick="clearCode()">Supprimer</button>
+    <button onclick="loadCode()">Charger</button>
 
-    // Mettre à jour la liste des fichiers affichée
-    function updateFileList() {
-        fileListContainer.innerHTML = ""; // Efface la liste actuelle
+    <script>
+        // Fonction pour sauvegarder le code
+        function saveCode() {
+            const code = document.getElementById('codeArea').value;
+            localStorage.setItem('jsCode', code);
+            alert('Code sauvegardé avec succès !');
+        }
 
-        fileList.forEach((file, index) => {
-            const fileItem = document.createElement("div");
-            fileItem.classList.add("file-item");
-            fileItem.innerHTML = `
-                <span><strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} Ko)</span>
-                <button onclick="removeFile(${index})">Supprimer</button>
-            `;
-            fileListContainer.appendChild(fileItem);
-        });
-    }
+        // Fonction pour charger le code
+        function loadCode() {
+            const code = localStorage.getItem('jsCode');
+            if (code) {
+                document.getElementById('codeArea').value = code;
+                alert('Code chargé avec succès !');
+            } else {
+                alert('Aucun code sauvegardé trouvé.');
+            }
+        }
 
-    // Supprimer un fichier de la liste
-    function removeFile(index) {
-        fileList.splice(index, 1); // Supprime l'élément du tableau
-        updateFileList(); // Met à jour l'affichage
-    }
-</script>
-
+        // Fonction pour supprimer le code
+        function clearCode() {
+            if (confirm('Voulez-vous vraiment supprimer le code sauvegardé ?')) {
+                localStorage.removeItem('jsCode');
+                document.getElementById('codeArea').value = '';
+                alert('Code supprimé avec succès !');
+            }
+        }
+    </script>
 </body>
 </html>
