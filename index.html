@@ -3,205 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulateur Microbit - Stockage et Exécution du Code</title>
+    <title>Feuille blanche</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
         }
-        textarea {
-            width: 100%;
-            height: 300px;
-            margin-bottom: 20px;
-            font-family: monospace;
+
+        .feuille {
+            width: 80%;
+            height: 90%;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
-        button {
-            padding: 10px 20px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        #output {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            font-family: monospace;
-            white-space: pre-wrap;
-            background-color: #f9f9f9;
-            height: 200px;
-            overflow-y: scroll;
-        }
-        #microbitDisplay {
-            margin-top: 20px;
-            width: 160px;
-            height: 160px;
-            border: 1px solid #ccc;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(5, 1fr);
-        }
-        .pixel {
-            width: 30px;
-            height: 30px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-        }
-        .on {
-            background-color: #000;
+
+        .feuille:focus {
+            outline: 2px solid #007bff;
         }
     </style>
 </head>
 <body>
-    <h1>Simulateur Microbit - Code JavaScript</h1>
-    <p>Ajoutez, modifiez ou supprimez votre code JavaScript. Le résultat de l'exécution sera affiché ci-dessous.</p>
-
-    <textarea id="codeArea">
-// Exemple de code JavaScript pour le Microbit
-let score = 0;
-let gameActive = false;
-
-// Fonction pour démarrer le jeu
-input.onButtonPressed(Button.AB, function () {
-    gameActive = true;
-    score = 0;
-    basic.showString("Go!");
-    playRound();
-});
-
-// Fonction pour jouer un tour
-function playRound() {
-    if (!gameActive) return;
-
-    // Choisir un bouton aléatoirement
-    let instruction = Math.randomRange(0, 1); // 0 pour A, 1 pour B
-    if (instruction == 0) {
-        basic.showString("A");
-    } else {
-        basic.showString("B");
-    }
-
-    // Délai pour répondre
-    let startTime = input.runningTime();
-    let answered = false;
-
-    // Vérifier les réponses
-    input.onButtonPressed(Button.A, function () {
-        if (instruction == 0 && !answered) {
-            score++;
-            answered = true;
-            basic.showIcon(IconNames.Yes); // Bonne réponse
-            basic.pause(500);
-            playRound();
-        } else if (!answered) {
-            endGame();
-        }
-    });
-
-    input.onButtonPressed(Button.B, function () {
-        if (instruction == 1 && !answered) {
-            score++;
-            answered = true;
-            basic.showIcon(IconNames.Yes); // Bonne réponse
-            basic.pause(500);
-            playRound();
-        } else if (!answered) {
-            endGame();
-        }
-    });
-
-    // Temps maximum pour répondre
-    control.inBackground(function () {
-        basic.pause(2000); // 2 secondes pour répondre
-        if (!answered) {
-            endGame();
-        }
-    });
-}
-
-// Fonction pour terminer le jeu
-function endGame() {
-    gameActive = false;
-    basic.showIcon(IconNames.No); // Mauvaise réponse ou temps écoulé
-    basic.pause(1000);
-    basic.showString("Score: " + score);
-}
-    </textarea>
-
-    <button onclick="saveCode()">Sauvegarder</button>
-    <button onclick="clearCode()">Supprimer</button>
-    <button onclick="loadCode()">Charger</button>
-    <button onclick="runCode()">Exécuter</button>
-
-    <div id="output"></div>
-
-    <div id="microbitDisplay"></div>
-
-    <script>
-        // Simuler l'affichage Microbit avec une grille
-        const microbitDisplay = document.getElementById("microbitDisplay");
-
-        function resetDisplay() {
-            microbitDisplay.innerHTML = '';
-            for (let i = 0; i < 25; i++) {
-                const pixel = document.createElement("div");
-                pixel.classList.add("pixel");
-                microbitDisplay.appendChild(pixel);
-            }
-        }
-
-        function showIcon(icon) {
-            resetDisplay();
-            const pixels = microbitDisplay.querySelectorAll('.pixel');
-            icon.forEach(index => {
-                pixels[index].classList.add("on");
-            });
-        }
-
-        function showString(str) {
-            const output = document.getElementById("output");
-            output.textContent = "Affichage: " + str;
-        }
-
-        // Fonction pour sauvegarder le code
-        function saveCode() {
-            const code = document.getElementById('codeArea').value;
-            localStorage.setItem('jsCode', code);
-            alert('Code sauvegardé avec succès !');
-        }
-
-        // Fonction pour charger le code
-        function loadCode() {
-            const code = localStorage.getItem('jsCode');
-            if (code) {
-                document.getElementById('codeArea').value = code;
-                alert('Code chargé avec succès !');
-            } else {
-                alert('Aucun code sauvegardé trouvé.');
-            }
-        }
-
-        // Fonction pour supprimer le code
-        function clearCode() {
-            if (confirm('Voulez-vous vraiment supprimer le code sauvegardé ?')) {
-                localStorage.removeItem('jsCode');
-                document.getElementById('codeArea').value = '';
-                alert('Code supprimé avec succès !');
-            }
-        }
-
-        // Fonction pour exécuter le code
-        function runCode() {
-            const code = document.getElementById('codeArea').value;
-            const output = document.getElementById("output");
-            try {
-                eval(code); // Exécute le code dans l'éditeur
-            } catch (e) {
-                output.textContent = 'Erreur d\'exécution : ' + e.message;
-            }
-        }
-
-        // Initialise l'affichage et la zone de texte
-        resetDisplay();
-    </script>
+    <div class="feuille" contenteditable="true">
+        Cliquez ici pour écrire...
+    </div>
 </body>
 </html>
