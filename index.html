@@ -1,79 +1,196 @@
-const cors = require("cors");
-const express = require("express");
-const bodyParser = require("body-parser");
-const fs = require("fs");
-const Groq = require("groq-sdk");
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat IA</title>
+    <style>
+        /* Style général */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://surflog.com.br/wp-content/uploads/2021/01/background-whatsapp-7.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-const app = express();
+        /* Conteneur de la discussion */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+        }
 
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
 
-const LOG_FILE = "Logs.txt";
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
 
-function logConversation(message) {
-    const timestamp = new Date().toISOString();
-    const logEntry = `[${timestamp}] ${message}\n`;
-    fs.appendFileSync(LOG_FILE, logEntry);
-}
+        /* Message */
+        .message {
+            margin: 5px 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+            color: #000000;
+        }
 
-function readConversationHistory() {
-    try {
-        const data = fs.readFileSync(LOG_FILE, 'utf8');
-        return data.split("\n").filter(line => line.trim() !== '');
-    } catch (error) {
-        console.error("Erreur de lecture du fichier de logs :", error);
-        return [];
-    }
-}
+        .message.user {
+            background-color: rgba(112, 245, 112, 0.7); /* Vert WhatsApp */
+            align-self: flex-end;
+        }
 
-app.post('/ask', async (req, res) => {
-    const question = req.body.question;
+        .message.ia {
+            background-color: rgba(255, 255, 255, 0.7); /* Bleu foncé */
+            align-self: flex-start;
+        }
 
-    const groq = new Groq({
-        apiKey: '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'
-    });
+        /* Zone de saisie */
+        .input-container {
+            display: flex;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-    try {
-        logConversation(`Utilisateur : ${question}`);
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
 
-        // Récupération de l'historique des conversations
-        const conversationHistory = readConversationHistory();
+        button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: rgba(0, 128, 0, 0.7);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
 
-        // Ajout de l'historique de la conversation précédente à la nouvelle requête
-        const messages = conversationHistory.map(line => {
-            const [timestamp, message] = line.split('] ');
-            if (message.startsWith('Utilisateur :')) {
-                return { role: 'user', content: message.replace('Utilisateur : ', '') };
-            } else if (message.startsWith('IA :')) {
-                return { role: 'assistant', content: message.replace('IA : ', '') };
+        button:hover {
+            background-color: rgba(0, 128, 0, 0.9);
+        }
+
+        /* Indicateur de saisie */
+        .typing-indicator {
+            margin: 5px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chat-container">
+        <!-- Les messages et l'indicateur de saisie apparaîtront ici -->
+    </div>
+    <div class="input-container">
+        <input type="text" id="question" placeholder="Écrivez votre message..." />
+        <button id="send-btn">Envoyer</button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const questionInput = document.getElementById('question');
+        const sendButton = document.getElementById('send-btn');
+        const botName = "NomDuBot"; // Changez le nom du bot ici
+
+        // Fonction pour ajouter un message à la discussion
+        function addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = content;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll automatique vers le bas
+        }
+
+        // Fonction pour afficher l'indicateur de saisie
+        function showTypingIndicator() {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('typing-indicator');
+            typingIndicator.id = 'typing-indicator';
+            typingIndicator.textContent = `${botName} est en train d'écrire...`;
+            chatContainer.appendChild(typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Fonction pour masquer l'indicateur de saisie
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                chatContainer.removeChild(typingIndicator);
             }
-        }).filter(Boolean); // Retirer les lignes non formatées
+        }
 
-        messages.push({
-            role: "user",
-            content: question,
+        // Événement bouton "Envoyer"
+        sendButton.addEventListener('click', async () => {
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // Ajout du message utilisateur
+            addMessage(question, 'user');
+            questionInput.value = '';
+
+            // Affichage de l'indicateur de saisie
+            showTypingIndicator();
+
+            // Simulation d'une latence de 0,5 seconde avant d'afficher la réponse
+            setTimeout(async () => {
+                try {
+                    // Envoi de la requête au serveur
+                    const response = await fetch('http://localhost:6259/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ question }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erreur serveur.');
+                    }
+
+                    // Suppression de l'indicateur de saisie
+                    hideTypingIndicator();
+
+                    // Ajout de la réponse de l'IA
+                    const data = await response.text();
+                    addMessage(data, 'ia');
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    hideTypingIndicator();
+                    addMessage("Une erreur est survenue. Veuillez réessayer.", 'ia');
+                }
+            }, 500); // Latence de 0,5 seconde
         });
 
-        const response = await groq.chat.completions.create({
-            messages: [
-                { role: "system", content: `Tu dois répondre en français.` },
-                ...messages
-            ],
-            model: "llama3-70b-8192"
+        // Permet d'envoyer le message avec la touche Entrée
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
         });
-
-        const responseToSend = response.choices[0].message.content.replaceAll(", ", ",");
-        logConversation(`IA : ${responseToSend}`);
-        res.send(responseToSend);
-
-    } catch (error) {
-        logConversation("Erreur : Une erreur est survenue lors du traitement.");
-        res.status(500).send("Erreur de traitement de la demande");
-    }
-});
-
-app.listen(6259, () => {
-    console.log("Le serveur est en cours d'exécution sur le port 6259");
-});
+    </script>
+</body>
+</html>
