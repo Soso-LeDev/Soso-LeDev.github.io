@@ -3,25 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Télécharger Mon App</title>
+    <title>Mon App Android</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            font-size: 3em;
+            animation: fadeIn 2s ease-in-out;
+        }
+        p {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
         .download-btn {
             display: inline-block;
-            padding: 15px 25px;
+            padding: 15px 30px;
             font-size: 20px;
             color: #fff;
-            background-color: #28a745;
+            background: linear-gradient(90deg, #ff8c00, #ff2e63);
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 50px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+            animation: pulse 1.5s infinite;
+        }
+        .download-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 46, 99, 0.8);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(255, 46, 99, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(255, 46, 99, 0.6); }
+            100% { box-shadow: 0 0 10px rgba(255, 46, 99, 0.4); }
         }
     </style>
 </head>
 <body>
-    <h1>Bienvenue sur Mon App !</h1>
-    <p>Cliquez ci-dessous pour télécharger notre application :</p>
+    <h1>🚀 Mon App Android</h1>
+    <p>Une application révolutionnaire qui change la donne ! Téléchargez-la maintenant.</p>
     <a href="https://github.com/ton-utilisateur/mon-app-android/releases/download/v1.0/app-release.apk" 
        class="download-btn">📥 Télécharger l'APK</a>
-    <p>(Si l'installation est bloquée, autorisez les "Sources inconnues" dans les paramètres Android)</p>
+    <p style="margin-top: 20px; font-size: 0.9em;">(Si l'installation est bloquée, autorisez les "Sources inconnues" dans les paramètres Android)</p>
 </body>
 </html>
