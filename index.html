@@ -1,86 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+    <title>Télécharger Mon App</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        .login-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .download-btn {
+            display: inline-block;
+            padding: 15px 25px;
+            font-size: 20px;
+            color: #fff;
+            background-color: #28a745;
+            text-decoration: none;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Connexion</h2>
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="Nom d'utilisateur" required>
-            <input type="password" id="password" placeholder="Mot de passe" required>
-            <button type="submit">Se connecter</button>
-            <p id="errorMessage" class="error" style="display:none;">Nom d'utilisateur ou mot de passe incorrect.</p>
-        </form>
-    </div>
-
-    <script>
-        const correctUsername = "admin"; // Nom d'utilisateur correct
-        const correctPassword = "12345"; // Mot de passe correct (simple pour le test)
-
-        const loginForm = document.getElementById("loginForm");
-        const errorMessage = document.getElementById("errorMessage");
-
-        loginForm.addEventListener("submit", function (e) {
-            e.preventDefault(); // Empêche le rechargement de la page
-
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-
-            if (username === correctUsername && password === correctPassword) {
-                alert("Connexion réussie !");
-                errorMessage.style.display = "none";
-            } else {
-                errorMessage.style.display = "block";
-            }
-        });
-    </script>
+    <h1>Bienvenue sur Mon App !</h1>
+    <p>Cliquez ci-dessous pour télécharger notre application :</p>
+    <a href="https://github.com/ton-utilisateur/mon-app-android/releases/download/v1.0/app-release.apk" 
+       class="download-btn">📥 Télécharger l'APK</a>
+    <p>(Si l'installation est bloquée, autorisez les "Sources inconnues" dans les paramètres Android)</p>
 </body>
 </html>
