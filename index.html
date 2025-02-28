@@ -3,54 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon App Android</title>
+    <title>Code Secret</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background-color: #121212;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
+        @keyframes bloom {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
-        h1 {
-            font-size: 3em;
-            animation: fadeIn 2s ease-in-out;
-        }
-        p {
-            font-size: 1.2em;
-            opacity: 0.8;
-        }
-        .download-btn {
-            display: inline-block;
-            padding: 15px 30px;
-            font-size: 20px;
-            color: #fff;
-            background: linear-gradient(90deg, #ff8c00, #ff2e63);
-            text-decoration: none;
-            border-radius: 50px;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
-            animation: pulse 1.5s infinite;
-        }
-        .download-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255, 46, 99, 0.8);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 10px rgba(255, 46, 99, 0.4); }
-            50% { box-shadow: 0 0 20px rgba(255, 46, 99, 0.6); }
-            100% { box-shadow: 0 0 10px rgba(255, 46, 99, 0.4); }
+        .flower {
+            animation: bloom 1s ease-out forwards;
         }
     </style>
 </head>
-<body>
-    <h1>🚀 Mon App Android</h1>
-    <p>Une application révolutionnaire qui change la donne ! Téléchargez-la maintenant.</p>
-    <a href="https://github.com/ton-utilisateur/mon-app-android/releases/download/v1.0/app-release.apk" 
-       class="download-btn">📥 Télécharger l'APK</a>
-    <p style="margin-top: 20px; font-size: 0.9em;">(Si l'installation est bloquée, autorisez les "Sources inconnues" dans les paramètres Android)</p>
+<body class="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+        <h1 class="text-2xl font-bold mb-4">Entrez le code secret</h1>
+        <input id="codeInput" type="text" placeholder="Code..." 
+               class="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button onclick="checkCode()" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            Valider
+        </button>
+        <p id="message" class="mt-4 text-red-500 hidden">Code incorrect !</p>
+    </div>
+    <div id="flowerContainer" class="hidden mt-6 flex flex-wrap gap-4 justify-center">
+        <span class="flower text-6xl">🌸</span>
+        <span class="flower text-6xl">💐</span>
+        <span class="flower text-6xl">🌺</span>
+        <span class="flower text-6xl">🌷</span>
+    </div>
+    <script>
+        function checkCode() {
+            const code = document.getElementById("codeInput").value;
+            const message = document.getElementById("message");
+            const flowerContainer = document.getElementById("flowerContainer");
+            
+            if (code.toLowerCase() === "armure de chevalier") {
+                message.classList.add("hidden");
+                flowerContainer.classList.remove("hidden");
+            } else {
+                message.classList.remove("hidden");
+                flowerContainer.classList.add("hidden");
+            }
+        }
+    </script>
 </body>
 </html>
