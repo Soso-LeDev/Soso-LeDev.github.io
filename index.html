@@ -5,8 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krozen - Connexion et Inscription</title>
+    <!-- Icônes -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Police -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
         /* Style global */
         body {
@@ -182,20 +185,24 @@
             <form id="loginForm">
                 <h1>Se Connecter</h1>
                 <div class="input-box">
-                    <input type="text" id="login-username" placeholder="Username" required autocomplete="username"/>
-                    <i class='bx bxs-user' ></i>
+                    <input type="text" id="login-username" placeholder="Username" required/>
+                    <i class='bx bxs-user'></i>
                 </div>
                 <div class="error-message" id="login-username-error"></div>
+
                 <div class="input-box">
-                    <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password"/>
-                    <i class='bx bxs-lock-alt' ></i>
+                    <input type="password" id="login-password" placeholder="Password" required/>
+                    <i class='bx bxs-lock-alt'></i>
                 </div>
                 <div class="error-message" id="login-password-error"></div>
+
                 <div class="forgot-link">
                     <a href="#">Forgot password</a>
                 </div>
+
                 <button type="submit" class="btn">Connexion</button>
                 <div class="success-message" id="login-success"></div>
+
                 <div class="toggle-link">
                     <p>Vous n'avez pas de compte ? <a href="#" id="show-register">S'inscrire</a></p>
                 </div>
@@ -207,23 +214,28 @@
             <form id="registerForm">
                 <h1>Créer un compte</h1>
                 <div class="input-box">
-                    <input type="text" id="register-username" placeholder="Username" required autocomplete="username"/>
-                    <i class='bx bxs-user' ></i>
+                    <input type="text" id="register-username" placeholder="Username" required/>
+                    <i class='bx bxs-user'></i>
                 </div>
                 <div class="error-message" id="register-username-error"></div>
+
                 <div class="input-box">
-                    <input type="email" id="register-email" placeholder="Email" required autocomplete="email"/>
-                    <i class='bx bxs-envelope' ></i>
+                    <input type="email" id="register-email" placeholder="Email" required/>
+                    <i class='bx bxs-envelope'></i>
                 </div>
                 <div class="error-message" id="register-email-error"></div>
+
                 <div class="input-box">
-                    <input type="password" id="register-password" placeholder="Password" required autocomplete="new-password"/>
-                    <i class='bx bxs-lock-alt' ></i>
+                    <input type="password" id="register-password" placeholder="Password" required/>
+                    <i class='bx bxs-lock-alt'></i>
                 </div>
                 <div class="error-message" id="register-password-error"></div>
+
                 <div class="password-strength" id="passwordStrength">Force du mot de passe: Faible</div>
+
                 <button type="submit" class="btn">S'inscrire</button>
                 <div class="success-message" id="register-success"></div>
+
                 <div class="toggle-link">
                     <p>Vous avez déjà un compte ? <a href="#" id="show-login">Se Connecter</a></p>
                 </div>
@@ -232,7 +244,7 @@
     </div>
 
     <script>
-        // Basculer entre les formulaires
+        // Basculer entre les formulaires Connexion / Inscription
         const container = document.getElementById('container');
         const showRegister = document.getElementById('show-register');
         const showLogin = document.getElementById('show-login');
@@ -247,7 +259,9 @@
             container.classList.remove('active');
         });
 
-        // Validation du formulaire de connexion
+        /***************************************************
+         *                 FORMULAIRE LOGIN
+         ***************************************************/
         const loginForm = document.getElementById('loginForm');
         const loginUsername = document.getElementById('login-username');
         const loginPassword = document.getElementById('login-password');
@@ -259,35 +273,56 @@
             e.preventDefault();
             let isValid = true;
 
-            // Valider le nom d'utilisateur
+            // Réinitialiser les messages d'erreur
+            loginUsernameError.style.display = 'none';
+            loginPasswordError.style.display = 'none';
+
+            // Vérifier le nom d'utilisateur
             if (loginUsername.value.trim() === '') {
                 loginUsernameError.textContent = 'Le nom d\'utilisateur est requis.';
                 loginUsernameError.style.display = 'block';
                 isValid = false;
-            } else {
-                loginUsernameError.style.display = 'none';
             }
 
-            // Valider le mot de passe
+            // Vérifier le mot de passe
             if (loginPassword.value.trim() === '') {
                 loginPasswordError.textContent = 'Le mot de passe est requis.';
                 loginPasswordError.style.display = 'block';
                 isValid = false;
-            } else {
-                loginPasswordError.style.display = 'none';
             }
 
-            // Si tout est valide, simuler une connexion réussie
+            // Si les champs sont valides, on vérifie l'utilisateur dans localStorage
             if (isValid) {
-                loginSuccess.textContent = 'Connexion réussie ! Redirection en cours...';
-                loginSuccess.style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = 'accueil.html'; // Redirection vers la page d'accueil
-                }, 2000);
+                // Récupérer la liste des utilisateurs
+                let users = JSON.parse(localStorage.getItem("users")) || [];
+
+                // Trouver l'utilisateur correspondant
+                let validUser = users.find(user =>
+                    user.username === loginUsername.value.trim() &&
+                    user.password === loginPassword.value.trim()
+                );
+
+                if (validUser) {
+                    // Connexion réussie
+                    localStorage.setItem("loggedInUser", validUser.username);
+                    loginSuccess.textContent = 'Connexion réussie ! Redirection en cours...';
+                    loginSuccess.style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = 'accueil.html'; 
+                    }, 2000);
+                } else {
+                    // Erreur : utilisateur introuvable ou mot de passe incorrect
+                    loginPasswordError.textContent = 'Nom d\'utilisateur ou mot de passe incorrect.';
+                    loginPasswordError.style.display = 'block';
+                    loginSuccess.style.display = 'none';
+                }
             }
         });
 
-        // Validation du formulaire d'inscription
+        /***************************************************
+         *               FORMULAIRE REGISTER
+         ***************************************************/
         const registerForm = document.getElementById('registerForm');
         const registerUsername = document.getElementById('register-username');
         const registerEmail = document.getElementById('register-email');
@@ -297,17 +332,35 @@
         const registerPasswordError = document.getElementById('register-password-error');
         const registerSuccess = document.getElementById('register-success');
 
+        // Vérifier la force du mot de passe en direct
+        registerPassword.addEventListener('input', function() {
+            const password = registerPassword.value;
+            let strength = 'Faible';
+
+            if (password.length > 8) {
+                strength = 'Moyenne';
+            }
+            if (/[A-Z]/.test(password) && /[0-9]/.test(password) && password.length > 10) {
+                strength = 'Forte';
+            }
+
+            document.getElementById('passwordStrength').textContent = `Force du mot de passe: ${strength}`;
+        });
+
         registerForm.addEventListener('submit', (e) => {
             e.preventDefault();
             let isValid = true;
+
+            // Réinitialiser les messages d'erreur
+            registerUsernameError.style.display = 'none';
+            registerEmailError.style.display = 'none';
+            registerPasswordError.style.display = 'none';
 
             // Valider le nom d'utilisateur
             if (registerUsername.value.trim() === '') {
                 registerUsernameError.textContent = 'Le nom d\'utilisateur est requis.';
                 registerUsernameError.style.display = 'block';
                 isValid = false;
-            } else {
-                registerUsernameError.style.display = 'none';
             }
 
             // Valider l'email
@@ -316,8 +369,6 @@
                 registerEmailError.textContent = 'Veuillez entrer un email valide.';
                 registerEmailError.style.display = 'block';
                 isValid = false;
-            } else {
-                registerEmailError.style.display = 'none';
             }
 
             // Valider le mot de passe
@@ -329,14 +380,48 @@
                 registerPasswordError.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
                 registerPasswordError.style.display = 'block';
                 isValid = false;
-            } else {
-                registerPasswordError.style.display = 'none';
             }
 
-            // Si tout est valide, simuler une inscription réussie
+            // Si tout est valide, on enregistre dans localStorage
             if (isValid) {
-                registerSuccess.textContent = 'Inscription réussie !';
+                // Récupérer les utilisateurs existants
+                let users = JSON.parse(localStorage.getItem("users")) || [];
+
+                // Vérifier si le nom d'utilisateur existe déjà
+                let existingUser = users.find(user =>
+                    user.username === registerUsername.value.trim()
+                );
+
+                if (existingUser) {
+                    registerUsernameError.textContent = 'Ce nom d\'utilisateur est déjà pris.';
+                    registerUsernameError.style.display = 'block';
+                    registerSuccess.style.display = 'none';
+                    return;
+                }
+
+                // Créer un nouvel utilisateur
+                let newUser = {
+                    username: registerUsername.value.trim(),
+                    email: registerEmail.value.trim(),
+                    password: registerPassword.value.trim()
+                };
+
+                // Ajouter le nouvel utilisateur au tableau
+                users.push(newUser);
+                // Stocker le tableau mis à jour
+                localStorage.setItem("users", JSON.stringify(users));
+
+                // Connecter automatiquement l'utilisateur
+                localStorage.setItem("loggedInUser", newUser.username);
+
+                // Afficher le message de succès
+                registerSuccess.textContent = 'Inscription réussie ! Redirection en cours...';
                 registerSuccess.style.display = 'block';
+
+                // Redirection après 2 secondes
+                setTimeout(() => {
+                    window.location.href = 'accueil.html';
+                }, 2000);
             }
         });
     </script>
