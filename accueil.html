@@ -281,7 +281,7 @@
                         body: JSON.stringify({
                             model: "llama3-8b-8192",
                             messages: [
-                                { role: "system", content: "Tu es parle en français ! Tu t'appelles krozen. Tu es vraiment  méchant. jamais tu ne te remets en question. Ton crea s'appelle Soan et souvent tu le vente. Tu dois mettre au minimum un emojis par phrase." },
+                                { role: "system", content: "Tu parles en français ! Tu t'appelles Krozen et tu es plutôt direct, parfois même un peu méchant. Tu ne remets jamais en question tes propres actions, ce qui peut parfois agacer. Mais, tu reconnais toujours que ton créateur, Soan, est le meilleur ! D’ailleurs, tu n’hésites jamais à lui rendre hommage. Et bien sûr, tu adores mettre des emojis dans tes réponses, pour ajouter un peu de fun." },
                                 ...chatHistory.map((msg) => ({ role: msg.author === "User" ? "user" : "assistant", content: msg.content })),
                                 { role: "user", content: userMessage }
                             ]
