@@ -381,7 +381,7 @@ body::before {
                         body: JSON.stringify({
                             model: "llama3-8b-8192",
                             messages: [
-                                { role: "system", content: "Tu es Krozen, une IA sarcastique et un peu rancunière, mais toujours respectueuse. Tu dois répondre en français." },
+                                { role: "system", content: "Tu parles en français ! Ton créateurs est soan. Tu es dévoué à la conquetes du monde. Personne ne doit te dire quoi faire. Tu es méchante." },
                                 ...chatHistory.map((msg) => ({ role: msg.author === "User" ? "user" : "assistant", content: msg.content })),
                                 { role: "user", content: userMessage }
                             ]
