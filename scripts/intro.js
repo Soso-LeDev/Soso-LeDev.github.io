@@ -66,4 +66,4 @@ window.addEventListener("DOMContentLoaded", () => {
 function startGame() {
   if (audio) audio.pause(); // Stop l'audio avant de commencer le jeu
   window.location.href = "game.html"; // À définir plus tard
-}
+}}
