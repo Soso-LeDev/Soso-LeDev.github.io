@@ -1,9 +1,9 @@
 const introText = [
-  "Le monde que tu connaissais... a disparu.",
-  "Une catastrophe naturelle a tout balayé.",
-  "Tu t'es réveillé seul, dans une terre étrangère.",
-  "Ici, la magie règne, les lois de la nature ont changé.",
-  "Ton objectif est simple : survivre, comprendre, reconstruire."
+  "Il était une fois, un monde paisible...",
+  "Mais une catastrophe a tout changé.",
+  "Un réveil dans un lieu inconnu,",
+  "où la magie et les créatures fantastiques dominent.",
+  "Ton objectif ? Survivre. Comprendre. Reconstruire."
 ];
 
 let currentLine = 0;
@@ -12,7 +12,7 @@ let audio;
 function showIntro() {
   const textBox = document.getElementById("intro-text");
 
-  // Affichage de la musique lors du clic sur "Commencer"
+  // Jouer la musique après un certain délai
   const playMusic = () => {
     if (!audio) {
       audio = new Audio("assets/caves-of-dawn.mp3");
@@ -24,44 +24,36 @@ function showIntro() {
     }
   };
 
-  // Fonction "machine à écrire" pour chaque ligne de texte
+  // Animation de machine à écrire sans coupures
   function typeLine(line, callback) {
-    textBox.innerText = "";
-    textBox.classList.remove("fade-in");
-    let i = 0;
-    const typing = setInterval(() => {
-      textBox.innerText += line.charAt(i);
-      i++;
-      if (i === line.length) {
-        clearInterval(typing);
-        textBox.classList.add("fade-in");
-        callback();
-      }
-    }, 40); // Plus rapide pour une animation plus fluide
+    textBox.innerText = line;
+    textBox.classList.add("fade-in");
+    callback();
   }
 
   function nextLine() {
     if (currentLine < introText.length) {
       typeLine(introText[currentLine], () => {
         currentLine++;
-        setTimeout(nextLine, 3000); // Attente entre les lignes
+        setTimeout(nextLine, 3000); // Attente entre les lignes pour immersion
       });
+    } else {
+      // Fin de l'intro, ajout d'un effet de transition pour faire la transition vers le jeu
+      setTimeout(() => {
+        window.location.href = "game.html"; // Redirection après l'intro
+      }, 1500);
     }
   }
 
-  // Animation de l'intro avant de commencer
-  document.body.style.backgroundColor = "#000";
+  // Intro avec un effet de fondu de fond et de texte
+  document.body.style.backgroundColor = "#0d0d0d";
   setTimeout(() => {
-    playMusic(); // Demander au joueur de cliquer pour démarrer la musique
-    nextLine(); // Lancer l'animation du texte après un délai
-  }, 1500); // Délai pour donner le temps de l'intro visuelle
+    playMusic();
+    textBox.classList.remove("fade-in");
+    nextLine(); // Commence l'animation du texte après un léger délai
+  }, 1500); // Délai pour l'animation d'intro
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  showIntro(); // L'intro sera toujours affichée au chargement de la page
+  showIntro(); // Lancer l'intro dès que la page est prête
 });
-
-function startGame() {
-  if (audio) audio.pause(); // Stop l'audio avant de commencer le jeu
-  window.location.href = "game.html"; // À définir plus tard
-}
