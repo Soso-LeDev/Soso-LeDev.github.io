@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      background: black;
+      background: linear-gradient(160deg, #000000 0%, #1a1a1a 100%);
       color: white;
       font-family: "Georgia", serif;
       display: flex;
@@ -14,18 +14,31 @@
       align-items: center;
       height: 100vh;
       overflow: hidden;
+      animation: bgFade 6s ease-in-out forwards;
+    }
+
+    @keyframes bgFade {
+      0% { background-color: black; }
+      100% { background-color: #1a1a1a; }
     }
 
     #intro-container {
       text-align: center;
       max-width: 80%;
+      animation: zoomIn 30s ease-in-out infinite alternate;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(1); }
+      to { transform: scale(1.02); }
     }
 
     #intro-text {
       font-size: 1.8rem;
-      opacity: 0;
-      transition: opacity 2s ease;
       min-height: 100px;
+      opacity: 0;
+      transition: opacity 1s ease;
+      white-space: pre-wrap;
     }
 
     .fade-in {
@@ -42,6 +55,15 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.5s ease, transform 1.5s ease;
+    }
+
+    #start-btn.show {
+      display: inline-block;
+      opacity: 1;
+      transform: translateY(0);
     }
 
     #start-btn:hover {
