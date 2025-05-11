@@ -1,469 +1,60 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krozen - Connexion et Inscription</title>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
-    <style>
-        /* Style global */
-        body {
-            font-family: 'Poppins', sans-serif; /* Police moderne */
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2); /* Dégradé violet */
-            color: #333;
-            overflow: hidden;
-        }
-    
-        /* Effet de particules en arrière-plan */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.2)" /><circle cx="50" cy="80" r="3" fill="rgba(255,255,255,0.2)" /><circle cx="120" cy="30" r="2" fill="rgba(255,255,255,0.2)" /><circle cx="150" cy="150" r="3" fill="rgba(255,255,255,0.2)" /><circle cx="80" cy="120" r="2" fill="rgba(255,255,255,0.2)" /><circle cx="20" cy="160" r="3" fill="rgba(255,255,255,0.2)" /><circle cx="180" cy="70" r="2" fill="rgba(255,255,255,0.2)" /><circle cx="100" cy="40" r="3" fill="rgba(255,255,255,0.2)" /></svg>');
-            animation: moveParticles 20s linear infinite;
-            z-index: -1;
-        }
-    
-        @keyframes moveParticles {
-            from { transform: translateY(0); }
-            to { transform: translateY(-200px); }
-        }
-    
-        /* Logo "Krozen" */
-        .logo {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 55px;
-            font-weight: 700;
-            color: #fff; /* Blanc */
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            animation: float 3s ease-in-out infinite;
-        }
-    
-        @keyframes float {
-            0%, 100% { transform: translate(-50%, 0); }
-            50% { transform: translate(-50%, -10px); }
-        }
-    
-        .container {
-            width: 400px;
-            background: rgba(255, 255, 255, 0.9); /* Fond blanc semi-transparent */
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            position: relative;
-            animation: fadeIn 0.5s ease;
-            margin-top: 80px;
-            backdrop-filter: blur(10px); /* Effet de flou */
-        }
-    
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    
-        .form-box {
-            padding: 40px;
-            transition: transform 0.5s ease;
-        }
-    
-        .form-box h1 {
-            font-size: 28px;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #444;
-        }
-    
-        .input-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-    
-        .input-box input {
-            width: calc(100% - 50px); /* Réduire la largeur pour laisser de la place à l'icône */
-            padding: 12px 40px 12px 12px; /* Ajuster le padding */
-            font-size: 14px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            outline: none;
-            background: #f9fafb;
-            color: #333;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-    
-        .input-box input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
-        }
-    
-        .input-box i {
-            position: absolute;
-            right: 15px; /* Ajuster la position de l'icône */
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            transition: color 0.3s ease;
-        }
-    
-        .input-box input:focus + i {
-            color: #667eea; /* Changement de couleur de l'icône au focus */
-        }
-    
-        .error-message {
-            color: #ff3860;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-    
-        .success-message {
-            color: #10b981;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 10px;
-            display: none;
-        }
-    
-        .forgot-link {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-    
-        .forgot-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-    
-        .forgot-link a:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-    
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-    
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-    
-        .btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
-        }
-    
-        .toggle-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-    
-        .toggle-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-    
-        .toggle-link a:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-    
-        .password-strength {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-    
-        /* Animation pour basculer entre les formulaires */
-        #register-form {
-            display: none;
-        }
-    
-        .container.active #login-form {
-            display: none;
-        }
-    
-        .container.active #register-form {
-            display: block;
-        }
-    
-        /* Responsive Design */
-        @media (max-width: 480px) {
-            .container {
-                width: 90%;
-                margin-top: 50px;
-            }
-    
-            .form-box {
-                padding: 20px;
-            }
-    
-            .form-box h1 {
-                font-size: 24px;
-            }
-    
-            .logo {
-                font-size: 40px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Nouvel Univers</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: "Georgia", serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #intro-container {
+      text-align: center;
+      max-width: 80%;
+    }
+
+    #intro-text {
+      font-size: 1.8rem;
+      opacity: 0;
+      transition: opacity 2s ease;
+      min-height: 100px;
+    }
+
+    .fade-in {
+      opacity: 1 !important;
+    }
+
+    #start-btn {
+      display: none;
+      margin-top: 40px;
+      padding: 10px 20px;
+      background: white;
+      color: black;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #start-btn:hover {
+      background: #cccccc;
+    }
+  </style>
 </head>
 <body>
-    <div class="logo">Krozen</div>
-    <div class="container" id="container">
-        <!-- Formulaire de Connexion -->
-        <div class="form-box" id="login-form">
-            <form id="loginForm">
-                <h1>Se Connecter</h1>
-                <div class="input-box">
-                    <input type="text" id="login-username" placeholder="Username" required/>
-                    <i class='bx bxs-user'></i>
-                </div>
-                <div class="error-message" id="login-username-error"></div>
+  <div id="intro-container">
+    <div id="intro-text"></div>
+    <button id="start-btn" onclick="startGame()">Commencer</button>
+  </div>
 
-                <div class="input-box">
-                    <input type="password" id="login-password" placeholder="Password" required/>
-                    <i class='bx bxs-lock-alt'></i>
-                </div>
-                <div class="error-message" id="login-password-error"></div>
-
-                <div class="forgot-link">
-                    <a href="#">Forgot password</a>
-                </div>
-
-                <button type="submit" class="btn">Connexion</button>
-                <div class="success-message" id="login-success"></div>
-
-                <div class="toggle-link">
-                    <p>Vous n'avez pas de compte ? <a href="#" id="show-register">S'inscrire</a></p>
-                </div>
-            </form>
-        </div>
-
-        <!-- Formulaire d'Inscription -->
-        <div class="form-box" id="register-form">
-            <form id="registerForm">
-                <h1>Créer un compte</h1>
-                <div class="input-box">
-                    <input type="text" id="register-username" placeholder="Username" required/>
-                    <i class='bx bxs-user'></i>
-                </div>
-                <div class="error-message" id="register-username-error"></div>
-
-                <div class="input-box">
-                    <input type="email" id="register-email" placeholder="Email" required/>
-                    <i class='bx bxs-envelope'></i>
-                </div>
-                <div class="error-message" id="register-email-error"></div>
-
-                <div class="input-box">
-                    <input type="password" id="register-password" placeholder="Password" required/>
-                    <i class='bx bxs-lock-alt'></i>
-                </div>
-                <div class="error-message" id="register-password-error"></div>
-
-                <div class="password-strength" id="passwordStrength">Force du mot de passe: Faible</div>
-
-                <button type="submit" class="btn">S'inscrire</button>
-                <div class="success-message" id="register-success"></div>
-
-                <div class="toggle-link">
-                    <p>Vous avez déjà un compte ? <a href="#" id="show-login">Se Connecter</a></p>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Vérifier si l'utilisateur est déjà connecté
-        if (localStorage.getItem("loggedInUser")) {
-            window.location.href = "accueil.html";
-        }
-
-        // Basculer entre les formulaires
-        const container = document.getElementById('container');
-        const showRegister = document.getElementById('show-register');
-        const showLogin = document.getElementById('show-login');
-
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            container.classList.add('active');
-        });
-
-        showLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            container.classList.remove('active');
-        });
-
-        /***************************************************
-         *                 FORMULAIRE LOGIN
-         ***************************************************/
-        const loginForm = document.getElementById('loginForm');
-        const loginUsername = document.getElementById('login-username');
-        const loginPassword = document.getElementById('login-password');
-        const loginUsernameError = document.getElementById('login-username-error');
-        const loginPasswordError = document.getElementById('login-password-error');
-        const loginSuccess = document.getElementById('login-success');
-
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let isValid = true;
-
-            // Réinitialiser les messages d'erreur
-            loginUsernameError.style.display = 'none';
-            loginPasswordError.style.display = 'none';
-
-            // Vérifier le nom d'utilisateur
-            if (loginUsername.value.trim() === '') {
-                loginUsernameError.textContent = 'Le nom d\'utilisateur est requis.';
-                loginUsernameError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Vérifier le mot de passe
-            if (loginPassword.value.trim() === '') {
-                loginPasswordError.textContent = 'Le mot de passe est requis.';
-                loginPasswordError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Si les champs sont valides, vérifier l'utilisateur
-            if (isValid) {
-                const users = JSON.parse(localStorage.getItem("users")) || [];
-                const hashedPassword = sha256(loginPassword.value.trim());
-                const validUser = users.find(user =>
-                    user.username === loginUsername.value.trim() &&
-                    user.password === hashedPassword
-                );
-
-                if (validUser) {
-                    // Connexion réussie
-                    localStorage.setItem("loggedInUser", validUser.username);
-                    loginSuccess.textContent = 'Connexion réussie ! Redirection en cours...';
-                    loginSuccess.style.display = 'block';
-
-                    setTimeout(() => {
-                        window.location.href = 'accueil.html';
-                    }, 2000);
-                } else {
-                    // Erreur : utilisateur introuvable ou mot de passe incorrect
-                    loginPasswordError.textContent = 'Nom d\'utilisateur ou mot de passe incorrect.';
-                    loginPasswordError.style.display = 'block';
-                    loginSuccess.style.display = 'none';
-                }
-            }
-        });
-
-        /***************************************************
-         *               FORMULAIRE REGISTER
-         ***************************************************/
-        const registerForm = document.getElementById('registerForm');
-        const registerUsername = document.getElementById('register-username');
-        const registerEmail = document.getElementById('register-email');
-        const registerPassword = document.getElementById('register-password');
-        const registerUsernameError = document.getElementById('register-username-error');
-        const registerEmailError = document.getElementById('register-email-error');
-        const registerPasswordError = document.getElementById('register-password-error');
-        const registerSuccess = document.getElementById('register-success');
-
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let isValid = true;
-
-            // Réinitialiser les messages d'erreur
-            registerUsernameError.style.display = 'none';
-            registerEmailError.style.display = 'none';
-            registerPasswordError.style.display = 'none';
-
-            // Valider le nom d'utilisateur
-            if (registerUsername.value.trim() === '') {
-                registerUsernameError.textContent = 'Le nom d\'utilisateur est requis.';
-                registerUsernameError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Valider l'email
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(registerEmail.value.trim())) {
-                registerEmailError.textContent = 'Veuillez entrer un email valide.';
-                registerEmailError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Valider le mot de passe
-            if (registerPassword.value.trim() === '') {
-                registerPasswordError.textContent = 'Le mot de passe est requis.';
-                registerPasswordError.style.display = 'block';
-                isValid = false;
-            } else if (registerPassword.value.trim().length < 6) {
-                registerPasswordError.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
-                registerPasswordError.style.display = 'block';
-                isValid = false;
-            }
-
-            // Si tout est valide, enregistrer l'utilisateur
-            if (isValid) {
-                const users = JSON.parse(localStorage.getItem("users")) || [];
-                const hashedPassword = sha256(registerPassword.value.trim());
-
-                // Vérifier si le nom d'utilisateur existe déjà
-                const existingUser = users.find(user =>
-                    user.username === registerUsername.value.trim()
-                );
-
-                if (existingUser) {
-                    registerUsernameError.textContent = 'Ce nom d\'utilisateur est déjà pris.';
-                    registerUsernameError.style.display = 'block';
-                    registerSuccess.style.display = 'none';
-                    return;
-                }
-
-                // Créer un nouvel utilisateur
-                const newUser = {
-                    username: registerUsername.value.trim(),
-                    email: registerEmail.value.trim(),
-                    password: hashedPassword
-                };
-
-                // Ajouter l'utilisateur et rediriger
-                users.push(newUser);
-                localStorage.setItem("users", JSON.stringify(users));
-                localStorage.setItem("loggedInUser", newUser.username);
-
-                registerSuccess.textContent = 'Inscription réussie ! Redirection en cours...';
-                registerSuccess.style.display = 'block';
-
-                setTimeout(() => {
-                    window.location.href = 'accueil.html';
-                }, 2000);
-            }
-        });
-    </script>
+  <script src="scripts/intro.js"></script>
 </body>
 </html>
