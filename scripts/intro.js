@@ -37,7 +37,7 @@ function showIntro() {
         textBox.classList.add("fade-in");
         callback();
       }
-    }, 60); // Vitesse d'écriture (plus lent que précédemment)
+    }, 40); // Plus rapide pour une animation plus fluide
   }
 
   function nextLine() {
@@ -46,17 +46,15 @@ function showIntro() {
         currentLine++;
         setTimeout(nextLine, 3000); // Attente entre les lignes
       });
-    } else {
-      const btn = document.getElementById("start-btn");
-      btn.classList.add("show");
     }
   }
 
-  // Initialisation du texte
-  nextLine();
-
-  // Demander au joueur de cliquer pour démarrer la musique
-  document.getElementById("intro-container").addEventListener("click", playMusic);
+  // Animation de l'intro avant de commencer
+  document.body.style.backgroundColor = "#000";
+  setTimeout(() => {
+    playMusic(); // Demander au joueur de cliquer pour démarrer la musique
+    nextLine(); // Lancer l'animation du texte après un délai
+  }, 1500); // Délai pour donner le temps de l'intro visuelle
 }
 
 window.addEventListener("DOMContentLoaded", () => {
