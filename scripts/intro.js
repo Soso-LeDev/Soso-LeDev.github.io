@@ -60,13 +60,6 @@ function showIntro() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  if (!localStorage.getItem("introShown")) {
-    showIntro();
-    localStorage.setItem("introShown", "true");
-  } else {
-    window.location.href = "game.html"; // Dirige vers la page de jeu une fois l'intro terminée
-  }
-});
 
 function startGame() {
   if (audio) audio.pause(); // Stop l'audio avant de commencer le jeu
