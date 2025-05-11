@@ -1,58 +1,51 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Nouvel Univers</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Nouveau Monde</title>
   <style>
     body {
       margin: 0;
-      background: #0d0d0d;
-      color: white;
-      font-family: "Georgia", serif;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       overflow: hidden;
-      animation: fadeInBackground 3s ease-in-out forwards;
     }
 
-    @keyframes fadeInBackground {
-      0% { background-color: black; }
-      100% { background-color: #2e2e2e; }
-    }
-
-    #intro-container {
-      text-align: center;
-      max-width: 90%;
-      animation: fadeInUp 4s ease-out forwards;
-      opacity: 0;
-    }
-
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(50px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    #intro-text {
-      font-size: 2rem;
-      font-weight: bold;
-      min-height: 100px;
-      white-space: pre-wrap;
-      opacity: 0;
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      z-index: 999;
+      cursor: pointer;
       transition: opacity 1s ease;
     }
 
-    .fade-in {
-      opacity: 1;
+    #intro-text {
+      font-size: 1.5em;
+      text-align: center;
+      padding: 20px;
+      max-width: 800px;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
-  <div id="intro-container">
-    <div id="intro-text"></div>
-  </div>
 
-  <script src="scripts/intro.js"></script>
+  <div id="intro-overlay">Clique pour commencer...</div>
+  <div id="intro-text"></div>
+
+  <script src="intro.js"></script>
 </body>
 </html>
