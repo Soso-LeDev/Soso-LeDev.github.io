@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      background: linear-gradient(160deg, #000000 0%, #1a1a1a 100%);
+      background: #000;
       color: white;
       font-family: "Georgia", serif;
       display: flex;
@@ -14,7 +14,7 @@
       align-items: center;
       height: 100vh;
       overflow: hidden;
-      animation: bgFade 6s ease-in-out forwards;
+      animation: bgFade 5s ease-in-out forwards;
     }
 
     @keyframes bgFade {
@@ -25,12 +25,12 @@
     #intro-container {
       text-align: center;
       max-width: 80%;
-      animation: zoomIn 30s ease-in-out infinite alternate;
+      animation: fadeInUp 3s ease-out forwards;
     }
 
-    @keyframes zoomIn {
-      from { transform: scale(1); }
-      to { transform: scale(1.02); }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(50px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
     #intro-text {
@@ -44,39 +44,13 @@
     .fade-in {
       opacity: 1 !important;
     }
-
-    #start-btn {
-      display: none;
-      margin-top: 40px;
-      padding: 10px 20px;
-      background: white;
-      color: black;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 1.5s ease, transform 1.5s ease;
-    }
-
-    #start-btn.show {
-      display: inline-block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    #start-btn:hover {
-      background: #cccccc;
-    }
   </style>
 </head>
 <body>
   <div id="intro-container">
     <div id="intro-text"></div>
-    <button id="start-btn" onclick="startGame()">Commencer</button>
   </div>
-
+  
   <script src="scripts/intro.js"></script>
 </body>
 </html>
