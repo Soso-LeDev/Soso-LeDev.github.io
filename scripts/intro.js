@@ -15,7 +15,7 @@ function showIntro() {
   // Jouer la musique après un certain délai
   const playMusic = () => {
     if (!audio) {
-      audio = new Audio("assets/caves-of-dawn.mp3");
+      audio = new Audio("frozen-landscape-116197.mp3");
       audio.loop = true;
       audio.volume = 0.5;
       audio.play().catch((err) => {
