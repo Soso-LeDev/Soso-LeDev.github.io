@@ -11,13 +11,20 @@ let audio;
 
 function showIntro() {
   const textBox = document.getElementById("intro-text");
-  audio = new Audio("assets/caves-of-dawn.mp3");
-  audio.loop = true;
-  audio.volume = 0.5;
-  audio.play().catch(() => {
-    console.warn("Autoplay bloqué");
-  });
 
+  // Affichage de la musique lors du clic sur "Commencer"
+  const playMusic = () => {
+    if (!audio) {
+      audio = new Audio("assets/caves-of-dawn.mp3");
+      audio.loop = true;
+      audio.volume = 0.5;
+      audio.play().catch((err) => {
+        console.warn("Autoplay bloqué. Cliquez pour démarrer l'audio.");
+      });
+    }
+  };
+
+  // Fonction "machine à écrire" pour chaque ligne de texte
   function typeLine(line, callback) {
     textBox.innerText = "";
     textBox.classList.remove("fade-in");
@@ -30,14 +37,14 @@ function showIntro() {
         textBox.classList.add("fade-in");
         callback();
       }
-    }, 40);
+    }, 60); // Vitesse d'écriture (plus lent que précédemment)
   }
 
   function nextLine() {
     if (currentLine < introText.length) {
       typeLine(introText[currentLine], () => {
         currentLine++;
-        setTimeout(nextLine, 2000);
+        setTimeout(nextLine, 3000); // Attente entre les lignes
       });
     } else {
       const btn = document.getElementById("start-btn");
@@ -45,7 +52,11 @@ function showIntro() {
     }
   }
 
+  // Initialisation du texte
   nextLine();
+
+  // Demander au joueur de cliquer pour démarrer la musique
+  document.getElementById("intro-container").addEventListener("click", playMusic);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -53,11 +64,11 @@ window.addEventListener("DOMContentLoaded", () => {
     showIntro();
     localStorage.setItem("introShown", "true");
   } else {
-    window.location.href = "game.html";
+    window.location.href = "game.html"; // Dirige vers la page de jeu une fois l'intro terminée
   }
 });
 
 function startGame() {
-  audio?.pause();
-  window.location.href = "game.html";
+  if (audio) audio.pause(); // Stop l'audio avant de commencer le jeu
+  window.location.href = "game.html"; // À définir plus tard
 }
