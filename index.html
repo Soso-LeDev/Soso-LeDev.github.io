@@ -1,51 +1,62 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le Nouveau Monde</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #000;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
+let audio = new Audio("frozen-landscape-116197.mp3");
+audio.loop = true;
+audio.volume = 0.6;
+
+const introText = [
+  "Un fracas. Un souffle. Le silence.",
+  "Le monde que tu connaissais a disparu.",
+  "Tu ouvres les yeux dans un autre univers.",
+  "Ici, la magie remplace la science...",
+  "Et ta survie dépendra de ce que tu construis."
+];
+
+let currentLine = 0;
+
+function typeWriter(text, element, callback) {
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      element.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(type, 40);
+    } else {
+      callback();
     }
+  }
+  type();
+}
 
-    #intro-overlay {
-      position: fixed;
-      inset: 0;
-      background-color: black;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2em;
-      z-index: 999;
-      cursor: pointer;
-      transition: opacity 1s ease;
-    }
+function showNextLine() {
+  const textBox = document.getElementById("intro-text");
+  if (currentLine < introText.length) {
+    textBox.innerText = "";
+    typeWriter(introText[currentLine], textBox, () => {
+      currentLine++;
+      setTimeout(showNextLine, 2500);
+    });
+  } else {
+    setTimeout(() => {
+      window.location.href = "game.html";
+    }, 1500);
+  }
+}
 
-    #intro-text {
-      font-size: 1.5em;
-      text-align: center;
-      padding: 20px;
-      max-width: 800px;
-      line-height: 1.6;
-    }
-  </style>
-</head>
-<body>
+function startIntro() {
+  // Démarre la musique
+  audio.play().catch(() => {
+    console.warn("Autoplay bloqué.");
+  });
 
-  <div id="intro-overlay">Clique pour commencer...</div>
-  <div id="intro-text"></div>
+  // Masque l'overlay de démarrage
+  const overlay = document.getElementById("intro-overlay");
+  overlay.style.opacity = 0;
+  setTimeout(() => {
+    overlay.style.display = "none";
+    showNextLine();
+  }, 1000);
+}
 
-  <script src="intro.js"></script>
-</body>
-</html>
+window.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("intro-overlay");
+  overlay.addEventListener("click", startIntro);
+});
