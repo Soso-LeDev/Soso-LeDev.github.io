@@ -60,6 +60,8 @@ function showIntro() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  showIntro(); // L'intro sera toujours affichée au chargement de la page
+});
 
 function startGame() {
   if (audio) audio.pause(); // Stop l'audio avant de commencer le jeu
