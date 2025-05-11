@@ -7,32 +7,45 @@ const introText = [
 ];
 
 let currentLine = 0;
+let audio;
 
 function showIntro() {
   const textBox = document.getElementById("intro-text");
-
-  // Musique de fond
-  const audio = new Audio("assets/caves-of-dawn.mp3");
+  audio = new Audio("assets/caves-of-dawn.mp3");
   audio.loop = true;
   audio.volume = 0.5;
   audio.play().catch(() => {
-    console.warn("Autoplay bloqué par le navigateur.");
+    console.warn("Autoplay bloqué");
   });
+
+  function typeLine(line, callback) {
+    textBox.innerText = "";
+    textBox.classList.remove("fade-in");
+    let i = 0;
+    const typing = setInterval(() => {
+      textBox.innerText += line.charAt(i);
+      i++;
+      if (i === line.length) {
+        clearInterval(typing);
+        textBox.classList.add("fade-in");
+        callback();
+      }
+    }, 40);
+  }
 
   function nextLine() {
     if (currentLine < introText.length) {
-      textBox.innerText = introText[currentLine];
-      textBox.classList.remove("fade-in");
-      void textBox.offsetWidth; // Reset animation
-      textBox.classList.add("fade-in");
-      currentLine++;
+      typeLine(introText[currentLine], () => {
+        currentLine++;
+        setTimeout(nextLine, 2000);
+      });
     } else {
-      document.getElementById("start-btn").style.display = "inline-block";
+      const btn = document.getElementById("start-btn");
+      btn.classList.add("show");
     }
   }
 
   nextLine();
-  const interval = setInterval(nextLine, 4000);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -40,10 +53,11 @@ window.addEventListener("DOMContentLoaded", () => {
     showIntro();
     localStorage.setItem("introShown", "true");
   } else {
-    window.location.href = "game.html"; // À créer plus tard
+    window.location.href = "game.html";
   }
 });
 
 function startGame() {
+  audio?.pause();
   window.location.href = "game.html";
 }
