@@ -6,14 +6,14 @@
 <title>site-X - Fondation SCP</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body, html {
     height: 100%;
     font-family: 'Inter', sans-serif;
-    background: #0f172a;
-    color: #e0e0e0;
+    background: url('https://images.unsplash.com/photo-1601987571302-0d09b998b1a8') no-repeat center center fixed;
+    background-size: cover;
+    color: #f0f0f0;
+    backdrop-filter: blur(5px);
     display: flex;
     flex-direction: column;
   }
@@ -21,213 +21,41 @@
     max-width: 900px;
     margin: 2rem auto;
     padding: 1rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    flex-grow: 1;
+    background-color: rgba(15, 23, 42, 0.85);
+    border-radius: 1rem;
+    box-shadow: 0 0 20px #000;
   }
   header {
     display: flex;
     justify-content: center;
     gap: 2rem;
+    margin-bottom: 1rem;
   }
   header button {
-    background: none;
+    background: #1f2937;
     border: none;
-    color: #94a3b8;
+    color: #f0f0f0;
     font-weight: 700;
     font-size: 1.15rem;
     padding: 0.6rem 1.4rem;
     border-radius: 12px;
     cursor: pointer;
-    position: relative;
     transition: background-color 0.3s, color 0.3s;
   }
   header button:hover, header button.active {
-    background-color: #10b981;
-    color: #0f172a;
+    background-color: #7c3aed;
+    color: #ffffff;
   }
-  section {
-    display: none;
-    background: #1e293b;
-    padding: 1.8rem 2rem;
-    border-radius: 16px;
-    box-shadow: 0 0 15px #10b981cc;
-    opacity: 0;
-    transform: translateY(15px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-    flex-direction: column;
-    min-height: 350px;
-  }
-  section.active {
-    display: flex;
-    opacity: 1;
-    transform: translateY(0);
-  }
-  /* Accueil */
-  #homeSection h1 {
-    font-size: 3rem;
-    color: #10b981;
-    margin-bottom: 1rem;
-    font-weight: 900;
-    letter-spacing: 2px;
-  }
-  #homeSection p {
-    font-size: 1.25rem;
-    line-height: 1.6;
-    color: #cbd5e1;
-    font-style: italic;
-  }
-  #homeSection p strong {
-    color: #34d399;
-  }
-
-  /* Chat */
-  #chatBox {
-    flex-grow: 1;
-    background: #0f172a;
-    border-radius: 12px;
-    border: 1px solid #334155;
-    padding: 1rem;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    max-height: 400px;
-  }
-  .msg {
-    max-width: 75%;
-    padding: 0.8rem 1rem;
-    border-radius: 14px;
-    opacity: 0;
-    transform: translateX(20px);
-    animation-fill-mode: forwards;
-    white-space: pre-wrap;
-  }
-  .msg.user {
-    align-self: flex-end;
-    background-color: #10b981cc;
-    color: #0f172a;
-    font-weight: 600;
-    animation-name: slideInRight;
-  }
-  .msg.assistant {
-    align-self: flex-start;
-    background-color: #334155cc;
-    color: #cbd5e1;
-    font-style: italic;
-    animation-name: slideInLeft;
-  }
-  @keyframes slideInLeft {
-    to {opacity: 1; transform: translateX(0);}
-  }
-  @keyframes slideInRight {
-    to {opacity: 1; transform: translateX(0);}
-  }
-  #chatInputRow {
-    display: flex;
-    gap: 0.7rem;
-    margin-top: 0.8rem;
-  }
-  #chatInputRow input {
-    flex-grow: 1;
-    padding: 0.8rem 1rem;
-    border-radius: 12px;
-    border: none;
-    background: #1e293b;
-    color: #e0e0e0;
-    font-size: 1rem;
-    outline-offset: 3px;
-    box-shadow: inset 0 0 8px #10b981aa;
-    transition: box-shadow 0.3s ease;
-  }
-  #chatInputRow input:focus {
-    box-shadow: 0 0 10px #10b981cc;
-  }
-  #chatInputRow button {
-    background-color: #10b981;
-    border: none;
-    color: #0f172a;
-    font-weight: 700;
-    padding: 0.7rem 1.4rem;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  #chatInputRow button:hover {
-    background-color: #059669;
-    transform: scale(1.05);
-  }
-  #chatInputRow button:active {
-    transform: scale(0.95);
-  }
-
-  /* Formulaire */
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  form label {
-    font-weight: 700;
-    color: #10b981;
-    user-select: none;
-  }
-  form input, form select, form textarea {
-    padding: 0.85rem 1rem;
-    border-radius: 12px;
-    border: none;
-    background: #1e293b;
-    color: #e0e0e0;
-    font-size: 1rem;
-    box-shadow: inset 0 0 8px #10b981aa;
-    resize: vertical;
-    transition: box-shadow 0.3s ease;
-  }
-  form input:focus, form select:focus, form textarea:focus {
-    outline: 3px solid #10b981cc;
-  }
-  form button {
-    background-color: #10b981;
-    border: none;
-    padding: 1rem;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: #0f172a;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  form button:hover {
-    background-color: #059669;
-    transform: scale(1.05);
-  }
-  form button:active {
-    transform: scale(0.95);
-  }
-  #applyMsg {
-    margin-top: 1rem;
-    font-weight: 700;
-    color: #34d399;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  #applyMsg.show {
-    display: block;
-    opacity: 1;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    #container {
-      margin: 1rem;
-      padding: 1rem;
-    }
-    #homeSection h1 {
-      font-size: 2.2rem;
-    }
-  }
+  section { display: none; padding: 1.5rem; border-radius: 1rem; }
+  section.active { display: block; background-color: rgba(30, 41, 59, 0.85); animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+  #chatBox { height: 300px; overflow-y: auto; background: #0f172a; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; }
+  .msg { margin-bottom: 0.8rem; padding: 0.7rem 1rem; border-radius: 0.75rem; max-width: 70%; }
+  .msg.user { background: #4ade80; color: #1f2937; align-self: flex-end; text-align: right; }
+  .msg.assistant { background: #334155; color: #f1f5f9; align-self: flex-start; text-align: left; }
+  #chatInputRow { display: flex; gap: 0.5rem; }
+  #chatInputRow input { flex: 1; padding: 0.8rem; border-radius: 0.75rem; border: none; background: #1e293b; color: white; }
+  #chatInputRow button { padding: 0.8rem 1.2rem; border-radius: 0.75rem; border: none; background: #7c3aed; color: white; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -240,138 +68,89 @@
 
     <section id="homeSection" class="active">
       <h1>Bienvenue dans le Monde SCP</h1>
-      <p>
-        <strong>site-X</strong> vous plonge au cœur de la Fondation SCP,<br />
-        une organisation secrète chargée de sécuriser, contenir et protéger<br />
-        l'humanité des phénomènes anormaux, objets et entités étranges.<br /><br />
-        Explorez nos archives, découvrez les histoires fascinantes des SCP, <br />
-        et participez à l’aventure en rejoignant nos rangs via notre formulaire.<br /><br />
-        Le savoir est une arme, la prudence une nécessité.<br />
-        Que votre curiosité guide vos pas, mais que votre raison soit votre bouclier.
-      </p>
+      <p>Explorez les mystères. Protégez l'humanité. Rejoignez la Fondation SCP.</p>
     </section>
 
     <section id="chatSection">
-      <div id="chatBox" aria-live="polite" aria-label="Conversation SCP"></div>
+      <div id="chatBox"></div>
       <div id="chatInputRow">
-        <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off" aria-label="Message à envoyer" />
-        <button id="chatSendBtn" aria-label="Envoyer message">Envoyer</button>
+        <input id="chatInput" type="text" placeholder="Demande à l'IA sur un SCP...">
+        <button id="chatSendBtn">Envoyer</button>
       </div>
     </section>
 
     <section id="formSection">
       <form id="inscriptionForm">
-        <label for="fullName">Nom complet</label>
-        <input type="text" id="fullName" name="fullName" placeholder="Votre nom complet" required autocomplete="name" />
-
-        <label for="email">Adresse Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@mail.com" required autocomplete="email" />
-
-        <label for="role">Rôle souhaité</label>
-        <select id="role" name="role" required>
-          <option value="" disabled selected>-- Choisissez un rôle --</option>
-          <option value="agent">Agent de terrain</option>
-          <option value="chercheur">Chercheur SCP</option>
-          <option value="technicien">Technicien</option>
-        </select>
-
-        <label for="motivation">Motivation</label>
-        <textarea id="motivation" name="motivation" rows="4" placeholder="Pourquoi souhaitez-vous rejoindre la Fondation ?" required></textarea>
-
-        <button type="submit">Soumettre la candidature</button>
+        <label>Nom</label>
+        <input type="text" name="name" required />
+        <label>Email</label>
+        <input type="email" name="email" required />
+        <label>Message</label>
+        <textarea name="message" required></textarea>
+        <button type="submit">Envoyer</button>
       </form>
-      <div id="applyMsg" role="alert" aria-live="assertive">Merci pour votre inscription, nous reviendrons vers vous bientôt !</div>
     </section>
   </div>
 
 <script>
-  // Onglets
-  const btnHome = document.getElementById('btnHome');
-  const btnChat = document.getElementById('btnChat');
-  const btnForm = document.getElementById('btnForm');
-  const homeSection = document.getElementById('homeSection');
-  const chatSection = document.getElementById('chatSection');
-  const formSection = document.getElementById('formSection');
+const btnHome = document.getElementById('btnHome');
+const btnChat = document.getElementById('btnChat');
+const btnForm = document.getElementById('btnForm');
+const homeSection = document.getElementById('homeSection');
+const chatSection = document.getElementById('chatSection');
+const formSection = document.getElementById('formSection');
 
-  function setActive(button, section) {
-    [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
-    [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
-    button.classList.add('active');
-    section.classList.add('active');
-  }
+function setActive(button, section) {
+  [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
+  [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
+  button.classList.add('active');
+  section.classList.add('active');
+}
 
-  btnHome.addEventListener('click', () => setActive(btnHome, homeSection));
-  btnChat.addEventListener('click', () => setActive(btnChat, chatSection));
-  btnForm.addEventListener('click', () => setActive(btnForm, formSection));
+btnHome.onclick = () => setActive(btnHome, homeSection);
+btnChat.onclick = () => setActive(btnChat, chatSection);
+btnForm.onclick = () => setActive(btnForm, formSection);
 
-  // Chat basique
-  const chatBox = document.getElementById('chatBox');
-  const chatInput = document.getElementById('chatInput');
-  const chatSendBtn = document.getElementById('chatSendBtn');
+// IA avec Groq API
+const chatBox = document.getElementById('chatBox');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
 
-  function addMessage(text, sender) {
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('msg', sender);
-    msgDiv.textContent = text;
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    msgDiv.style.animation = 'none';
-    void msgDiv.offsetWidth; // relance animation
-    msgDiv.style.animation = sender === 'user' ? 'slideInRight 0.4s forwards' : 'slideInLeft 0.4s forwards';
-  }
-
-  function assistantReply(userText) {
-    let reply = "Je n'ai pas cette information pour l'instant, désolé.";
-    const lower = userText.toLowerCase();
-    if(lower.includes('scp-173')) reply = "SCP-173 est une entité animée extrêmement dangereuse, immobile uniquement quand on la regarde.";
-    else if(lower.includes('scp-049')) reply = "SCP-049 est un humanoïde masqué se proclamant 'Peste Noire', capable d'endormir et transformer les humains.";
-    else if(lower.includes('scp')) reply = "Les SCPs sont des objets ou entités anormaux catalogués par la Fondation, chacun avec ses particularités uniques.";
-    addMessage(reply, 'assistant');
-  }
-
-  chatSendBtn.addEventListener('click', () => {
-    const text = chatInput.value.trim();
-    if(!text) return;
-    addMessage(text, 'user');
-    chatInput.value = '';
-    setTimeout(() => assistantReply(text), 800);
+async function sendToAI(message) {
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer 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"
+    },
+    body: JSON.stringify({
+      model: "llama3-8b-8192",
+      messages: [
+        { role: "system", content: "Tu es un expert SCP, tu réponds de manière informative, synthétique, et immersive." },
+        { role: "user", content: message }
+      ]
+    })
   });
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
 
-  chatInput.addEventListener('keypress', e => {
-    if(e.key === 'Enter') chatSendBtn.click();
-  });
+function addMessage(text, sender) {
+  const msg = document.createElement('div');
+  msg.className = `msg ${sender}`;
+  msg.textContent = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-  // Formulaire - mailto
-  const form = document.getElementById('inscriptionForm');
-  const applyMsg = document.getElementById('applyMsg');
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    // Crée mailto: avec contenu du formulaire
-    const fullName = encodeURIComponent(form.fullName.value.trim());
-    const email = encodeURIComponent(form.email.value.trim());
-    const role = encodeURIComponent(form.role.value);
-    const motivation = encodeURIComponent(form.motivation.value.trim());
-
-    const subject = encodeURIComponent(`Nouvelle candidature site-X: ${fullName}`);
-    const body = encodeURIComponent(
-      `Nom complet: ${fullName}\n` +
-      `Email: ${email}\n` +
-      `Rôle souhaité: ${role}\n` +
-      `Motivation:\n${motivation}`
-    );
-
-    // Compose mailto url
-    const mailtoLink = `mailto:testsoso45@gmail.com?subject=${subject}&body=${body}`;
-
-    // Ouvre le client mail
-    window.location.href = mailtoLink;
-
-    // Message de confirmation affiché (même si mail pas envoyé vraiment)
-    applyMsg.classList.add('show');
-    form.reset();
-    setTimeout(() => applyMsg.classList.remove('show'), 7000);
-  });
+chatSendBtn.onclick = async () => {
+  const input = chatInput.value.trim();
+  if (!input) return;
+  addMessage(input, 'user');
+  chatInput.value = '';
+  const reply = await sendToAI(input);
+  addMessage(reply, 'assistant');
+};
 </script>
 </body>
 </html>
