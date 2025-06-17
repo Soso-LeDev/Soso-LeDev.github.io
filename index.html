@@ -1,145 +1,400 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" >
 <head>
-  <meta charset="UTF-8">
-  <title>SCP‑Redux • Portail</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SCP Redux - Portail Officiel</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
-    body { background: #060606; color: #E2E8F0; }
-    .neon { text-shadow: 0 0 8px #10B981; }
-    .card { backdrop-filter: blur(10px); background: rgba(20,20,20,0.6); }
+    /* Reset & fonts */
+    body,html {
+      margin:0; padding:0; height:100%;
+      background: #0a0a0a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #d0f3d0;
+      overflow-x: hidden;
+    }
+    /* Glassmorphism cards */
+    .glass-card {
+      background: rgba(20, 25, 20, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 12px;
+      border: 1px solid #0f4210;
+      box-shadow: 0 0 8px #10b981aa;
+      padding: 1.5rem;
+    }
+    /* Neon text */
+    .neon-text {
+      color: #10b981;
+      text-shadow:
+        0 0 5px #10b981,
+        0 0 10px #10b981,
+        0 0 20px #10b981,
+        0 0 40px #0fb05e;
+    }
+    /* Navbar */
+    nav {
+      position: fixed;
+      top:0; left:0; right:0;
+      height: 60px;
+      background: rgba(10, 15, 10, 0.9);
+      backdrop-filter: saturate(180%) blur(10px);
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 1000;
+      box-shadow: 0 2px 8px #0f4210cc;
+    }
+    nav a {
+      color: #10b981;
+      margin-right: 2rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    nav a:hover, nav a.active {
+      color: #75ffc0;
+      text-shadow: 0 0 8px #75ffc0;
+    }
+    main {
+      padding: 80px 2rem 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    /* Sections */
+    section {
+      margin-bottom: 3rem;
+    }
+    /* Intro full screen overlay */
+    #introOverlay {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: #040804;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      color: #10b981;
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-shadow:
+        0 0 20px #10b981,
+        0 0 40px #10b981,
+        0 0 80px #0fb05e;
+      user-select:none;
+    }
+    /* Portal animation */
+    @keyframes portalPulse {
+      0% { text-shadow: 0 0 20px #10b981, 0 0 40px #10b981, 0 0 80px #0fb05e; }
+      50% { text-shadow: 0 0 40px #75ffc0, 0 0 80px #75ffc0, 0 0 160px #75ffc0; }
+      100% { text-shadow: 0 0 20px #10b981, 0 0 40px #10b981, 0 0 80px #0fb05e; }
+    }
+    #introOverlay span {
+      animation: portalPulse 2.5s ease-in-out infinite;
+    }
+    /* Chat box styling */
+    #chatBox {
+      height: 300px;
+      overflow-y: auto;
+      background: rgba(10, 15, 10, 0.8);
+      border-radius: 12px;
+      padding: 1rem;
+      color: #a0f0a0;
+      font-family: monospace;
+      font-size: 0.95rem;
+      box-shadow: inset 0 0 10px #10b981aa;
+    }
+    .chat-msg-user {
+      background: #0f4210cc;
+      margin: 0.3rem 0;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      align-self: flex-end;
+      max-width: 80%;
+    }
+    .chat-msg-assistant {
+      background: #103a04cc;
+      margin: 0.3rem 0;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      align-self: flex-start;
+      max-width: 80%;
+    }
+    /* Chat container flex */
+    #chatContainer {
+      display: flex;
+      flex-direction: column;
+    }
+    /* Chat input & button */
+    #chatInputRow {
+      margin-top: 0.8rem;
+      display: flex;
+      gap: 0.6rem;
+    }
+    #chatInputRow input {
+      flex-grow: 1;
+      border-radius: 8px;
+      border: none;
+      padding: 0.6rem 1rem;
+      background: #142514;
+      color: #a0f0a0;
+      font-family: monospace;
+      font-size: 1rem;
+      outline-offset: 2px;
+    }
+    #chatInputRow input:focus {
+      outline: 2px solid #10b981;
+      background: #163018;
+    }
+    #chatInputRow button {
+      background: #10b981;
+      border: none;
+      border-radius: 8px;
+      padding: 0 1.2rem;
+      color: #020;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #chatInputRow button:hover {
+      background: #75ffc0;
+    }
+    /* Recruitment form */
+    #recruitForm input, #recruitForm select, #recruitForm textarea {
+      width: 100%;
+      background: #142514;
+      border-radius: 8px;
+      border: 1px solid #0f4210;
+      padding: 0.6rem 1rem;
+      color: #a0f0a0;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      resize: vertical;
+      transition: border-color 0.3s;
+      font-family: inherit;
+    }
+    #recruitForm input:focus, #recruitForm select:focus, #recruitForm textarea:focus {
+      outline: none;
+      border-color: #10b981;
+      background: #163018;
+    }
+    #recruitForm button {
+      background: #10b981;
+      color: #020;
+      font-weight: 700;
+      padding: 0.8rem 0;
+      border-radius: 8px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #recruitForm button:hover {
+      background: #75ffc0;
+    }
+    #applyMsg {
+      color: #75ffc0;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+    }
+    /* Docs section */
+    #docsSection a {
+      color: #10b981;
+      text-decoration: underline;
+      transition: color 0.3s;
+    }
+    #docsSection a:hover {
+      color: #75ffc0;
+    }
+    /* Responsive */
+    @media (max-width: 640px) {
+      main {
+        padding: 80px 1rem 1rem;
+      }
+      nav {
+        padding: 0 1rem;
+      }
+    }
   </style>
 </head>
-<body class="font-sans antialiased flex flex-col items-center p-6 space-y-6">
+<body>
+  <!-- Intro screen -->
+  <div id="introOverlay"><span>--- SCP Redux ---</span></div>
 
-  <h1 class="neon text-4xl font-bold">🛡️ SCP‑Redux Portal</h1>
+  <!-- Navbar -->
+  <nav>
+    <a href="#accueil" class="active">Accueil</a>
+    <a href="#chat">Chat</a>
+    <a href="#recrutement">Recrutement</a>
+    <a href="#docs">Docs</a>
+  </nav>
 
-  <!-- Connexion Google -->
-  <div id="google-login" class="card p-6 rounded-lg shadow-lg space-y-4">
-    <p class="text-center">Connecte-toi pour accéder au chat & à l’équipe</p>
-    <div id="g_id_onload"
-         data-client_id="623343442822-vg5208651s2f9jfdlr6d65379lehna8b.apps.googleusercontent.com"
-         data-callback="onGoogleLogin"
-         data-auto_prompt="false"></div>
-    <div class="g_id_signin" data-type="standard" data-size="large"
-         data-theme="outline" data-text="sign_in_with"
-         data-shape="pill" data-logo_alignment="left"></div>
-  </div>
+  <!-- Main container -->
+  <main>
+    <!-- Accueil -->
+    <section id="accueil" class="glass-card">
+      <h1 class="text-4xl neon-text mb-4">Bienvenue sur SCP Redux</h1>
+      <p>Ce portail officiel est dédié à l'univers SCP, avec un assistant intelligent nommé <strong>Krozen</strong> pour t'aider dans le jeu et le projet.</p>
+      <p>Connecte-toi avec Google pour accéder au chat et postuler à l'équipe de développement.</p>
 
-  <!-- Conteneur principal, caché si non connecté -->
-  <div id="mainContent" class="hidden flex-col space-y-8 items-center w-full max-w-3xl">
+      <!-- Google Sign-In -->
+      <div id="google-login" class="mt-6 flex justify-center">
+        <div id="g_id_onload"
+             data-client_id="623343442822-vg5208651s2f9jfdlr6d65379lehna8b.apps.googleusercontent.com"
+             data-callback="onGoogleLogin"
+             data-auto_prompt="false"></div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="pill"
+             data-logo_alignment="left"></div>
+      </div>
+    </section>
 
-    <!-- Profil & Déconnexion -->
-    <div id="userInfo" class="flex items-center justify-between w-full card p-4 rounded-lg">
-      <div class="flex items-center space-x-4">
-        <img id="userPic" src="" alt="avatar" class="w-12 h-12 rounded-full border border-[#10B981]" />
-        <div>
-          <p id="userName" class="font-semibold"></p>
-          <p id="userEmail" class="text-sm text-gray-400"></p>
+    <!-- Chat -->
+    <section id="chat" class="glass-card hidden flex flex-col">
+      <h2 class="text-3xl neon-text mb-4">Chat avec Krozen</h2>
+      <div id="chatContainer" class="flex flex-col">
+        <div id="chatBox" aria-live="polite" role="log" class="mb-3"></div>
+        <div id="chatInputRow">
+          <input id="chatInput" type="text" placeholder="Pose ta question SCP ou projet..." autocomplete="off" />
+          <button aria-label="Envoyer message" onclick="sendChat()">➤</button>
         </div>
       </div>
-      <button onclick="logout()" class="px-4 py-2 bg-red-600 rounded-md hover:bg-red-500">Déconnexion</button>
-    </div>
+    </section>
 
-    <!-- Chat “krozen” -->
-    <div class="w-full card rounded-lg shadow-lg p-4 space-y-4">
-      <h2 class="text-2xl neon">Chat “krozen”</h2>
-      <div id="chatBox" class="h-64 overflow-y-auto p-3 bg-gray-900 rounded-md space-y-2"></div>
-      <div class="flex space-x-2">
-        <input id="chatInput" type="text" placeholder="Parle à krozen..." class="flex-1 p-2 rounded-md bg-gray-800 focus:outline-green-500"/>
-        <button onclick="sendChat()" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-md">➤</button>
-      </div>
-    </div>
-
-    <!-- Formulaire recrutement -->
-    <div class="w-full card rounded-lg p-4 space-y-4 shadow-lg">
-      <h2 class="text-2xl neon">Postuler au projet</h2>
-      <form id="recruitForm" class="space-y-4">
-        <input type="text" id="fullName" placeholder="Nom complet" class="w-full p-2 rounded-md bg-gray-800" required/>
-        <input type="email" id="emailApply" placeholder="Email" class="w-full p-2 rounded-md bg-gray-800" required/>
-        <select id="roleSelect" class="w-full p-2 rounded-md bg-gray-800">
+    <!-- Recrutement -->
+    <section id="recrutement" class="glass-card hidden">
+      <h2 class="text-3xl neon-text mb-4">Recrutement</h2>
+      <form id="recruitForm" aria-label="Formulaire de recrutement">
+        <input type="text" id="fullName" placeholder="Nom complet" required autocomplete="name" />
+        <input type="email" id="emailApply" placeholder="Email" required autocomplete="email" />
+        <select id="roleSelect" aria-label="Sélectionner un rôle">
           <option value="dev">Développeur</option>
           <option value="designer">Designer</option>
           <option value="tester">Testeur</option>
           <option value="autre">Autre</option>
         </select>
-        <textarea id="motivation" rows="4" placeholder="Pourquoi tu veux rejoindre ?" class="w-full p-2 rounded-md bg-gray-800" required></textarea>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded-md">Envoyer la demande</button>
+        <textarea id="motivation" placeholder="Pourquoi souhaites-tu rejoindre ?" rows="4" required></textarea>
+        <button type="submit">Envoyer la demande</button>
       </form>
-      <div id="applyMsg" class="text-center text-green-300 hidden">✅ Merci, ta candidature a été envoyée !</div>
-    </div>
-  </div>
+      <div id="applyMsg" role="alert" aria-live="assertive"></div>
+    </section>
+
+    <!-- Docs -->
+    <section id="docs" class="glass-card">
+      <h2 class="text-3xl neon-text mb-4">Documentation</h2>
+      <p>Liens utiles :</p>
+      <ul>
+        <li><a href="https://scpwiki.com" target="_blank" rel="noopener">SCP Wiki</a></li>
+        <li><a href="https://krozen.docs" target="_blank" rel="noopener">Documentation Krozen (exemple)</a></li>
+        <li><a href="https://github.com/soso-ledev/scp-redux" target="_blank" rel="noopener">Repo GitHub SCP Redux</a></li>
+      </ul>
+    </section>
+  </main>
 
   <script>
+    // Intro overlay hide après 3.5s
+    setTimeout(() => {
+      document.getElementById('introOverlay').style.display = 'none';
+    }, 3500);
+
+    // Navigation active link highlight
+    const navLinks = document.querySelectorAll('nav a');
+    navLinks.forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        navLinks.forEach(link => link.classList.remove('active'));
+        a.classList.add('active');
+        document.querySelector(a.getAttribute('href')).scrollIntoView({behavior: 'smooth'});
+      });
+    });
+
+    // Google Login
     let googleUser = null;
 
     function onGoogleLogin(response) {
-      const p = JSON.parse(atob(response.credential.split('.')[1]));
-      googleUser = p;
-      document.getElementById('userName').textContent = p.name;
-      document.getElementById('userEmail').textContent = p.email;
-      document.getElementById('userPic').src = p.picture;
-      document.getElementById('google-login').classList.add('hidden');
-      document.getElementById('mainContent').classList.remove('hidden');
-      appendChat('[SYSTEM] Bienvenue ' + p.name);
+      try {
+        const p = JSON.parse(atob(response.credential.split('.')[1]));
+        googleUser = p;
+
+        // Cache zone connexion, affiche chat + recrutement
+        document.getElementById('google-login').style.display = 'none';
+        document.getElementById('chat').classList.remove('hidden');
+        document.getElementById('recrutement').classList.remove('hidden');
+
+        appendChat('[SYSTEM] Bienvenue ' + p.name + ' ! Pose tes questions SCP ou sur le projet.');
+
+      } catch (e) {
+        console.error("Erreur parsing Google token:", e);
+      }
     }
 
-    function logout() {
-      googleUser = null;
-      document.getElementById('mainContent').classList.add('hidden');
-      document.getElementById('google-login').classList.remove('hidden');
-      document.getElementById('chatBox').innerHTML = '';
+    // Chat
+    const chatBox = document.getElementById('chatBox');
+    const chatInput = document.getElementById('chatInput');
+
+    function appendChat(msg, user = false) {
+      const div = document.createElement('div');
+      div.className = user ? 'chat-msg-user' : 'chat-msg-assistant';
+      div.textContent = msg;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    /* Chat */
-    function appendChat(msg, from='user') {
-      const d = document.createElement('div');
-      d.textContent = msg;
-      d.className = 'p-2 rounded ' + (from==='user'? 'bg-blue-800 self-end':'bg-gray-700 self-start');
-      document.getElementById('chatBox').appendChild(d);
-      d.scrollIntoView({behavior:'smooth'});
+    function sendChat() {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      appendChat(msg, true);
+      chatInput.value = '';
+
+      // Simuler réponse IA basique (placeholder)
+      setTimeout(() => {
+        let response = "Je ne sais pas répondre à ça pour l'instant.";
+        // Exemple: réponse spéciale pour scp-173
+        if (msg.toLowerCase().includes('scp-173')) {
+          response = "SCP-173 est une sculpture animée extrêmement dangereuse, immobilisez-le en le regardant constamment.";
+        }
+        if (msg.toLowerCase().includes('chef de projet')) {
+          response = "Le chef de projet est actuellement Soso, responsable de la coordination du projet SCP Redux.";
+        }
+        appendChat(response);
+      }, 1000);
     }
 
-    async function sendChat() {
-      const txt = document.getElementById('chatInput').value.trim();
-      if (!txt) return;
-      appendChat(txt, 'user');
-      document.getElementById('chatInput').value = '';
-      // Appel API à "krozen" (remplace avec ton vrai endpoint + auth)
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method:'POST',
-        headers: {
-          'Content-Type':'application/json',
-          'Authorization':'Bearer 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'
-        },
-        body: JSON.stringify({
-          model: "llama3-8b-8192",
-          messages: [
-            {role:'system', content: 'Tu es krozen, assistant expert SCP & recrutement.'},
-            {role:'user', content: txt}
-          ],
-          temperature: 0.6
-        })
-      });
-      const j = await res.json().catch(()=>null);
-      const reply = j?.choices?.[0]?.message?.content || '[Erreur de krozen]';
-      appendChat(reply, 'assistant');
-    }
+    // Recrutement form
+    const form = document.getElementById('recruitForm');
+    const applyMsg = document.getElementById('applyMsg');
 
-    /* Recrutement */
-    document.getElementById('recruitForm').addEventListener('submit', e=>{
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      // → envoi vers back ou API ici (placeholder)
-      console.log({
-        name:document.getElementById('fullName').value,
-        email:document.getElementById('emailApply').value,
-        role:document.getElementById('roleSelect').value,
-        message:document.getElementById('motivation').value
-      });
-      document.getElementById('applyMsg').classList.remove('hidden');
-      setTimeout(()=>document.getElementById('applyMsg').classList.add('hidden'), 5000);
-      e.target.reset();
+      if (!googleUser) {
+        alert("Connectez-vous via Google avant de postuler.");
+        return;
+      }
+
+      // Collect data
+      const data = {
+        name: form.fullName.value.trim(),
+        email: form.emailApply.value.trim(),
+        role: form.roleSelect.value,
+        motivation: form.motivation.value.trim(),
+        userId: googleUser.sub
+      };
+
+      // Ici tu peux envoyer ces données à une API, backend, ou stockage
+      // Exemple fake:
+      setTimeout(() => {
+        applyMsg.textContent = "Merci " + data.name + ", ta candidature a été envoyée !";
+        applyMsg.style.display = 'block';
+        form.reset();
+      }, 800);
     });
   </script>
 </body>
