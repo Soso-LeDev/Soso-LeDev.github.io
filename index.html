@@ -4,181 +4,207 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Chat SCP + Formulaire</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
 <style>
-  /* Reset */
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-  }
+  *{margin:0; padding:0; box-sizing:border-box;}
   body, html {
     height: 100%;
     font-family: 'Inter', sans-serif;
-    background-color: #0f172a;
-    color: #f9fafb;
-    display: flex;
-    flex-direction: column;
+    background:#0f172a; color:#f9fafb;
+    display:flex; flex-direction:column;
   }
   #container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    max-width: 900px;
-    margin: auto;
-    padding: 1rem;
-    gap: 1rem;
+    flex:1;
+    max-width:900px;
+    margin:auto;
+    padding:1rem;
+    display:flex; flex-direction:column; gap:1rem;
   }
   header {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
+    display:flex; justify-content:center; gap:2rem;
   }
   header button {
-    background: none;
-    border: none;
-    color: #94a3b8;
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 0.6rem 1.2rem;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: color 0.3s ease, background-color 0.3s ease;
+    background:none; border:none; color:#94a3b8; font-weight:700; font-size:1.1rem;
+    padding:0.6rem 1.2rem; border-radius:12px; cursor:pointer;
+    transition:color 0.3s, background-color 0.3s;
+    position:relative; overflow:hidden;
   }
-  header button.active,
-  header button:hover {
-    color: #10b981;
-    background-color: #1e293b;
+  header button.active, header button:hover {
+    color:#10b981;
+    background:#1e293b;
   }
-
-  /* Sections (onglets) */
+  header button::after {
+    content:'';
+    position:absolute; bottom:0; left:50%; width:0; height:2px;
+    background:#10b981;
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+  header button.active::after, header button:hover::after {
+    width:100%; left:0;
+  }
   section {
-    display: none;
-    flex-direction: column;
-    background-color: #1e293b;
-    padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 0 10px #10b981aa;
+    display:none;
+    flex-direction:column;
+    background:#1e293b;
+    padding:1.5rem;
+    border-radius:16px;
+    box-shadow:0 0 10px #10b981aa;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity 0.4s ease, transform 0.4s ease;
   }
   section.active {
-    display: flex;
+    display:flex;
+    opacity:1;
+    transform:translateY(0);
   }
-  
-  /* ACCUEIL */
+  /* Accueil */
   #homeSection h1 {
-    font-size: 2.8rem;
-    margin-bottom: 0.5rem;
-    color: #10b981;
+    font-size:2.8rem;
+    margin-bottom:0.5rem;
+    color:#10b981;
+    animation: fadeInUp 0.6s ease forwards;
   }
   #homeSection p {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    color: #cbd5e1;
+    font-size:1.2rem;
+    line-height:1.6;
+    color:#cbd5e1;
+    animation: fadeInUp 0.8s ease forwards;
+    animation-delay:0.3s;
   }
-
-  /* CHAT SCP */
+  /* Chat */
   #chatBox {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 1rem;
-    background-color: #0f172a;
-    max-height: 350px;
+    flex:1;
+    overflow-y:auto;
+    margin-bottom:1rem;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:1rem;
+    background:#0f172a;
+    max-height:350px;
+    display:flex; flex-direction:column; gap:0.5rem;
   }
   .msg {
-    margin-bottom: 1rem;
-    padding: 0.8rem 1rem;
-    border-radius: 14px;
-    max-width: 80%;
-    white-space: pre-wrap;
+    padding:0.8rem 1rem;
+    border-radius:14px;
+    max-width:80%;
+    white-space:pre-wrap;
+    opacity:0;
+    transform:translateX(20px);
+    animation: slideInLeft 0.4s forwards;
   }
   .msg.user {
-    background-color: #10b981cc;
-    align-self: flex-end;
-    color: #0f172a;
-    font-weight: 600;
+    background:#10b981cc;
+    align-self:flex-end;
+    color:#0f172a;
+    font-weight:600;
+    animation-name: slideInRight;
   }
   .msg.assistant {
-    background-color: #334155cc;
-    color: #cbd5e1;
-    align-self: flex-start;
-    font-style: italic;
+    background:#334155cc;
+    color:#cbd5e1;
+    align-self:flex-start;
+    font-style:italic;
   }
   #chatInputRow {
-    display: flex;
-    gap: 0.7rem;
+    display:flex; gap:0.7rem;
   }
   #chatInputRow input {
-    flex: 1;
-    padding: 0.7rem 1rem;
-    border-radius: 12px;
-    border: none;
-    font-size: 1rem;
-    background-color: #1e293b;
-    color: #f9fafb;
-    outline-offset: 3px;
+    flex:1;
+    padding:0.7rem 1rem;
+    border-radius:12px;
+    border:none;
+    font-size:1rem;
+    background:#1e293b;
+    color:#f9fafb;
+    outline-offset:3px;
     box-shadow: inset 0 0 8px #10b981aa;
     transition: box-shadow 0.3s ease;
   }
   #chatInputRow input:focus {
-    box-shadow: 0 0 10px #10b981cc;
+    box-shadow:0 0 10px #10b981cc;
   }
   #chatInputRow button {
-    background-color: #10b981;
-    border: none;
-    color: #0f172a;
-    font-weight: 700;
-    padding: 0.7rem 1.4rem;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    background:#10b981;
+    border:none;
+    color:#0f172a;
+    font-weight:700;
+    padding:0.7rem 1.4rem;
+    border-radius:12px;
+    cursor:pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
   #chatInputRow button:hover {
-    background-color: #059669;
+    background:#059669;
+    transform: scale(1.05);
   }
-
-  /* FORMULAIRE */
+  #chatInputRow button:active {
+    transform: scale(0.95);
+  }
+  /* Formulaire */
   form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
   }
   form label {
-    font-weight: 700;
-    color: #10b981;
+    font-weight:700;
+    color:#10b981;
+    user-select:none;
   }
   form input, form select, form textarea {
-    padding: 0.8rem 1rem;
-    border-radius: 12px;
-    border: none;
-    background-color: #1e293b;
-    color: #f9fafb;
-    font-size: 1rem;
+    padding:0.8rem 1rem;
+    border-radius:12px;
+    border:none;
+    background:#1e293b;
+    color:#f9fafb;
+    font-size:1rem;
     box-shadow: inset 0 0 8px #10b981aa;
     resize: vertical;
+    transition: box-shadow 0.3s ease;
   }
   form input:focus, form select:focus, form textarea:focus {
-    outline: 3px solid #10b981cc;
+    outline:3px solid #10b981cc;
   }
   form button {
-    background-color: #10b981;
-    border: none;
-    padding: 1rem;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #0f172a;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    background:#10b981;
+    border:none;
+    padding:1rem;
+    border-radius:14px;
+    font-weight:700;
+    font-size:1.1rem;
+    color:#0f172a;
+    cursor:pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
   form button:hover {
-    background-color: #059669;
+    background:#059669;
+    transform: scale(1.05);
+  }
+  form button:active {
+    transform: scale(0.95);
   }
   #applyMsg {
-    margin-top: 1rem;
-    font-weight: 700;
-    color: #34d399;
-    display: none;
+    margin-top:1rem;
+    font-weight:700;
+    color:#34d399;
+    display:none;
+    opacity:0;
+    transition: opacity 0.5s ease;
+  }
+  #applyMsg.show {
+    display:block;
+    opacity:1;
+  }
+  /* Animations */
+  @keyframes fadeInUp {
+    from {opacity:0; transform: translateY(15px);}
+    to {opacity:1; transform: translateY(0);}
+  }
+  @keyframes slideInLeft {
+    to {opacity:1; transform: translateX(0);}
+  }
+  @keyframes slideInRight {
+    to {opacity:1; transform: translateX(0);}
   }
 </style>
 </head>
@@ -193,7 +219,7 @@
     <section id="homeSection" class="active">
       <h1>Bienvenue dans l'univers SCP</h1>
       <p>
-        Explorez des informations détaillées sur les objets, entités et phénomènes anormaux documentés par la Fondation SCP.  
+        Explorez des informations détaillées sur les objets, entités et phénomènes anormaux documentés par la Fondation SCP.<br />
         Utilisez notre chat IA pour poser toutes vos questions sur SCP et obtenez des réponses précises et rapides.
       </p>
     </section>
@@ -201,7 +227,7 @@
     <section id="chatSection">
       <div id="chatBox"></div>
       <div id="chatInputRow">
-        <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off"/>
+        <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off" />
         <button id="chatSendBtn">Envoyer</button>
       </div>
     </section>
@@ -231,97 +257,88 @@
     </section>
   </div>
 
-<script>
-  // Gestion onglets
-  const btnHome = document.getElementById('btnHome');
-  const btnChat = document.getElementById('btnChat');
-  const btnForm = document.getElementById('btnForm');
+  <!-- EmailJS CDN -->
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    // Remplace par ta clé publique EmailJS (obligatoire)
+    emailjs.init('YOUR_PUBLIC_KEY');
 
-  const homeSection = document.getElementById('homeSection');
-  const chatSection = document.getElementById('chatSection');
-  const formSection = document.getElementById('formSection');
+    const btnHome = document.getElementById('btnHome');
+    const btnChat = document.getElementById('btnChat');
+    const btnForm = document.getElementById('btnForm');
+    const homeSection = document.getElementById('homeSection');
+    const chatSection = document.getElementById('chatSection');
+    const formSection = document.getElementById('formSection');
 
-  function setActive(button, section) {
-    [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
-    [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
-    button.classList.add('active');
-    section.classList.add('active');
-  }
+    function setActive(button, section) {
+      [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
+      [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
+      button.classList.add('active');
+      section.classList.add('active');
+    }
+    btnHome.addEventListener('click', () => setActive(btnHome, homeSection));
+    btnChat.addEventListener('click', () => setActive(btnChat, chatSection));
+    btnForm.addEventListener('click', () => setActive(btnForm, formSection));
 
-  btnHome.addEventListener('click', () => setActive(btnHome, homeSection));
-  btnChat.addEventListener('click', () => setActive(btnChat, chatSection));
-  btnForm.addEventListener('click', () => setActive(btnForm, formSection));
+    // Chat basique simulation
+    const chatBox = document.getElementById('chatBox');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
 
-  // Chat SCP simple simulation (à remplacer par vrai API plus tard)
-  const chatBox = document.getElementById('chatBox');
-  const chatInput = document.getElementById('chatInput');
-  const chatSendBtn = document.getElementById('chatSendBtn');
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('msg', sender);
+      msgDiv.textContent = text;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      msgDiv.style.animation = 'none';
+      void msgDiv.offsetWidth; // reset animation
+      msgDiv.style.animation = sender === 'user' ? 'slideInRight 0.4s forwards' : 'slideInLeft 0.4s forwards';
+    }
 
-  function addMessage(text, sender) {
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('msg', sender);
-    msgDiv.textContent = text;
-    chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+    function assistantReply(userText) {
+      // Simule réponse IA
+      let reply = "Je suis désolé, je n'ai pas cette information pour le moment.";
+      if(userText.toLowerCase().includes("scp-173")) reply = "SCP-173 est une sculpture animée extrêmement hostile...";
+      else if(userText.toLowerCase().includes("scp")) reply = "Chaque SCP a ses propres particularités, peux-tu préciser ?";
+      addMessage(reply, 'assistant');
+    }
 
-  chatSendBtn.addEventListener('click', () => {
-    const msg = chatInput.value.trim();
-    if(!msg) return;
-    addMessage(msg, 'user');
-    chatInput.value = '';
-    // Simuler réponse IA SCP (en attendant API)
-    setTimeout(() => {
-      addMessage("Réponse SCP IA : " + msg.split('').reverse().join(''), 'assistant');
-    }, 1000);
-  });
-  chatInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') {
+    chatSendBtn.addEventListener('click', () => {
+      const text = chatInput.value.trim();
+      if(!text) return;
+      addMessage(text, 'user');
+      chatInput.value = '';
+      setTimeout(() => assistantReply(text), 700);
+    });
+    chatInput.addEventListener('keypress', e => {
+      if(e.key === 'Enter') chatSendBtn.click();
+    });
+
+    // Formulaire EmailJS
+    const form = document.getElementById('inscriptionForm');
+    const applyMsg = document.getElementById('applyMsg');
+
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      chatSendBtn.click();
-    }
-  });
-
-  // Formulaire + API GROQ post
-  const form = document.getElementById('inscriptionForm');
-  const applyMsg = document.getElementById('applyMsg');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    applyMsg.style.display = 'none';
-
-    const data = {
-      _type: 'inscription',
-      fullName: form.fullName.value.trim(),
-      email: form.email.value.trim(),
-      role: form.role.value,
-      motivation: form.motivation.value.trim(),
-      date: new Date().toISOString()
-    };
-
-    try {
-      const res = await fetch('https://your-groq-api-endpoint/v1/data/mutate/your-dataset', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer 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'
-        },
-        body: JSON.stringify({
-          mutations: [
-            { create: data }
-          ]
-        }),
+      // Collect data
+      const formData = {
+        fullName: form.fullName.value,
+        email: form.email.value,
+        role: form.role.value,
+        motivation: form.motivation.value,
+      };
+      // Envoi via EmailJS
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+      .then(() => {
+        applyMsg.classList.add('show');
+        form.reset();
+        setTimeout(() => applyMsg.classList.remove('show'), 5000);
+      }, (err) => {
+        alert('Erreur envoi formulaire, réessaie plus tard.');
+        console.error(err);
       });
-
-      if (!res.ok) throw new Error('Erreur lors de l\'envoi');
-
-      applyMsg.style.display = 'block';
-      form.reset();
-
-    } catch (error) {
-      alert('Erreur lors de la soumission : ' + error.message);
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
