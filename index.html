@@ -3,208 +3,230 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chat SCP + Formulaire</title>
+<title>site-X - Fondation SCP</title>
 <style>
-  *{margin:0; padding:0; box-sizing:border-box;}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
   body, html {
     height: 100%;
     font-family: 'Inter', sans-serif;
-    background:#0f172a; color:#f9fafb;
-    display:flex; flex-direction:column;
+    background: #0f172a;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
   }
   #container {
-    flex:1;
-    max-width:900px;
-    margin:auto;
-    padding:1rem;
-    display:flex; flex-direction:column; gap:1rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex-grow: 1;
   }
   header {
-    display:flex; justify-content:center; gap:2rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
   }
   header button {
-    background:none; border:none; color:#94a3b8; font-weight:700; font-size:1.1rem;
-    padding:0.6rem 1.2rem; border-radius:12px; cursor:pointer;
-    transition:color 0.3s, background-color 0.3s;
-    position:relative; overflow:hidden;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-weight: 700;
+    font-size: 1.15rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
   }
-  header button.active, header button:hover {
-    color:#10b981;
-    background:#1e293b;
-  }
-  header button::after {
-    content:'';
-    position:absolute; bottom:0; left:50%; width:0; height:2px;
-    background:#10b981;
-    transition: width 0.3s ease, left 0.3s ease;
-  }
-  header button.active::after, header button:hover::after {
-    width:100%; left:0;
+  header button:hover, header button.active {
+    background-color: #10b981;
+    color: #0f172a;
   }
   section {
-    display:none;
-    flex-direction:column;
-    background:#1e293b;
-    padding:1.5rem;
-    border-radius:16px;
-    box-shadow:0 0 10px #10b981aa;
-    opacity:0;
-    transform:translateY(10px);
-    transition:opacity 0.4s ease, transform 0.4s ease;
+    display: none;
+    background: #1e293b;
+    padding: 1.8rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 0 15px #10b981cc;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    flex-direction: column;
+    min-height: 350px;
   }
   section.active {
-    display:flex;
-    opacity:1;
-    transform:translateY(0);
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
   }
   /* Accueil */
   #homeSection h1 {
-    font-size:2.8rem;
-    margin-bottom:0.5rem;
-    color:#10b981;
-    animation: fadeInUp 0.6s ease forwards;
+    font-size: 3rem;
+    color: #10b981;
+    margin-bottom: 1rem;
+    font-weight: 900;
+    letter-spacing: 2px;
   }
   #homeSection p {
-    font-size:1.2rem;
-    line-height:1.6;
-    color:#cbd5e1;
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay:0.3s;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    font-style: italic;
   }
+  #homeSection p strong {
+    color: #34d399;
+  }
+
   /* Chat */
   #chatBox {
-    flex:1;
-    overflow-y:auto;
-    margin-bottom:1rem;
-    border:1px solid #334155;
-    border-radius:12px;
-    padding:1rem;
-    background:#0f172a;
-    max-height:350px;
-    display:flex; flex-direction:column; gap:0.5rem;
+    flex-grow: 1;
+    background: #0f172a;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 400px;
   }
   .msg {
-    padding:0.8rem 1rem;
-    border-radius:14px;
-    max-width:80%;
-    white-space:pre-wrap;
-    opacity:0;
-    transform:translateX(20px);
-    animation: slideInLeft 0.4s forwards;
+    max-width: 75%;
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    opacity: 0;
+    transform: translateX(20px);
+    animation-fill-mode: forwards;
+    white-space: pre-wrap;
   }
   .msg.user {
-    background:#10b981cc;
-    align-self:flex-end;
-    color:#0f172a;
-    font-weight:600;
+    align-self: flex-end;
+    background-color: #10b981cc;
+    color: #0f172a;
+    font-weight: 600;
     animation-name: slideInRight;
   }
   .msg.assistant {
-    background:#334155cc;
-    color:#cbd5e1;
-    align-self:flex-start;
-    font-style:italic;
+    align-self: flex-start;
+    background-color: #334155cc;
+    color: #cbd5e1;
+    font-style: italic;
+    animation-name: slideInLeft;
+  }
+  @keyframes slideInLeft {
+    to {opacity: 1; transform: translateX(0);}
+  }
+  @keyframes slideInRight {
+    to {opacity: 1; transform: translateX(0);}
   }
   #chatInputRow {
-    display:flex; gap:0.7rem;
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 0.8rem;
   }
   #chatInputRow input {
-    flex:1;
-    padding:0.7rem 1rem;
-    border-radius:12px;
-    border:none;
-    font-size:1rem;
-    background:#1e293b;
-    color:#f9fafb;
-    outline-offset:3px;
+    flex-grow: 1;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: none;
+    background: #1e293b;
+    color: #e0e0e0;
+    font-size: 1rem;
+    outline-offset: 3px;
     box-shadow: inset 0 0 8px #10b981aa;
     transition: box-shadow 0.3s ease;
   }
   #chatInputRow input:focus {
-    box-shadow:0 0 10px #10b981cc;
+    box-shadow: 0 0 10px #10b981cc;
   }
   #chatInputRow button {
-    background:#10b981;
-    border:none;
-    color:#0f172a;
-    font-weight:700;
-    padding:0.7rem 1.4rem;
-    border-radius:12px;
-    cursor:pointer;
+    background-color: #10b981;
+    border: none;
+    color: #0f172a;
+    font-weight: 700;
+    padding: 0.7rem 1.4rem;
+    border-radius: 12px;
+    cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
   }
   #chatInputRow button:hover {
-    background:#059669;
+    background-color: #059669;
     transform: scale(1.05);
   }
   #chatInputRow button:active {
     transform: scale(0.95);
   }
+
   /* Formulaire */
   form {
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
   form label {
-    font-weight:700;
-    color:#10b981;
-    user-select:none;
+    font-weight: 700;
+    color: #10b981;
+    user-select: none;
   }
   form input, form select, form textarea {
-    padding:0.8rem 1rem;
-    border-radius:12px;
-    border:none;
-    background:#1e293b;
-    color:#f9fafb;
-    font-size:1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    border: none;
+    background: #1e293b;
+    color: #e0e0e0;
+    font-size: 1rem;
     box-shadow: inset 0 0 8px #10b981aa;
     resize: vertical;
     transition: box-shadow 0.3s ease;
   }
   form input:focus, form select:focus, form textarea:focus {
-    outline:3px solid #10b981cc;
+    outline: 3px solid #10b981cc;
   }
   form button {
-    background:#10b981;
-    border:none;
-    padding:1rem;
-    border-radius:14px;
-    font-weight:700;
-    font-size:1.1rem;
-    color:#0f172a;
-    cursor:pointer;
+    background-color: #10b981;
+    border: none;
+    padding: 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #0f172a;
+    cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
   }
   form button:hover {
-    background:#059669;
+    background-color: #059669;
     transform: scale(1.05);
   }
   form button:active {
     transform: scale(0.95);
   }
   #applyMsg {
-    margin-top:1rem;
-    font-weight:700;
-    color:#34d399;
-    display:none;
-    opacity:0;
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #34d399;
+    display: none;
+    opacity: 0;
     transition: opacity 0.5s ease;
   }
   #applyMsg.show {
-    display:block;
-    opacity:1;
+    display: block;
+    opacity: 1;
   }
-  /* Animations */
-  @keyframes fadeInUp {
-    from {opacity:0; transform: translateY(15px);}
-    to {opacity:1; transform: translateY(0);}
-  }
-  @keyframes slideInLeft {
-    to {opacity:1; transform: translateX(0);}
-  }
-  @keyframes slideInRight {
-    to {opacity:1; transform: translateX(0);}
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    #container {
+      margin: 1rem;
+      padding: 1rem;
+    }
+    #homeSection h1 {
+      font-size: 2.2rem;
+    }
   }
 </style>
 </head>
@@ -217,32 +239,37 @@
     </header>
 
     <section id="homeSection" class="active">
-      <h1>Bienvenue dans l'univers SCP</h1>
+      <h1>Bienvenue dans le Monde SCP</h1>
       <p>
-        Explorez des informations détaillées sur les objets, entités et phénomènes anormaux documentés par la Fondation SCP.<br />
-        Utilisez notre chat IA pour poser toutes vos questions sur SCP et obtenez des réponses précises et rapides.
+        <strong>site-X</strong> vous plonge au cœur de la Fondation SCP,<br />
+        une organisation secrète chargée de sécuriser, contenir et protéger<br />
+        l'humanité des phénomènes anormaux, objets et entités étranges.<br /><br />
+        Explorez nos archives, découvrez les histoires fascinantes des SCP, <br />
+        et participez à l’aventure en rejoignant nos rangs via notre formulaire.<br /><br />
+        Le savoir est une arme, la prudence une nécessité.<br />
+        Que votre curiosité guide vos pas, mais que votre raison soit votre bouclier.
       </p>
     </section>
 
     <section id="chatSection">
-      <div id="chatBox"></div>
+      <div id="chatBox" aria-live="polite" aria-label="Conversation SCP"></div>
       <div id="chatInputRow">
-        <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off" />
-        <button id="chatSendBtn">Envoyer</button>
+        <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off" aria-label="Message à envoyer" />
+        <button id="chatSendBtn" aria-label="Envoyer message">Envoyer</button>
       </div>
     </section>
 
     <section id="formSection">
       <form id="inscriptionForm">
         <label for="fullName">Nom complet</label>
-        <input type="text" id="fullName" name="fullName" placeholder="Votre nom complet" required />
+        <input type="text" id="fullName" name="fullName" placeholder="Votre nom complet" required autocomplete="name" />
 
         <label for="email">Adresse Email</label>
-        <input type="email" id="email" name="email" placeholder="exemple@mail.com" required />
+        <input type="email" id="email" name="email" placeholder="exemple@mail.com" required autocomplete="email" />
 
         <label for="role">Rôle souhaité</label>
         <select id="role" name="role" required>
-          <option value="">-- Choisissez un rôle --</option>
+          <option value="" disabled selected>-- Choisissez un rôle --</option>
           <option value="agent">Agent de terrain</option>
           <option value="chercheur">Chercheur SCP</option>
           <option value="technicien">Technicien</option>
@@ -251,94 +278,100 @@
         <label for="motivation">Motivation</label>
         <textarea id="motivation" name="motivation" rows="4" placeholder="Pourquoi souhaitez-vous rejoindre la Fondation ?" required></textarea>
 
-        <button type="submit">Soumettre</button>
+        <button type="submit">Soumettre la candidature</button>
       </form>
-      <div id="applyMsg">Merci pour votre inscription, nous reviendrons vers vous bientôt !</div>
+      <div id="applyMsg" role="alert" aria-live="assertive">Merci pour votre inscription, nous reviendrons vers vous bientôt !</div>
     </section>
   </div>
 
-  <!-- EmailJS CDN -->
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    // Remplace par ta clé publique EmailJS (obligatoire)
-    emailjs.init('YOUR_PUBLIC_KEY');
+<script>
+  // Onglets
+  const btnHome = document.getElementById('btnHome');
+  const btnChat = document.getElementById('btnChat');
+  const btnForm = document.getElementById('btnForm');
+  const homeSection = document.getElementById('homeSection');
+  const chatSection = document.getElementById('chatSection');
+  const formSection = document.getElementById('formSection');
 
-    const btnHome = document.getElementById('btnHome');
-    const btnChat = document.getElementById('btnChat');
-    const btnForm = document.getElementById('btnForm');
-    const homeSection = document.getElementById('homeSection');
-    const chatSection = document.getElementById('chatSection');
-    const formSection = document.getElementById('formSection');
+  function setActive(button, section) {
+    [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
+    [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
+    button.classList.add('active');
+    section.classList.add('active');
+  }
 
-    function setActive(button, section) {
-      [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
-      [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
-      button.classList.add('active');
-      section.classList.add('active');
-    }
-    btnHome.addEventListener('click', () => setActive(btnHome, homeSection));
-    btnChat.addEventListener('click', () => setActive(btnChat, chatSection));
-    btnForm.addEventListener('click', () => setActive(btnForm, formSection));
+  btnHome.addEventListener('click', () => setActive(btnHome, homeSection));
+  btnChat.addEventListener('click', () => setActive(btnChat, chatSection));
+  btnForm.addEventListener('click', () => setActive(btnForm, formSection));
 
-    // Chat basique simulation
-    const chatBox = document.getElementById('chatBox');
-    const chatInput = document.getElementById('chatInput');
-    const chatSendBtn = document.getElementById('chatSendBtn');
+  // Chat basique
+  const chatBox = document.getElementById('chatBox');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
 
-    function addMessage(text, sender) {
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add('msg', sender);
-      msgDiv.textContent = text;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      msgDiv.style.animation = 'none';
-      void msgDiv.offsetWidth; // reset animation
-      msgDiv.style.animation = sender === 'user' ? 'slideInRight 0.4s forwards' : 'slideInLeft 0.4s forwards';
-    }
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('msg', sender);
+    msgDiv.textContent = text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    msgDiv.style.animation = 'none';
+    void msgDiv.offsetWidth; // relance animation
+    msgDiv.style.animation = sender === 'user' ? 'slideInRight 0.4s forwards' : 'slideInLeft 0.4s forwards';
+  }
 
-    function assistantReply(userText) {
-      // Simule réponse IA
-      let reply = "Je suis désolé, je n'ai pas cette information pour le moment.";
-      if(userText.toLowerCase().includes("scp-173")) reply = "SCP-173 est une sculpture animée extrêmement hostile...";
-      else if(userText.toLowerCase().includes("scp")) reply = "Chaque SCP a ses propres particularités, peux-tu préciser ?";
-      addMessage(reply, 'assistant');
-    }
+  function assistantReply(userText) {
+    let reply = "Je n'ai pas cette information pour l'instant, désolé.";
+    const lower = userText.toLowerCase();
+    if(lower.includes('scp-173')) reply = "SCP-173 est une entité animée extrêmement dangereuse, immobile uniquement quand on la regarde.";
+    else if(lower.includes('scp-049')) reply = "SCP-049 est un humanoïde masqué se proclamant 'Peste Noire', capable d'endormir et transformer les humains.";
+    else if(lower.includes('scp')) reply = "Les SCPs sont des objets ou entités anormaux catalogués par la Fondation, chacun avec ses particularités uniques.";
+    addMessage(reply, 'assistant');
+  }
 
-    chatSendBtn.addEventListener('click', () => {
-      const text = chatInput.value.trim();
-      if(!text) return;
-      addMessage(text, 'user');
-      chatInput.value = '';
-      setTimeout(() => assistantReply(text), 700);
-    });
-    chatInput.addEventListener('keypress', e => {
-      if(e.key === 'Enter') chatSendBtn.click();
-    });
+  chatSendBtn.addEventListener('click', () => {
+    const text = chatInput.value.trim();
+    if(!text) return;
+    addMessage(text, 'user');
+    chatInput.value = '';
+    setTimeout(() => assistantReply(text), 800);
+  });
 
-    // Formulaire EmailJS
-    const form = document.getElementById('inscriptionForm');
-    const applyMsg = document.getElementById('applyMsg');
+  chatInput.addEventListener('keypress', e => {
+    if(e.key === 'Enter') chatSendBtn.click();
+  });
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      // Collect data
-      const formData = {
-        fullName: form.fullName.value,
-        email: form.email.value,
-        role: form.role.value,
-        motivation: form.motivation.value,
-      };
-      // Envoi via EmailJS
-      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
-      .then(() => {
-        applyMsg.classList.add('show');
-        form.reset();
-        setTimeout(() => applyMsg.classList.remove('show'), 5000);
-      }, (err) => {
-        alert('Erreur envoi formulaire, réessaie plus tard.');
-        console.error(err);
-      });
-    });
-  </script>
+  // Formulaire - mailto
+  const form = document.getElementById('inscriptionForm');
+  const applyMsg = document.getElementById('applyMsg');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    // Crée mailto: avec contenu du formulaire
+    const fullName = encodeURIComponent(form.fullName.value.trim());
+    const email = encodeURIComponent(form.email.value.trim());
+    const role = encodeURIComponent(form.role.value);
+    const motivation = encodeURIComponent(form.motivation.value.trim());
+
+    const subject = encodeURIComponent(`Nouvelle candidature site-X: ${fullName}`);
+    const body = encodeURIComponent(
+      `Nom complet: ${fullName}\n` +
+      `Email: ${email}\n` +
+      `Rôle souhaité: ${role}\n` +
+      `Motivation:\n${motivation}`
+    );
+
+    // Compose mailto url
+    const mailtoLink = `mailto:testsoso45@gmail.com?subject=${subject}&body=${body}`;
+
+    // Ouvre le client mail
+    window.location.href = mailtoLink;
+
+    // Message de confirmation affiché (même si mail pas envoyé vraiment)
+    applyMsg.classList.add('show');
+    form.reset();
+    setTimeout(() => applyMsg.classList.remove('show'), 7000);
+  });
+</script>
 </body>
 </html>
