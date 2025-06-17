@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>SCP Terminal - Assistant IA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
@@ -12,11 +13,30 @@
 <body class="bg-black text-green-400 font-mono flex items-center justify-center min-h-screen p-6">
 
   <div class="w-full max-w-2xl bg-[#0a0a0a] border border-green-700 rounded-2xl shadow-lg flex flex-col overflow-hidden">
+    
     <div class="bg-green-900 text-center py-3 text-lg font-bold border-b border-green-600">
       TERMINAL SÉCURISÉ — SCP AI ASSISTANT V1.0
     </div>
 
-    <div id="chat" class="p-4 space-y-4 h-[480px] overflow-y-auto text-sm bg-black">
+    <!-- Google Login -->
+    <div id="google-login" class="text-center bg-black py-4 border-b border-green-600">
+      <div id="g_id_onload"
+           data-client_id="623343442822-vg5208651s2f9jfdlr6d65379lehna8b.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+
+      <div class="g_id_signin"
+           data-type="standard"
+           data-size="large"
+           data-theme="outline"
+           data-text="sign_in_with"
+           data-shape="pill"
+           data-logo_alignment="left">
+      </div>
+    </div>
+
+    <div id="chat" class="p-4 space-y-4 h-[440px] overflow-y-auto text-sm bg-black">
       <div class="bg-green-800 bg-opacity-20 p-3 rounded-md max-w-[80%]">
         [SYSTÈME] Connexion à l'assistant IA de la Fondation SCP...<br>
         [SYSTÈME] Posez votre question sur un SCP ou demandez une information liée au développement.
@@ -45,9 +65,9 @@ Tu es spécialisée dans :
 - L'aide aux joueurs sur les mécaniques du jeu
 - Les détails du développement du jeu
 
-Chef de projet : Alex "BlackBox" Morvan  
-Développeurs : Lisa Tremblay (UI/UX), Maxime Dufresne (Gameplay), Omar Naël (IA)  
-Version du jeu actuelle : 0.9.3 Beta
+Chef de projet : Soan
+Développeurs : Théo (Builder), Soan (Script,Builder) 
+Version du jeu actuelle : Non lancé
 
 Réponds avec clarté et immersion, dans le style d'une IA de la Fondation SCP.
 `;
@@ -96,7 +116,17 @@ Réponds avec clarté et immersion, dans le style d'une IA de la Fondation SCP.
     input.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendMessage();
     });
-  </script>
 
+    function handleCredentialResponse(response) {
+      const token = response.credential;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      const name = payload.name;
+      const email = payload.email;
+
+      appendMessage(`[AUTH] Connecté en tant que ${name} (${email})`, "assistant");
+      document.getElementById("google-login").style.display = "none";
+    }
+  </script>
 </body>
 </html>
