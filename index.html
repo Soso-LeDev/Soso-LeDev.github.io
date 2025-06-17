@@ -2,75 +2,101 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Chat avec GROQ</title>
+  <title>SCP Terminal - Assistant IA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+  </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-black text-green-400 font-mono flex items-center justify-center min-h-screen p-6">
 
-  <div class="w-full max-w-xl bg-gray-800 rounded-2xl shadow-lg flex flex-col overflow-hidden">
-    <div id="chat" class="flex-1 p-4 space-y-4 h-[500px] overflow-y-auto">
-      <div class="bg-gray-700 p-3 rounded-lg self-start max-w-[80%]">Salut ! Pose-moi une question.</div>
+  <div class="w-full max-w-2xl bg-[#0a0a0a] border border-green-700 rounded-2xl shadow-lg flex flex-col overflow-hidden">
+    <div class="bg-green-900 text-center py-3 text-lg font-bold border-b border-green-600">
+      TERMINAL SÉCURISÉ — SCP AI ASSISTANT V1.0
     </div>
 
-    <div class="flex p-4 bg-gray-700">
-      <input id="messageInput" type="text" placeholder="Écris ici..." 
-        class="flex-1 px-4 py-2 rounded-l-lg bg-gray-600 text-white focus:outline-none" />
+    <div id="chat" class="p-4 space-y-4 h-[480px] overflow-y-auto text-sm bg-black">
+      <div class="bg-green-800 bg-opacity-20 p-3 rounded-md max-w-[80%]">
+        [SYSTÈME] Connexion à l'assistant IA de la Fondation SCP...<br>
+        [SYSTÈME] Posez votre question sur un SCP ou demandez une information liée au développement.
+      </div>
+    </div>
+
+    <div class="flex border-t border-green-600 p-3 bg-black">
+      <input id="messageInput" type="text" placeholder="> Entrez votre commande ici..." 
+        class="flex-1 bg-black border border-green-600 text-green-300 px-3 py-2 rounded-l-md focus:outline-none" />
       <button onclick="sendMessage()" 
-        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg text-white font-semibold">
-        Envoyer
+        class="bg-green-700 hover:bg-green-600 px-4 py-2 rounded-r-md font-bold text-black">
+        ENVOYER
       </button>
     </div>
   </div>
 
   <script>
-    const chatDiv = document.getElementById('chat');
-    const input = document.getElementById('messageInput');
-    const apiKey = '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';
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("messageInput");
+    const apiKey = "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";
+
+    const systemPrompt = `
+Tu es une intelligence artificielle intégrée au terminal sécurisé du jeu SCP-REDUX.
+Tu es spécialisée dans :
+- L'univers SCP (objets, classes, histoires, rôles)
+- L'aide aux joueurs sur les mécaniques du jeu
+- Les détails du développement du jeu
+
+Chef de projet : Alex "BlackBox" Morvan  
+Développeurs : Lisa Tremblay (UI/UX), Maxime Dufresne (Gameplay), Omar Naël (IA)  
+Version du jeu actuelle : 0.9.3 Beta
+
+Réponds avec clarté et immersion, dans le style d'une IA de la Fondation SCP.
+`;
 
     function appendMessage(content, role) {
-      const msg = document.createElement('div');
-      msg.className = `p-3 rounded-lg max-w-[80%] whitespace-pre-wrap ${role === 'user' ? 'bg-blue-600 self-end' : 'bg-gray-700 self-start'}`;
+      const msg = document.createElement("div");
+      msg.className = `p-3 rounded-md max-w-[80%] whitespace-pre-wrap ${role === "user" ? "bg-green-700 bg-opacity-30 self-end" : "bg-green-800 bg-opacity-20 self-start"}`;
       msg.textContent = content;
-      chatDiv.appendChild(msg);
-      chatDiv.scrollTop = chatDiv.scrollHeight;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
     }
 
     async function sendMessage() {
       const userInput = input.value.trim();
       if (!userInput) return;
-      
-      appendMessage(userInput, 'user');
-      input.value = '';
-      
+
+      appendMessage("> " + userInput, "user");
+      input.value = "";
+
       try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
           },
           body: JSON.stringify({
             model: "llama3-8b-8192",
             messages: [
-              { role: "system", content: "Tu es un assistant utile et amical." },
+              { role: "system", content: systemPrompt },
               { role: "user", content: userInput }
             ],
-            temperature: 0.7
+            temperature: 0.5
           })
         });
 
         const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-        appendMessage(reply, 'assistant');
+        const reply = data.choices?.[0]?.message?.content || "[Erreur : réponse vide]";
+        appendMessage(reply, "assistant");
 
       } catch (err) {
-        appendMessage("Erreur de réponse : " + err.message, 'assistant');
+        appendMessage("[ERREUR] Connexion interrompue : " + err.message, "assistant");
       }
     }
 
-    input.addEventListener("keypress", function(e) {
+    input.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendMessage();
     });
   </script>
+
 </body>
 </html>
