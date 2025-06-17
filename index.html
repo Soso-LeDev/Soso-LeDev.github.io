@@ -3,387 +3,325 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chat Modernisé</title>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+<title>Chat SCP + Formulaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
 <style>
-  /* Reset basique */
+  /* Reset */
   * {
     margin: 0; padding: 0; box-sizing: border-box;
   }
   body, html {
     height: 100%;
     font-family: 'Inter', sans-serif;
-    background: #121212;
-    color: #eee;
+    background-color: #0f172a;
+    color: #f9fafb;
     display: flex;
+    flex-direction: column;
   }
   #container {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: #121212;
-  }
-  /* SIDEBAR */
-  #sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #0d47a1 0%, #1976d2 100%);
+    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 2rem 1.5rem;
-    gap: 2.5rem;
-    box-shadow: 4px 0 15px rgba(25, 118, 210, 0.8);
-    user-select: none;
-  }
-  #sidebar h1 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 900;
-    font-size: 2.4rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #bbdefb;
-    text-align: center;
-    text-shadow: 0 0 12px #82b1ffaa;
-    user-select: none;
-  }
-  nav {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  nav a {
-    color: #bbdefbcc;
-    font-weight: 700;
-    font-size: 1.2rem;
-    text-decoration: none;
-    padding: 0.85rem 1.3rem;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
+    max-width: 900px;
+    margin: auto;
+    padding: 1rem;
     gap: 1rem;
-    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    box-shadow: inset 0 0 0 transparent;
   }
-  nav a svg {
-    stroke: #bbdefbcc;
-    width: 24px;
-    height: 24px;
-    transition: stroke 0.25s ease;
-  }
-  nav a:hover, nav a.active {
-    background-color: #e3f2fd;
-    color: #0d47a1;
-    box-shadow: 0 0 18px #82b1ffdd;
-  }
-  nav a:hover svg, nav a.active svg {
-    stroke: #0d47a1;
-  }
-
-  /* MAIN CONTENT */
-  #mainContent {
-    flex-grow: 1;
+  header {
     display: flex;
-    flex-direction: column;
-    background: #1e1e1e;
-    padding: 3rem 4rem;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #2196f3 #121212;
+    justify-content: center;
+    gap: 2rem;
   }
-  #mainContent::-webkit-scrollbar {
-    width: 10px;
-  }
-  #mainContent::-webkit-scrollbar-track {
-    background: #121212;
-  }
-  #mainContent::-webkit-scrollbar-thumb {
-    background-color: #2196f3;
-    border-radius: 10px;
-  }
-  section {
-    max-width: 760px;
-    margin-bottom: 3.5rem;
-  }
-  h2 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #2196f3;
-    margin-bottom: 1.6rem;
-    text-shadow: 0 0 18px #64b5f6cc;
-  }
-  p {
-    font-size: 1.15rem;
-    line-height: 1.7;
-    color: #cfd8dc;
-    margin-bottom: 1.2rem;
-  }
-
-  /* Chat */
-  #chatSection {
-    background: #272727;
-    border-radius: 20px;
-    padding: 2rem 2.5rem;
-    box-shadow: 0 0 28px #2196f344 inset;
-    display: flex;
-    flex-direction: column;
-    font-family: 'Fira Code', monospace;
-    color: #ddd;
-  }
-  #chatBox {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    padding-right: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: #2196f3 #272727;
-    margin-bottom: 1.6rem;
-  }
-  #chatBox::-webkit-scrollbar {
-    width: 9px;
-  }
-  #chatBox::-webkit-scrollbar-track {
-    background: #272727;
-  }
-  #chatBox::-webkit-scrollbar-thumb {
-    background-color: #2196f3;
-    border-radius: 10px;
-  }
-  .chat-msg-user, .chat-msg-assistant {
-    max-width: 70%;
-    padding: 1rem 1.4rem;
-    border-radius: 24px;
-    white-space: pre-wrap;
-    font-size: 1rem;
-    line-height: 1.3;
-    box-shadow: 0 0 16px #2196f3aa;
-    transition: background-color 0.3s ease;
-  }
-  .chat-msg-user {
-    background: #2196f3dd;
-    color: #121212;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
+  header button {
+    background: none;
+    border: none;
+    color: #94a3b8;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    font-size: 1.1rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
   }
-  .chat-msg-user:hover {
-    background: #1976d2dd;
-  }
-  .chat-msg-assistant {
-    background: #424242dd;
-    color: #e0e0e0;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-    font-style: italic;
-    letter-spacing: 0.015em;
-  }
-  .chat-msg-assistant:hover {
-    background: #616161dd;
+  header button.active,
+  header button:hover {
+    color: #10b981;
+    background-color: #1e293b;
   }
 
-  /* Input row */
+  /* Sections (onglets) */
+  section {
+    display: none;
+    flex-direction: column;
+    background-color: #1e293b;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 0 10px #10b981aa;
+  }
+  section.active {
+    display: flex;
+  }
+  
+  /* ACCUEIL */
+  #homeSection h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    color: #10b981;
+  }
+  #homeSection p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+  }
+
+  /* CHAT SCP */
+  #chatBox {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1rem;
+    background-color: #0f172a;
+    max-height: 350px;
+  }
+  .msg {
+    margin-bottom: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    max-width: 80%;
+    white-space: pre-wrap;
+  }
+  .msg.user {
+    background-color: #10b981cc;
+    align-self: flex-end;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  .msg.assistant {
+    background-color: #334155cc;
+    color: #cbd5e1;
+    align-self: flex-start;
+    font-style: italic;
+  }
   #chatInputRow {
     display: flex;
-    gap: 1rem;
+    gap: 0.7rem;
   }
   #chatInputRow input {
-    flex-grow: 1;
-    padding: 1rem 1.6rem;
-    border-radius: 24px;
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
     border: none;
-    font-family: 'Fira Code', monospace;
-    font-size: 1.15rem;
-    background: #333;
-    color: #eee;
-    box-shadow: inset 0 0 14px #2196f3aa;
-    outline-offset: 4px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  #chatInputRow input::placeholder {
-    color: #90caf9aa;
-    font-style: italic;
+    font-size: 1rem;
+    background-color: #1e293b;
+    color: #f9fafb;
+    outline-offset: 3px;
+    box-shadow: inset 0 0 8px #10b981aa;
+    transition: box-shadow 0.3s ease;
   }
   #chatInputRow input:focus {
-    background-color: #2196f3;
-    color: #121212;
-    box-shadow: 0 0 30px #2196f3cc;
-    outline: 3px solid #0d47a1;
+    box-shadow: 0 0 10px #10b981cc;
   }
   #chatInputRow button {
-    padding: 1rem 2.4rem;
-    border-radius: 24px;
+    background-color: #10b981;
     border: none;
-    background-color: #2196f3;
-    color: #121212;
+    color: #0f172a;
     font-weight: 700;
-    font-size: 1.15rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 12px;
     cursor: pointer;
-    box-shadow: 0 0 30px #2196f3cc;
-    user-select: none;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease;
   }
   #chatInputRow button:hover {
-    background-color: #0d47a1;
-    box-shadow: 0 0 40px #0d47a1cc;
+    background-color: #059669;
   }
 
-  /* Recruitment form */
-  #recruitSection {
-    display: none;
+  /* FORMULAIRE */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
-  #recruitSection.active {
-    display: block;
-  }
-  #recruitForm {
-    max-width: 720px;
-    background: #2c2c2c;
-    padding: 2rem 2.5rem;
-    border-radius: 24px;
-    box-shadow: 0 0 30px #2196f3cc inset;
-    color: #e0e0e0;
-    font-size: 1.1rem;
-  }
-  #recruitForm label {
+  form label {
     font-weight: 700;
-    color: #2196f3;
-    margin-bottom: 0.5rem;
-    display: block;
-    text-shadow: 0 0 10px #64b5f6aa;
+    color: #10b981;
   }
-  #recruitForm input,
-  #recruitForm select,
-  #recruitForm textarea {
-    width: 100%;
-    padding: 1rem 1.4rem;
-    margin-bottom: 1.5rem;
-    border-radius: 20px;
+  form input, form select, form textarea {
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
     border: none;
-    background: #1e1e1e;
-    color: #eee;
-    font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
-    box-shadow: inset 0 0 12px #2196f3cc;
-    outline-offset: 3px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #1e293b;
+    color: #f9fafb;
+    font-size: 1rem;
+    box-shadow: inset 0 0 8px #10b981aa;
     resize: vertical;
   }
-  #recruitForm input:focus,
-  #recruitForm select:focus,
-  #recruitForm textarea:focus {
-    background: #2196f3;
-    box-shadow: 0 0 25px #2196f3cc;
-    color: #121212;
-    outline: 3px solid #0d47a1;
+  form input:focus, form select:focus, form textarea:focus {
+    outline: 3px solid #10b981cc;
   }
-  #recruitForm button {
-    width: 100%;
-    background: #2196f3;
+  form button {
+    background-color: #10b981;
     border: none;
-    padding: 1.3rem;
-    border-radius: 24px;
-    font-weight: 900;
-    font-size: 1.25rem;
-    color: #121212;
+    padding: 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #0f172a;
     cursor: pointer;
-    box-shadow: 0 0 30px #2196f3cc;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    user-select: none;
+    transition: background-color 0.3s ease;
   }
-  #recruitForm button:hover {
-    background: #0d47a1;
-    box-shadow: 0 0 40px #0d47a1cc;
+  form button:hover {
+    background-color: #059669;
   }
   #applyMsg {
-    text-align: center;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     font-weight: 700;
-    color: #4caf50;
+    color: #34d399;
     display: none;
-    text-shadow: 0 0 16px #4caf50cc;
-  }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    #container {
-      flex-direction: column;
-    }
-    #sidebar {
-      width: 100%;
-      flex-direction: row;
-      justify-content: space-around;
-      padding: 1rem 0.5rem;
-      box-shadow: none;
-      background: linear-gradient(90deg, #0d47a1 0%, #1976d2 100%);
-    }
-    nav {
-      flex-direction: row;
-      gap: 1.5rem;
-    }
-    nav a {
-      font-size: 1rem;
-      padding: 0.55rem 1rem;
-    }
-    #mainContent {
-      padding: 2rem 1.5rem;
-    }
-    section {
-      max-width: 100%;
-    }
   }
 </style>
 </head>
 <body>
   <div id="container">
-    <aside id="sidebar">
-      <h1>ChatApp</h1>
-      <nav>
-        <a href="#" class="active">
-          <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 20l9-5-9-5-9 5 9 5z"/></svg>
-          Accueil
-        </a>
-        <a href="#">
-          <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-          Discussions
-        </a>
-        <a href="#">
-          <svg fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>
-          Paramètres
-        </a>
-      </nav>
-    </aside>
-    <main id="mainContent">
-      <section id="chatSection">
-        <div id="chatBox">
-          <div class="chat-msg-assistant">Bonjour, comment puis-je vous aider aujourd'hui ?</div>
-          <div class="chat-msg-user">Salut, peux-tu moderniser mon design CSS ?</div>
-        </div>
-        <div id="chatInputRow">
-          <input type="text" placeholder="Écris un message..." />
-          <button>Envoyer</button>
-        </div>
-      </section>
-      <section id="recruitSection">
-        <form id="recruitForm">
-          <label for="name">Nom complet</label>
-          <input id="name" type="text" placeholder="Votre nom" />
-          <label for="email">Email</label>
-          <input id="email" type="email" placeholder="Votre email" />
-          <label for="position">Poste désiré</label>
-          <select id="position">
-            <option>Développeur Frontend</option>
-            <option>Développeur Backend</option>
-            <option>Designer UI/UX</option>
-          </select>
-          <label for="message">Message</label>
-          <textarea id="message" rows="5" placeholder="Pourquoi devrions-nous vous choisir ?"></textarea>
-          <button type="submit">Postuler</button>
-          <div id="applyMsg">Merci pour votre candidature !</div>
-        </form>
-      </section>
-    </main>
+    <header>
+      <button id="btnHome" class="active">Accueil</button>
+      <button id="btnChat">Chat SCP</button>
+      <button id="btnForm">Inscription</button>
+    </header>
+
+    <section id="homeSection" class="active">
+      <h1>Bienvenue dans l'univers SCP</h1>
+      <p>
+        Explorez des informations détaillées sur les objets, entités et phénomènes anormaux documentés par la Fondation SCP.  
+        Utilisez notre chat IA pour poser toutes vos questions sur SCP et obtenez des réponses précises et rapides.
+      </p>
+    </section>
+
+    <section id="chatSection">
+      <div id="chatBox"></div>
+      <div id="chatInputRow">
+        <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off"/>
+        <button id="chatSendBtn">Envoyer</button>
+      </div>
+    </section>
+
+    <section id="formSection">
+      <form id="inscriptionForm">
+        <label for="fullName">Nom complet</label>
+        <input type="text" id="fullName" name="fullName" placeholder="Votre nom complet" required />
+
+        <label for="email">Adresse Email</label>
+        <input type="email" id="email" name="email" placeholder="exemple@mail.com" required />
+
+        <label for="role">Rôle souhaité</label>
+        <select id="role" name="role" required>
+          <option value="">-- Choisissez un rôle --</option>
+          <option value="agent">Agent de terrain</option>
+          <option value="chercheur">Chercheur SCP</option>
+          <option value="technicien">Technicien</option>
+        </select>
+
+        <label for="motivation">Motivation</label>
+        <textarea id="motivation" name="motivation" rows="4" placeholder="Pourquoi souhaitez-vous rejoindre la Fondation ?" required></textarea>
+
+        <button type="submit">Soumettre</button>
+      </form>
+      <div id="applyMsg">Merci pour votre inscription, nous reviendrons vers vous bientôt !</div>
+    </section>
   </div>
+
+<script>
+  // Gestion onglets
+  const btnHome = document.getElementById('btnHome');
+  const btnChat = document.getElementById('btnChat');
+  const btnForm = document.getElementById('btnForm');
+
+  const homeSection = document.getElementById('homeSection');
+  const chatSection = document.getElementById('chatSection');
+  const formSection = document.getElementById('formSection');
+
+  function setActive(button, section) {
+    [btnHome, btnChat, btnForm].forEach(b => b.classList.remove('active'));
+    [homeSection, chatSection, formSection].forEach(s => s.classList.remove('active'));
+    button.classList.add('active');
+    section.classList.add('active');
+  }
+
+  btnHome.addEventListener('click', () => setActive(btnHome, homeSection));
+  btnChat.addEventListener('click', () => setActive(btnChat, chatSection));
+  btnForm.addEventListener('click', () => setActive(btnForm, formSection));
+
+  // Chat SCP simple simulation (à remplacer par vrai API plus tard)
+  const chatBox = document.getElementById('chatBox');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('msg', sender);
+    msgDiv.textContent = text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  chatSendBtn.addEventListener('click', () => {
+    const msg = chatInput.value.trim();
+    if(!msg) return;
+    addMessage(msg, 'user');
+    chatInput.value = '';
+    // Simuler réponse IA SCP (en attendant API)
+    setTimeout(() => {
+      addMessage("Réponse SCP IA : " + msg.split('').reverse().join(''), 'assistant');
+    }, 1000);
+  });
+  chatInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') {
+      e.preventDefault();
+      chatSendBtn.click();
+    }
+  });
+
+  // Formulaire + API GROQ post
+  const form = document.getElementById('inscriptionForm');
+  const applyMsg = document.getElementById('applyMsg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    applyMsg.style.display = 'none';
+
+    const data = {
+      _type: 'inscription',
+      fullName: form.fullName.value.trim(),
+      email: form.email.value.trim(),
+      role: form.role.value,
+      motivation: form.motivation.value.trim(),
+      date: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch('https://your-groq-api-endpoint/v1/data/mutate/your-dataset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer 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'
+        },
+        body: JSON.stringify({
+          mutations: [
+            { create: data }
+          ]
+        }),
+      });
+
+      if (!res.ok) throw new Error('Erreur lors de l\'envoi');
+
+      applyMsg.style.display = 'block';
+      form.reset();
+
+    } catch (error) {
+      alert('Erreur lors de la soumission : ' + error.message);
+    }
+  });
+</script>
 </body>
 </html>
