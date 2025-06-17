@@ -1,60 +1,76 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Le Nouveau Monde</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #000;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #intro-overlay {
-      position: fixed;
-      inset: 0;
-      background-color: black;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2em;
-      z-index: 999;
-      cursor: pointer;
-      transition: opacity 1s ease;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    #intro-text {
-      font-size: 1.5em;
-      text-align: center;
-      padding: 20px;
-      max-width: 800px;
-      line-height: 1.6;
-      z-index: 1;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Chat avec GROQ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
-  <div id="intro-overlay">Clique pour commencer...</div>
-  <div id="intro-text"></div>
+  <div class="w-full max-w-xl bg-gray-800 rounded-2xl shadow-lg flex flex-col overflow-hidden">
+    <div id="chat" class="flex-1 p-4 space-y-4 h-[500px] overflow-y-auto">
+      <div class="bg-gray-700 p-3 rounded-lg self-start max-w-[80%]">Salut ! Pose-moi une question.</div>
+    </div>
 
-  <!-- Chemin corrigé vers le fichier intro.js -->
-  <script src="scripts/intro.js"></script>
+    <div class="flex p-4 bg-gray-700">
+      <input id="messageInput" type="text" placeholder="Écris ici..." 
+        class="flex-1 px-4 py-2 rounded-l-lg bg-gray-600 text-white focus:outline-none" />
+      <button onclick="sendMessage()" 
+        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg text-white font-semibold">
+        Envoyer
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const chatDiv = document.getElementById('chat');
+    const input = document.getElementById('messageInput');
+    const apiKey = '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';
+
+    function appendMessage(content, role) {
+      const msg = document.createElement('div');
+      msg.className = `p-3 rounded-lg max-w-[80%] whitespace-pre-wrap ${role === 'user' ? 'bg-blue-600 self-end' : 'bg-gray-700 self-start'}`;
+      msg.textContent = content;
+      chatDiv.appendChild(msg);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const userInput = input.value.trim();
+      if (!userInput) return;
+      
+      appendMessage(userInput, 'user');
+      input.value = '';
+      
+      try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+          },
+          body: JSON.stringify({
+            model: "llama3-8b-8192",
+            messages: [
+              { role: "system", content: "Tu es un assistant utile et amical." },
+              { role: "user", content: userInput }
+            ],
+            temperature: 0.7
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "[Réponse vide]";
+        appendMessage(reply, 'assistant');
+
+      } catch (err) {
+        appendMessage("Erreur de réponse : " + err.message, 'assistant');
+      }
+    }
+
+    input.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
 </body>
 </html>
