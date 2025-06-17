@@ -2,131 +2,145 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>SCP Terminal - Assistant IA</title>
+  <title>SCP‑Redux • Portail</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    body { background: #060606; color: #E2E8F0; }
+    .neon { text-shadow: 0 0 8px #10B981; }
+    .card { backdrop-filter: blur(10px); background: rgba(20,20,20,0.6); }
   </style>
 </head>
-<body class="bg-black text-green-400 font-mono flex items-center justify-center min-h-screen p-6">
+<body class="font-sans antialiased flex flex-col items-center p-6 space-y-6">
 
-  <div class="w-full max-w-2xl bg-[#0a0a0a] border border-green-700 rounded-2xl shadow-lg flex flex-col overflow-hidden">
-    
-    <div class="bg-green-900 text-center py-3 text-lg font-bold border-b border-green-600">
-      TERMINAL SÉCURISÉ — SCP AI ASSISTANT V1.0
+  <h1 class="neon text-4xl font-bold">🛡️ SCP‑Redux Portal</h1>
+
+  <!-- Connexion Google -->
+  <div id="google-login" class="card p-6 rounded-lg shadow-lg space-y-4">
+    <p class="text-center">Connecte-toi pour accéder au chat & à l’équipe</p>
+    <div id="g_id_onload"
+         data-client_id="623343442822-vg5208651s2f9jfdlr6d65379lehna8b.apps.googleusercontent.com"
+         data-callback="onGoogleLogin"
+         data-auto_prompt="false"></div>
+    <div class="g_id_signin" data-type="standard" data-size="large"
+         data-theme="outline" data-text="sign_in_with"
+         data-shape="pill" data-logo_alignment="left"></div>
+  </div>
+
+  <!-- Conteneur principal, caché si non connecté -->
+  <div id="mainContent" class="hidden flex-col space-y-8 items-center w-full max-w-3xl">
+
+    <!-- Profil & Déconnexion -->
+    <div id="userInfo" class="flex items-center justify-between w-full card p-4 rounded-lg">
+      <div class="flex items-center space-x-4">
+        <img id="userPic" src="" alt="avatar" class="w-12 h-12 rounded-full border border-[#10B981]" />
+        <div>
+          <p id="userName" class="font-semibold"></p>
+          <p id="userEmail" class="text-sm text-gray-400"></p>
+        </div>
+      </div>
+      <button onclick="logout()" class="px-4 py-2 bg-red-600 rounded-md hover:bg-red-500">Déconnexion</button>
     </div>
 
-    <!-- Google Login -->
-    <div id="google-login" class="text-center bg-black py-4 border-b border-green-600">
-      <div id="g_id_onload"
-           data-client_id="623343442822-vg5208651s2f9jfdlr6d65379lehna8b.apps.googleusercontent.com"
-           data-callback="handleCredentialResponse"
-           data-auto_prompt="false">
-      </div>
-
-      <div class="g_id_signin"
-           data-type="standard"
-           data-size="large"
-           data-theme="outline"
-           data-text="sign_in_with"
-           data-shape="pill"
-           data-logo_alignment="left">
+    <!-- Chat “krozen” -->
+    <div class="w-full card rounded-lg shadow-lg p-4 space-y-4">
+      <h2 class="text-2xl neon">Chat “krozen”</h2>
+      <div id="chatBox" class="h-64 overflow-y-auto p-3 bg-gray-900 rounded-md space-y-2"></div>
+      <div class="flex space-x-2">
+        <input id="chatInput" type="text" placeholder="Parle à krozen..." class="flex-1 p-2 rounded-md bg-gray-800 focus:outline-green-500"/>
+        <button onclick="sendChat()" class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-md">➤</button>
       </div>
     </div>
 
-    <div id="chat" class="p-4 space-y-4 h-[440px] overflow-y-auto text-sm bg-black">
-      <div class="bg-green-800 bg-opacity-20 p-3 rounded-md max-w-[80%]">
-        [SYSTÈME] Connexion à l'assistant IA de la Fondation SCP...<br>
-        [SYSTÈME] Posez votre question sur un SCP ou demandez une information liée au développement.
-      </div>
-    </div>
-
-    <div class="flex border-t border-green-600 p-3 bg-black">
-      <input id="messageInput" type="text" placeholder="> Entrez votre commande ici..." 
-        class="flex-1 bg-black border border-green-600 text-green-300 px-3 py-2 rounded-l-md focus:outline-none" />
-      <button onclick="sendMessage()" 
-        class="bg-green-700 hover:bg-green-600 px-4 py-2 rounded-r-md font-bold text-black">
-        ENVOYER
-      </button>
+    <!-- Formulaire recrutement -->
+    <div class="w-full card rounded-lg p-4 space-y-4 shadow-lg">
+      <h2 class="text-2xl neon">Postuler au projet</h2>
+      <form id="recruitForm" class="space-y-4">
+        <input type="text" id="fullName" placeholder="Nom complet" class="w-full p-2 rounded-md bg-gray-800" required/>
+        <input type="email" id="emailApply" placeholder="Email" class="w-full p-2 rounded-md bg-gray-800" required/>
+        <select id="roleSelect" class="w-full p-2 rounded-md bg-gray-800">
+          <option value="dev">Développeur</option>
+          <option value="designer">Designer</option>
+          <option value="tester">Testeur</option>
+          <option value="autre">Autre</option>
+        </select>
+        <textarea id="motivation" rows="4" placeholder="Pourquoi tu veux rejoindre ?" class="w-full p-2 rounded-md bg-gray-800" required></textarea>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded-md">Envoyer la demande</button>
+      </form>
+      <div id="applyMsg" class="text-center text-green-300 hidden">✅ Merci, ta candidature a été envoyée !</div>
     </div>
   </div>
 
   <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("messageInput");
-    const apiKey = "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";
+    let googleUser = null;
 
-    const systemPrompt = `
-Tu es une intelligence artificielle intégrée au terminal sécurisé du jeu SCP-REDUX.
-Tu es spécialisée dans :
-- L'univers SCP (objets, classes, histoires, rôles)
-- L'aide aux joueurs sur les mécaniques du jeu
-- Les détails du développement du jeu
-
-Chef de projet : Soan
-Développeurs : Théo (Builder), Soan (Script,Builder) 
-Version du jeu actuelle : Non lancé
-
-Réponds avec clarté et immersion, dans le style d'une IA de la Fondation SCP.
-`;
-
-    function appendMessage(content, role) {
-      const msg = document.createElement("div");
-      msg.className = `p-3 rounded-md max-w-[80%] whitespace-pre-wrap ${role === "user" ? "bg-green-700 bg-opacity-30 self-end" : "bg-green-800 bg-opacity-20 self-start"}`;
-      msg.textContent = content;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
+    function onGoogleLogin(response) {
+      const p = JSON.parse(atob(response.credential.split('.')[1]));
+      googleUser = p;
+      document.getElementById('userName').textContent = p.name;
+      document.getElementById('userEmail').textContent = p.email;
+      document.getElementById('userPic').src = p.picture;
+      document.getElementById('google-login').classList.add('hidden');
+      document.getElementById('mainContent').classList.remove('hidden');
+      appendChat('[SYSTEM] Bienvenue ' + p.name);
     }
 
-    async function sendMessage() {
-      const userInput = input.value.trim();
-      if (!userInput) return;
-
-      appendMessage("> " + userInput, "user");
-      input.value = "";
-
-      try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "llama3-8b-8192",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userInput }
-            ],
-            temperature: 0.5
-          })
-        });
-
-        const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content || "[Erreur : réponse vide]";
-        appendMessage(reply, "assistant");
-
-      } catch (err) {
-        appendMessage("[ERREUR] Connexion interrompue : " + err.message, "assistant");
-      }
+    function logout() {
+      googleUser = null;
+      document.getElementById('mainContent').classList.add('hidden');
+      document.getElementById('google-login').classList.remove('hidden');
+      document.getElementById('chatBox').innerHTML = '';
     }
 
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessage();
+    /* Chat */
+    function appendChat(msg, from='user') {
+      const d = document.createElement('div');
+      d.textContent = msg;
+      d.className = 'p-2 rounded ' + (from==='user'? 'bg-blue-800 self-end':'bg-gray-700 self-start');
+      document.getElementById('chatBox').appendChild(d);
+      d.scrollIntoView({behavior:'smooth'});
+    }
+
+    async function sendChat() {
+      const txt = document.getElementById('chatInput').value.trim();
+      if (!txt) return;
+      appendChat(txt, 'user');
+      document.getElementById('chatInput').value = '';
+      // Appel API à "krozen" (remplace avec ton vrai endpoint + auth)
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method:'POST',
+        headers: {
+          'Content-Type':'application/json',
+          'Authorization':'Bearer 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'
+        },
+        body: JSON.stringify({
+          model: "llama3-8b-8192",
+          messages: [
+            {role:'system', content: 'Tu es krozen, assistant expert SCP & recrutement.'},
+            {role:'user', content: txt}
+          ],
+          temperature: 0.6
+        })
+      });
+      const j = await res.json().catch(()=>null);
+      const reply = j?.choices?.[0]?.message?.content || '[Erreur de krozen]';
+      appendChat(reply, 'assistant');
+    }
+
+    /* Recrutement */
+    document.getElementById('recruitForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      // → envoi vers back ou API ici (placeholder)
+      console.log({
+        name:document.getElementById('fullName').value,
+        email:document.getElementById('emailApply').value,
+        role:document.getElementById('roleSelect').value,
+        message:document.getElementById('motivation').value
+      });
+      document.getElementById('applyMsg').classList.remove('hidden');
+      setTimeout(()=>document.getElementById('applyMsg').classList.add('hidden'), 5000);
+      e.target.reset();
     });
-
-    function handleCredentialResponse(response) {
-      const token = response.credential;
-      const payload = JSON.parse(atob(token.split('.')[1]));
-
-      const name = payload.name;
-      const email = payload.email;
-
-      appendMessage(`[AUTH] Connecté en tant que ${name} (${email})`, "assistant");
-      document.getElementById("google-login").style.display = "none";
-    }
   </script>
 </body>
 </html>
