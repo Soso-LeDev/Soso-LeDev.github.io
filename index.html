@@ -1,165 +1,142 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>site‑X · Fondation SCP</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-body,html{height:100%;font-family:'Inter',sans-serif;
-  background:url('https://i.imgur.com/8fKQZ8n.jpg') center/cover no-repeat;
-  color:#e0e0e0;display:flex;flex-direction:column;}
-#container{max-width:900px;margin:2rem auto;padding:1rem;display:flex;flex-direction:column;gap:1.5rem;
-  background:rgba(15,23,42,0.85);border-radius:16px;}
-header{display:flex;justify-content:center;gap:2rem;}
-header button{background:none;border:none;color:#94a3b8;font-weight:700;font-size:1.15rem;padding:.6rem 1.4rem;
-  border-radius:12px;cursor:pointer;transition:.3s;}
-header button:hover,.active{background:#10b981;color:#0f172a;}
-section{display:none;flex-direction:column;background:#1e293b;padding:1.8rem;border-radius:16px;
-  box-shadow:0 0 15px #10b981aa;opacity:0;transform:translateY(15px);transition:.5s;}
-section.active{display:flex;opacity:1;transform:translateY(0);}
-#homeSection h1{font-size:3rem;color:#10b981;font-weight:900;letter-spacing:2px;margin-bottom:1rem;}
-#homeSection p{font-size:1.25rem;line-height:1.6;color:#cbd5e1;font-style:italic;}
-#chatBox{flex:1;background:#0f172a;border:1px solid #334155;padding:1rem;border-radius:12px;
-  overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;max-height:400px;}
-.msg{max-width:75%;padding:.8rem 1rem;border-radius:14px;opacity:0;transform:translateX(20px);
-  white-space:pre-wrap;}
-.msg.user{align-self:flex-end;background:#10b981cc;color:#0f172a;font-weight:600;
-  animation:slideInRight .4s forwards;}
-.msg.assistant{align-self:flex-start;background:#334155cc;color:#cbd5e1;font-style:italic;
-  animation:slideInLeft .4s forwards;}
-@keyframes slideInLeft{to{opacity:1;transform:translateX(0);}}
-@keyframes slideInRight{to{opacity:1;transform:translateX(0);}}
-#chatInputRow{display:flex;gap:.7rem;margin-top:.8rem;}
-input,select,textarea{background:#1e293b;color:#e0e0e0;border-radius:12px;border:none;
-  padding:.8rem 1rem;font-size:1rem;box-shadow:inset 0 0 8px #10b981aa;transition:.3s;}
-input:focus,select:focus,textarea:focus{outline:3px solid #10b981cc;}
-#chatInputRow button,form button{background:#10b981;color:#0f172a;font-weight:700;
-  padding:.7rem 1.4rem;border:none;border-radius:12px;cursor:pointer;transition:.3s;}
-#chatInputRow button:hover,form button:hover{background:#059669;transform:scale(1.05);}
-#chatInputRow button:active,form button:active{transform:scale(0.95);}
-form{display:flex;flex-direction:column;gap:1rem;}
-form label{font-weight:700;color:#10b981;}
-#applyMsg{margin-top:1rem;font-weight:700;color:#34d399;opacity:0;transition:.5s;}
-#applyMsg.show{opacity:1;}
-@media(max-width:600px){#homeSection h1{font-size:2.2rem;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Tool - Recherche de Pseudos</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .network-checkbox { margin: 5px; }
+        #results { margin-top: 20px; }
+        .result-section { margin-bottom: 20px; }
+        .result-item { margin: 5px 0; padding: 5px; background: #f5f5f5; border-radius: 3px; }
+    </style>
 </head>
 <body>
-<div id="container">
-  <header>
-    <button id="btnHome" class="active">Accueil</button>
-    <button id="btnChat">Chat SCP</button>
-    <button id="btnForm">Inscription</button>
-  </header>
-  
-  <section id="homeSection" class="active">
-    <h1>Bienvenue dans le Monde SCP</h1>
-    <p>
-      <strong>site‑X</strong> explore l’ombre de la Fondation SCP:<br/>
-      entités dangereuses, objets hors normes & phénomènes inexpliqués.<br/><br/>
-      Nos archives consignent l'inconnu – découvrez-les,<br/>
-      questionnez notre IA spécialisée, et rejoignez-nous.<br/><br/>
-      <em>“Le savoir est une arme – la prudence votre bouclier.”</em>
-    </p>
-  </section>
-
-  <section id="chatSection">
-    <div id="chatBox" aria-live="polite" aria-label="Conversation SCP"></div>
-    <div id="chatInputRow">
-      <input id="chatInput" type="text" placeholder="Pose ta question sur SCP..." autocomplete="off"/>
-      <button id="chatSendBtn">Envoyer</button>
+    <h1>🔍 OSINT Person Finder</h1>
+    
+    <div>
+        <label for="username">Pseudonyme :</label>
+        <input type="text" id="username" placeholder="ex: johndoe">
     </div>
-  </section>
+    
+    <div style="margin: 15px 0;">
+        <h3>Réseaux sociaux à vérifier :</h3>
+        <div id="networks">
+            <!-- Les cases à cocher seront ajoutées ici par JS -->
+        </div>
+    </div>
+    
+    <button onclick="runSearch()">Lancer la recherche</button>
+    
+    <div id="results"></div>
 
-  <section id="formSection">
-    <form id="inscriptionForm">
-      <label>Nom complet</label><input id="fullName" name="fullName" required/>
-      <label>Email</label><input type="email" id="email" name="email" required/>
-      <label>Rôle souhaité</label>
-      <select id="role" name="role" required>
-        <option value="" disabled selected>-- Choisissez un rôle --</option>
-        <option value="agent">Agent</option>
-        <option value="chercheur">Chercheur</option>
-        <option value="technicien">Technicien</option>
-      </select>
-      <label>Motivation</label><textarea id="motivation" name="motivation" rows="4" required></textarea>
-      <button type="submit">Soumettre la candidature</button>
-    </form>
-    <div id="applyMsg" role="alert">Préparation du mail prêt à être envoyé…</div>
-  </section>
-</div>
+    <script>
+        const SOCIAL_NETWORKS = [
+            { name: "Twitter", domain: "twitter.com" },
+            { name: "GitHub", domain: "github.com" },
+            { name: "Instagram", domain: "instagram.com" },
+            { name: "LinkedIn", domain: "linkedin.com" },
+            { name: "Facebook", domain: "facebook.com" },
+            { name: "Reddit", domain: "reddit.com" }
+        ];
 
-<script>
-const [btnHome,btnChat,btnForm] = [ 'btnHome','btnChat','btnForm'].map(id=>document.getElementById(id));
-const [homeSection,chatSection,formSection] = [ 'homeSection','chatSection','formSection'].map(id=>document.getElementById(id));
-const chatBox = document.getElementById('chatBox');
-const chatInput = document.getElementById('chatInput');
-const chatSendBtn = document.getElementById('chatSendBtn');
-const form = document.getElementById('inscriptionForm');
-const applyMsg = document.getElementById('applyMsg');
+        // Affiche les réseaux sociaux sous forme de checkboxes
+        function renderNetworkOptions() {
+            const container = document.getElementById('networks');
+            SOCIAL_NETWORKS.forEach(network => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <input type="checkbox" 
+                           class="network-checkbox" 
+                           id="${network.domain}" 
+                           checked>
+                    <label for="${network.domain}">${network.name}</label>
+                `;
+                container.appendChild(div);
+            });
+        }
 
-function setActive(b,s){
-  [btnHome,btnChat,btnForm].forEach(x=>x.classList.remove('active'));
-  [homeSection,chatSection,formSection].forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  s.classList.add('active');
-}
-btnHome.onclick=()=>setActive(btnHome,homeSection);
-btnChat.onclick=()=>setActive(btnChat,chatSection);
-btnForm.onclick=()=>setActive(btnForm,formSection);
+        // Lance la recherche
+        async function runSearch() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert("Veuillez entrer un pseudonyme");
+                return;
+            }
 
-function addMsg(text,sender){
-  const d=document.createElement('div');
-  d.className='msg '+sender;
-  d.textContent=text;
-  chatBox.appendChild(d);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+            const selectedNetworks = Array.from(document.querySelectorAll('.network-checkbox:checked'))
+                                        .map(checkbox => checkbox.id);
 
-async function assistantReply(text){
-  try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/json',
-        Authorization: 'Bearer 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'
-      },
-      body: JSON.stringify({
-        model: 'gemma2-9b-it',
-        messages: [{role:'user',content:text}],
-        temperature:0.5,
-        max_tokens:512,
-        stream:false
-      })
-    });
-    const j = await res.json();
-    const ans = j.choices?.[0]?.message?.content || "Désolé, je ne peux pas répondre.";
-    addMsg(ans, 'assistant');
-  } catch(e){
-    addMsg("Erreur de connexion à l'IA.", 'assistant');
-  }
-}
+            const results = {
+                profiles: [],
+                emails: [],
+                mentions: []
+            };
 
-chatSendBtn.onclick=()=>{
-  const t=chatInput.value.trim(); if(!t) return;
-  addMsg(t,'user');
-  chatInput.value='';
-  assistantReply(t);
-};
-chatInput.addEventListener('keypress',e=>{if(e.key==='Enter') chatSendBtn.click();});
+            // Recherche sur chaque réseau
+            for (const domain of selectedNetworks) {
+                try {
+                    const response = await fetch(`https://${domain}/${username}`);
+                    if (response.ok) {
+                        results.profiles.push(`https://${domain}/${username}`);
+                    }
+                } catch (e) {
+                    // Si erreur, on essaie via Google
+                    try {
+                        const googleSearch = await fetch(`https://www.google.com/search?q=site:${domain}+${username}`);
+                        const text = await googleSearch.text();
+                        if (text.includes(username)) {
+                            results.mentions.push(`Mention trouvée sur ${domain}`);
+                        }
+                    } catch (e) {
+                        console.error(`Erreur avec ${domain}:`, e);
+                    }
+                }
+            }
 
-form.onsubmit=e=>{
-  e.preventDefault();
-  const n=encodeURIComponent(form.fullName.value.trim()),
-        m=encodeURIComponent(form.email.value.trim()),
-        r=encodeURIComponent(form.role.value),
-        o=encodeURIComponent(form.motivation.value.trim()),
-        sub=encodeURIComponent(`Candidature site‑X: ${n}`),
-        body=encodeURIComponent(`Nom: ${n}\nEmail: ${m}\nRôle: ${r}\nMotivation:\n${o}`);
-  window.location.href = `mailto:testsoso45@gmail.com?subject=${sub}&body=${body}`;
-  applyMsg.classList.add('show');
-  form.reset();
-  setTimeout(()=>applyMsg.classList.remove('show'),7000);
-};
-</script>
+            // Recherche d'emails (simulée)
+            results.emails = await searchEmails(username);
+
+            // Affiche les résultats
+            displayResults(results);
+        }
+
+        // Simulation de recherche d'emails
+        async function searchEmails(username) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // En réalité, vous devriez utiliser une API comme Hunter.io
+                    resolve([`${username}@gmail.com`, `${username}@yahoo.com`]);
+                }, 1000);
+            });
+        }
+
+        // Affiche les résultats
+        function displayResults(results) {
+            const container = document.getElementById('results');
+            container.innerHTML = `
+                <h2>Résultats pour "${document.getElementById('username').value}"</h2>
+                
+                <div class="result-section">
+                    <h3>Profils trouvés (${results.profiles.length}) :</h3>
+                    ${results.profiles.map(profile => `<div class="result-item"><a href="${profile}" target="_blank">${profile}</a></div>`).join('')}
+                </div>
+                
+                <div class="result-section">
+                    <h3>Emails possibles (${results.emails.length}) :</h3>
+                    ${results.emails.map(email => `<div class="result-item">${email}</div>`).join('')}
+                </div>
+                
+                <div class="result-section">
+                    <h3>Mentions (${results.mentions.length}) :</h3>
+                    ${results.mentions.map(mention => `<div class="result-item">${mention}</div>`).join('')}
+                </div>
+            `;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', renderNetworkOptions);
+    </script>
+</body>
+</html>
