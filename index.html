@@ -3,140 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSINT Tool - Recherche de Pseudos</title>
+    <title>Interface Groq API</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .network-checkbox { margin: 5px; }
-        #results { margin-top: 20px; }
-        .result-section { margin-bottom: 20px; }
-        .result-item { margin: 5px 0; padding: 5px; background: #f5f5f5; border-radius: 3px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #chat-container {
+            height: 500px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        #input-area {
+            display: flex;
+            gap: 10px;
+        }
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background: #e3f2fd;
+            align-self: flex-end;
+            text-align: right;
+        }
+        .ai-message {
+            background: #f1f1f1;
+        }
+        .typing {
+            display: inline-block;
+        }
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite both;
+        }
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
     </style>
 </head>
 <body>
-    <h1>🔍 OSINT Person Finder</h1>
+    <h1>Interface Groq API</h1>
     
-    <div>
-        <label for="username">Pseudonyme :</label>
-        <input type="text" id="username" placeholder="ex: johndoe">
+    <div id="chat-container"></div>
+    
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Tapez votre message..." autofocus>
+        <button id="send-btn">Envoyer</button>
     </div>
     
-    <div style="margin: 15px 0;">
-        <h3>Réseaux sociaux à vérifier :</h3>
-        <div id="networks">
-            <!-- Les cases à cocher seront ajoutées ici par JS -->
-        </div>
-    </div>
-    
-    <button onclick="runSearch()">Lancer la recherche</button>
-    
-    <div id="results"></div>
-
     <script>
-        const SOCIAL_NETWORKS = [
-            { name: "Twitter", domain: "twitter.com" },
-            { name: "GitHub", domain: "github.com" },
-            { name: "Instagram", domain: "instagram.com" },
-            { name: "LinkedIn", domain: "linkedin.com" },
-            { name: "Facebook", domain: "facebook.com" },
-            { name: "Reddit", domain: "reddit.com" }
+        // Configuration de l'API Groq
+        const GROQ_API_KEY = "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"; // Remplacez par votre clé API
+        const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+        
+        // Éléments du DOM
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        // Historique de la conversation
+        let conversationHistory = [
+            {
+                role: "system",
+                content: "Vous êtes un assistant IA utile. Répondez de manière concise et précise."
+            }
         ];
-
-        // Affiche les réseaux sociaux sous forme de checkboxes
-        function renderNetworkOptions() {
-            const container = document.getElementById('networks');
-            SOCIAL_NETWORKS.forEach(network => {
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <input type="checkbox" 
-                           class="network-checkbox" 
-                           id="${network.domain}" 
-                           checked>
-                    <label for="${network.domain}">${network.name}</label>
-                `;
-                container.appendChild(div);
-            });
+        
+        // Fonction pour ajouter un message au chat
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${role}-message`);
+            messageDiv.textContent = content;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-
-        // Lance la recherche
-        async function runSearch() {
-            const username = document.getElementById('username').value.trim();
-            if (!username) {
-                alert("Veuillez entrer un pseudonyme");
-                return;
-            }
-
-            const selectedNetworks = Array.from(document.querySelectorAll('.network-checkbox:checked'))
-                                        .map(checkbox => checkbox.id);
-
-            const results = {
-                profiles: [],
-                emails: [],
-                mentions: []
-            };
-
-            // Recherche sur chaque réseau
-            for (const domain of selectedNetworks) {
-                try {
-                    const response = await fetch(`https://${domain}/${username}`);
-                    if (response.ok) {
-                        results.profiles.push(`https://${domain}/${username}`);
-                    }
-                } catch (e) {
-                    // Si erreur, on essaie via Google
-                    try {
-                        const googleSearch = await fetch(`https://www.google.com/search?q=site:${domain}+${username}`);
-                        const text = await googleSearch.text();
-                        if (text.includes(username)) {
-                            results.mentions.push(`Mention trouvée sur ${domain}`);
-                        }
-                    } catch (e) {
-                        console.error(`Erreur avec ${domain}:`, e);
-                    }
-                }
-            }
-
-            // Recherche d'emails (simulée)
-            results.emails = await searchEmails(username);
-
-            // Affiche les résultats
-            displayResults(results);
-        }
-
-        // Simulation de recherche d'emails
-        async function searchEmails(username) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    // En réalité, vous devriez utiliser une API comme Hunter.io
-                    resolve([`${username}@gmail.com`, `${username}@yahoo.com`]);
-                }, 1000);
-            });
-        }
-
-        // Affiche les résultats
-        function displayResults(results) {
-            const container = document.getElementById('results');
-            container.innerHTML = `
-                <h2>Résultats pour "${document.getElementById('username').value}"</h2>
-                
-                <div class="result-section">
-                    <h3>Profils trouvés (${results.profiles.length}) :</h3>
-                    ${results.profiles.map(profile => `<div class="result-item"><a href="${profile}" target="_blank">${profile}</a></div>`).join('')}
-                </div>
-                
-                <div class="result-section">
-                    <h3>Emails possibles (${results.emails.length}) :</h3>
-                    ${results.emails.map(email => `<div class="result-item">${email}</div>`).join('')}
-                </div>
-                
-                <div class="result-section">
-                    <h3>Mentions (${results.mentions.length}) :</h3>
-                    ${results.mentions.map(mention => `<div class="result-item">${mention}</div>`).join('')}
-                </div>
+        
+        // Fonction pour afficher l'indicateur de saisie
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('message', 'ai-message', 'typing');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
             `;
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', renderNetworkOptions);
+        
+        // Fonction pour masquer l'indicateur de saisie
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Fonction pour envoyer un message à l'API Groq
+        async function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (!userMessage) return;
+            
+            // Ajouter le message de l'utilisateur à l'historique et à l'interface
+            conversationHistory.push({ role: "user", content: userMessage });
+            addMessage('user', userMessage);
+            userInput.value = '';
+            
+            // Afficher l'indicateur de saisie
+            showTypingIndicator();
+            
+            try {
+                // Appel à l'API Groq
+                const response = await fetch(GROQ_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        messages: conversationHistory,
+                        model: "mixtral-8x7b-32768"
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+                
+                // Ajouter la réponse de l'IA à l'historique et à l'interface
+                conversationHistory.push({ role: "assistant", content: aiResponse });
+                hideTypingIndicator();
+                addMessage('ai', aiResponse);
+                
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('ai', `Erreur: ${error.message}`);
+                console.error('Erreur avec l\'API Groq:', error);
+            }
+        }
+        
+        // Événements
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Message initial
+        addMessage('ai', "Bonjour ! Comment puis-je vous aider aujourd'hui ?");
     </script>
 </body>
 </html>
