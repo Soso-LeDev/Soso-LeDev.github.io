@@ -2,109 +2,66 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat avec Scout</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background-color: #ece5dd;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      display: flex; flex-direction: column; height: 100vh;
     }
-
     header {
-      background-color: #075e54;
-      color: white;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      position: relative;
+      background-color: #075e54; color: white;
+      padding: 16px; font-size: 18px; font-weight: bold;
+      text-align: center; position: relative;
     }
-
     #clearBtn {
-      position: absolute;
-      right: 16px;
-      top: 50%;
+      position: absolute; right: 16px; top: 50%;
       transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
+      background: none; border: none;
+      color: white; font-size: 20px; cursor: pointer;
     }
-
     #chat {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      flex: 1; padding: 10px;
+      overflow-y: auto; display: flex;
+      flex-direction: column; gap: 8px;
       background-image: url('https://i.imgur.com/3eF1QTT.png');
       background-size: cover;
     }
-
     .message {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 15px;
-      line-height: 1.4;
-      white-space: pre-wrap;
+      max-width: 80%; padding: 10px 14px;
+      border-radius: 8px; font-size: 15px;
+      line-height: 1.4; white-space: pre-wrap;
       word-wrap: break-word;
     }
-
     .user {
       align-self: flex-end;
       background-color: #dcf8c6;
       border-bottom-right-radius: 0;
     }
-
     .bot {
       align-self: flex-start;
       background-color: #ffffff;
       border-bottom-left-radius: 0;
     }
-
     #inputArea {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-      background-color: #f0f0f0;
+      display: flex; padding: 10px;
+      border-top: 1px solid #ccc; background-color: #f0f0f0;
     }
-
     input {
-      flex: 1;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 20px;
-      border: none;
-      outline: none;
-      background-color: white;
+      flex: 1; padding: 12px;
+      font-size: 16px; border-radius: 20px;
+      border: none; outline: none; background-color: white;
     }
-
     button {
-      margin-left: 8px;
-      padding: 12px 16px;
-      background-color: #25d366;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
+      margin-left: 8px; padding: 12px 16px;
+      background-color: #25d366; color: white;
+      font-size: 16px; border: none;
+      border-radius: 50%; cursor: pointer;
     }
-
-    button:hover {
-      background-color: #128c7e;
-    }
-
+    button:hover { background-color: #128c7e; }
     @media (max-width: 600px) {
       header { font-size: 16px; }
       .message { font-size: 14px; }
@@ -127,89 +84,117 @@
   </div>
 
   <script>
-    const apiKey = "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";
+    // === CONSTANTES API ===
+    const cx = "24246487405284f60";
+    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
+    const groqApiKey = "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";
     const model = "meta-llama/llama-4-scout-17b-16e-instruct";
-    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
-
-    const chatBox = document.getElementById("chat");
-    const inputField = document.getElementById("userInput");
+    const groqUrl = "https://api.groq.com/openai/v1/chat/completions";
 
     const SYSTEM_PROMPT = {
       role: "system",
       content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
     };
 
-    // Charge l'historique ou démarre une nouvelle session
-    let messages = JSON.parse(localStorage.getItem("chatHistory")) || [SYSTEM_PROMPT];
+    const chatBox = document.getElementById("chat");
+    const inputField = document.getElementById("userInput");
 
-    // Affiche les messages sauvegardés au chargement
+    // Récupère l'historique
+    let messages = JSON.parse(localStorage.getItem("chatHistory")) || [SYSTEM_PROMPT];
     window.onload = () => {
       messages.forEach(msg => {
-        if (msg.role === "user") {
-          displayMessage("Soan", msg.content, "user");
-        } else if (msg.role === "assistant") {
-          displayMessage("Scout", msg.content, "bot");
-        }
+        if (msg.role === "user") displayMessage("Soan", msg.content, "user");
+        if (msg.role === "assistant") displayMessage("Scout", msg.content, "bot");
       });
     };
-
     function saveMessages() {
       localStorage.setItem("chatHistory", JSON.stringify(messages));
     }
-
     function displayMessage(sender, text, type) {
       const msgDiv = document.createElement("div");
-      msgDiv.classList.add("message", type);
+      msgDiv.className = `message ${type}`;
       msgDiv.textContent = text;
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
+    function resetConversation() {
+      if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
+        localStorage.removeItem("chatHistory");
+        location.reload();
+      }
+    }
 
+    // === FONCTION QUI DÉCIDE SI ON DOIT RECHERCHER ===
+    function needsSearch(query) {
+      const interrogatifs = /\b(google/internet)\b/i;
+      return interrogatifs.test(query);
+    }
+
+    // === APPEL À L'API GOOGLE CUSTOM SEARCH ===
+    async function searchGoogle(query) {
+      const url = `https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${cx}&q=${encodeURIComponent(query)}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        // on prend les 3 premiers résultats
+        return data.items?.slice(0, 3).map(item =>
+          `• ${item.title}\n  ${item.snippet}`
+        ).join("\n") || "Aucun résultat trouvé.";
+      } catch (err) {
+        return `Erreur Google Search : ${err.message}`;
+      }
+    }
+
+    // === ENVOI DE MESSAGE ===
     async function sendMessage() {
       const userMessage = inputField.value.trim();
       if (!userMessage) return;
 
+      // affiche la question utilisateur
       messages.push({ role: "user", content: userMessage });
       displayMessage("Soan", userMessage, "user");
       inputField.value = "";
       saveMessages();
 
+      let enrichedMessages = [...messages];
+
+      // si besoin de recherche, on interroge Google et on ajoute un système
+      if (needsSearch(userMessage)) {
+        displayMessage("Scout", "Recherche d'informations...", "bot");
+        const results = await searchGoogle(userMessage);
+        enrichedMessages.push({
+          role: "system",
+          content: `Résultats de recherche Google :\n${results}`
+        });
+      }
+
+      // appel à Groq
       try {
-        const response = await fetch(apiUrl, {
+        const res = await fetch(groqUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
+            "Authorization": `Bearer ${groqApiKey}`
           },
           body: JSON.stringify({
-            model: model,
-            messages: messages
+            model,
+            messages: enrichedMessages
           })
         });
-
-        const data = await response.json();
-        const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-        messages.push({ role: "assistant", content: botReply });
-        displayMessage("Scout", botReply, "bot");
+        const json = await res.json();
+        const reply = json.choices?.[0]?.message?.content || "[Réponse vide]";
+        messages.push({ role: "assistant", content: reply });
+        displayMessage("Scout", reply, "bot");
         saveMessages();
-
-      } catch (error) {
-        displayMessage("Scout", `❌ Erreur : ${error.message}`, "bot");
+      } catch (err) {
+        displayMessage("Scout", `❌ Erreur : ${err.message}`, "bot");
       }
     }
 
-    inputField.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        sendMessage();
-      }
+    inputField.addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMessage();
     });
-
-    function resetConversation() {
-      if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
-        localStorage.removeItem("chatHistory");
-        location.reload();
-      }
-    }
   </script>
 </body>
 </html>
