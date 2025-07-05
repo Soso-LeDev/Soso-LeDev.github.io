@@ -1,185 +1,65 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Groq API</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        #chat-container {
-            height: 500px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            display: flex;
-            flex-direction: column;
-        }
-        #input-area {
-            display: flex;
-            gap: 10px;
-        }
-        #user-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            background: #0066ff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .user-message {
-            background: #e3f2fd;
-            align-self: flex-end;
-            text-align: right;
-        }
-        .ai-message {
-            background: #f1f1f1;
-            align-self: flex-start;
-        }
-        .typing {
-            display: inline-block;
-        }
-        .typing-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #666;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: typing 1.4s infinite both;
-        }
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Chat Groq</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+    .message { margin: 5px 0; }
+    .user { color: blue; font-weight: bold; }
+    .bot { color: green; }
+    input { width: 80%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
 </head>
 <body>
-    <h1>Interface Groq API</h1>
-    
-    <div id="chat-container"></div>
-    
-    <div id="input-area">
-        <input type="text" id="user-input" placeholder="Tapez votre message..." autofocus>
-        <button id="send-btn">Envoyer</button>
-    </div>
-    
-    <script>
-        const GROQ_API_KEY = "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"; // à régénérer après test
-        const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+  <h2>Chat avec Groq (LLaMA 4 Scout)</h2>
+  <div id="chat"></div>
+  <input type="text" id="userInput" placeholder="Ton message..." />
+  <button onclick="sendMessage()">Envoyer</button>
 
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
+  <script>
+    const apiKey = "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";
+    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+    const chatBox = document.getElementById("chat");
 
-        let conversationHistory = [
-            {
-                role: "system",
-                content: "Vous êtes un assistant IA utile. Répondez de manière concise et précise."
-            }
-        ];
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
 
-        function addMessage(role, content) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', `${role}-message`);
-            messageDiv.textContent = content;
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+      // Affiche le message de l'utilisateur
+      chatBox.innerHTML += `<div class="message user">👤 ${userMessage}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
 
-        function showTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.classList.add('message', 'ai-message', 'typing');
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = `
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-            `;
-            chatContainer.appendChild(typingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+      const body = {
+        model: model,
+        messages: [
+          { role: "user", content: userMessage }
+        ]
+      };
 
-        function hideTypingIndicator() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) typingIndicator.remove();
-        }
-
-        async function sendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage) return;
-
-            conversationHistory.push({ role: "user", content: userMessage });
-            addMessage('user', userMessage);
-            userInput.value = '';
-            showTypingIndicator();
-
-            try {
-                const response = await fetch(GROQ_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "mixtral-8x7b-32768",
-                        messages: conversationHistory,
-                        temperature: 0.7,
-                        top_p: 1,
-                        stream: false
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
-
-                conversationHistory.push({ role: "assistant", content: aiResponse });
-                hideTypingIndicator();
-                addMessage('ai', aiResponse);
-
-            } catch (error) {
-                hideTypingIndicator();
-                addMessage('ai', `Erreur: ${error.message}`);
-                console.error("Erreur avec l'API Groq:", error);
-            }
-        }
-
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify(body)
         });
 
-        // Message de bienvenue
-        addMessage('ai', "Bonjour ! Comment puis-je vous aider aujourd'hui ?");
-    </script>
+        const data = await response.json();
+        const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
+        chatBox.innerHTML += `<div class="message bot">🤖 ${botReply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        chatBox.innerHTML += `<div class="message bot">❌ Erreur : ${error.message}</div>`;
+      }
+    }
+  </script>
 </body>
 </html>
