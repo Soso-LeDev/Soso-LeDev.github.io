@@ -1,126 +1,113 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Assistant Scout</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat avec Scout</title>
   <style>
     * {
       box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #f0f2f5, #d9e4f5);
       margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    .container {
-      margin-top: 40px;
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 600px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ece5dd;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      height: 100vh;
     }
 
     header {
-      background-color: #007bff;
+      background-color: #075e54;
       color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 22px;
+      padding: 16px;
+      font-size: 18px;
       font-weight: bold;
-      border-bottom: 1px solid #0056b3;
+      text-align: center;
     }
 
     #chat {
-      padding: 20px;
-      height: 400px;
+      flex: 1;
+      padding: 10px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      background-image: url('https://i.imgur.com/3eF1QTT.png');
+      background-size: cover;
     }
 
     .message {
       max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 20px;
+      padding: 10px 14px;
+      border-radius: 8px;
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.4;
       white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
     .user {
       align-self: flex-end;
-      background-color: #d0e6ff;
-      color: #003366;
-      border-bottom-right-radius: 4px;
+      background-color: #dcf8c6;
+      border-bottom-right-radius: 0;
     }
 
     .bot {
       align-self: flex-start;
-      background-color: #e8ffe8;
-      color: #1a3c1a;
-      border-bottom-left-radius: 4px;
+      background-color: #ffffff;
+      border-bottom-left-radius: 0;
     }
 
     #inputArea {
       display: flex;
-      border-top: 1px solid #ddd;
-      padding: 12px;
-      background-color: #fafafa;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      background-color: #f0f0f0;
     }
 
     input {
       flex: 1;
-      padding: 10px 15px;
+      padding: 12px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 20px;
+      border: none;
       outline: none;
+      background-color: white;
     }
 
     button {
-      margin-left: 10px;
-      padding: 10px 20px;
-      background-color: #007bff;
-      border: none;
+      margin-left: 8px;
+      padding: 12px 16px;
+      background-color: #25d366;
       color: white;
       font-size: 16px;
-      border-radius: 8px;
+      border: none;
+      border-radius: 50%;
       cursor: pointer;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background-color: #128c7e;
     }
 
     @media (max-width: 600px) {
-      header { font-size: 18px; }
+      header { font-size: 16px; }
       .message { font-size: 14px; }
+      input { font-size: 15px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>💬 Assistant Scout</header>
 
-    <div id="chat"></div>
+  <header>Scout – Assistant IA</header>
 
-    <div id="inputArea">
-      <input type="text" id="userInput" placeholder="Écrivez votre message ici..." />
-      <button onclick="sendMessage()">Envoyer</button>
-    </div>
+  <div id="chat"></div>
+
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="Écrivez un message..." />
+    <button onclick="sendMessage()">▶️</button>
   </div>
 
   <script>
@@ -131,11 +118,11 @@
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
 
-    // 🧠 Mémoire : Scout se souvient de la conversation
+    // Mémoire de la conversation
     const messages = [
       {
         role: "system",
-        content: `Vous êtes Scout, une intelligence artificielle bienveillante, respectueuse et polie. Vous parlez à Soan, une personne que vous devez toujours vouvoyer avec respect. Répondez de manière claire, chaleureuse et humaine. Ne tutoyez jamais. Soyez attentionné.`
+        content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
       }
     ];
 
@@ -178,7 +165,6 @@
       }
     }
 
-    // Envoi avec touche "Entrée"
     inputField.addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
         sendMessage();
