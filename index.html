@@ -196,7 +196,6 @@
         return;
       }
 
-      // Appel normal à LLaMA
       try {
         const res = await fetch(apiUrl, {
           method: "POST",
@@ -241,16 +240,47 @@
       }
     }
 
-    // Synthèse vocale
+    // Synthèse vocale avec voix masculine française si possible
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'fr-FR';
       utterance.pitch = 1;
       utterance.rate = 1;
-      speechSynthesis.speak(utterance);
+
+      // Attendre que les voix soient chargées
+      const setVoice = () => {
+        const voices = speechSynthesis.getVoices();
+
+        // Rechercher une voix masculine française
+        const maleVoices = voices.filter(voice => 
+          voice.lang.startsWith('fr') &&
+          (voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('homme') || voice.name.toLowerCase().includes('man'))
+        );
+
+        if (maleVoices.length > 0) {
+          utterance.voice = maleVoices[0];
+        } else {
+          // Sinon, choisir une voix française par défaut
+          const frenchVoices = voices.filter(voice => voice.lang.startsWith('fr'));
+          if (frenchVoices.length > 0) {
+            utterance.voice = frenchVoices[0];
+          }
+        }
+        speechSynthesis.speak(utterance);
+      };
+
+      if (speechSynthesis.getVoices().length === 0) {
+        // Voix non chargées, attendre
+        speechSynthesis.onvoiceschanged = () => {
+          setVoice();
+          speechSynthesis.onvoiceschanged = null;
+        };
+      } else {
+        setVoice();
+      }
     }
 
-    // Nettoyer HTML pour lecture
+    // Nettoyer HTML pour lecture vocale
     function stripHTML(html) {
       const div = document.createElement("div");
       div.innerHTML = html;
