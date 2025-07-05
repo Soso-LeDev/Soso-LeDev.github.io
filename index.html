@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +8,6 @@
     * {
       box-sizing: border-box;
     }
-
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -18,7 +16,6 @@
       flex-direction: column;
       height: 100vh;
     }
-
     header {
       background-color: #075e54;
       color: white;
@@ -28,7 +25,6 @@
       text-align: center;
       position: relative;
     }
-
     #clearBtn {
       position: absolute;
       right: 16px;
@@ -40,7 +36,6 @@
       font-size: 20px;
       cursor: pointer;
     }
-
     #chat {
       flex: 1;
       padding: 10px;
@@ -51,7 +46,6 @@
       background-image: url('https://i.imgur.com/3eF1QTT.png');
       background-size: cover;
     }
-
     .message {
       max-width: 80%;
       padding: 10px 14px;
@@ -61,26 +55,22 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
-
     .user {
       align-self: flex-end;
       background-color: #dcf8c6;
       border-bottom-right-radius: 0;
     }
-
     .bot {
       align-self: flex-start;
       background-color: #ffffff;
       border-bottom-left-radius: 0;
     }
-
     #inputArea {
       display: flex;
       padding: 10px;
       border-top: 1px solid #ccc;
       background-color: #f0f0f0;
     }
-
     input {
       flex: 1;
       padding: 12px;
@@ -90,7 +80,6 @@
       outline: none;
       background-color: white;
     }
-
     button {
       margin-left: 8px;
       padding: 12px 16px;
@@ -101,23 +90,20 @@
       border-radius: 50%;
       cursor: pointer;
     }
-
+    #micBtn {
+      background-color: #075e54;
+      color: white;
+    }
+    #micBtn.listening {
+      background-color: #ff9800;
+    }
     button:hover {
       background-color: #128c7e;
     }
-
     @media (max-width: 600px) {
-      header {
-        font-size: 16px;
-      }
-
-      .message {
-        font-size: 14px;
-      }
-
-      input {
-        font-size: 15px;
-      }
+      header { font-size: 16px; }
+      .message { font-size: 14px; }
+      input { font-size: 15px; }
     }
   </style>
 </head>
@@ -133,13 +119,13 @@
   <div id="inputArea">
     <input type="text" id="userInput" placeholder="Écrivez un message..." />
     <button onclick="sendMessage()">▶️</button>
+    <button id="micBtn" title="Parler 🎤">🎤</button>
   </div>
 
   <script>
     const apiKey = "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";
     const model = "meta-llama/llama-4-scout-17b-16e-instruct";
     const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
-
     const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
     const googleCx = "24246487405284f60";
 
@@ -149,14 +135,11 @@
     };
 
     let messages = [SYSTEM_PROMPT];
-
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
 
     function escapeHTML(str) {
-      return str.replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function displayMessage(sender, text, type) {
@@ -165,6 +148,8 @@
       msgDiv.innerHTML = type === "bot" ? text : escapeHTML(text);
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
+
+      if (type === "bot") speak(stripHTML(text));
     }
 
     async function sendMessage() {
@@ -186,7 +171,6 @@
         }
 
         displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
-
         try {
           const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
           const data = await res.json();
@@ -204,17 +188,15 @@
             displayMessage("Scout", msg, "bot");
             await logToFile(`Scout : ${msg}`);
           }
-
         } catch (error) {
           const errMsg = `❌ Erreur Google : ${error.message}`;
           displayMessage("Scout", errMsg, "bot");
           await logToFile(`Scout : ${errMsg}`);
         }
-
         return;
       }
 
-      // Sinon requête normale vers Scout (Groq / LLaMA)
+      // Appel normal à LLaMA
       try {
         const res = await fetch(apiUrl, {
           method: "POST",
@@ -222,10 +204,7 @@
             "Content-Type": "application/json",
             "Authorization": `Bearer ${apiKey}`
           },
-          body: JSON.stringify({
-            model: model,
-            messages: messages
-          })
+          body: JSON.stringify({ model: model, messages: messages })
         });
 
         const data = await res.json();
@@ -248,7 +227,7 @@
           body: JSON.stringify({ message: content })
         });
       } catch (e) {
-        console.error("Erreur de sauvegarde dans le fichier :", e);
+        console.error("Erreur de sauvegarde :", e);
       }
     }
 
@@ -262,10 +241,53 @@
       }
     }
 
+    // Synthèse vocale
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      speechSynthesis.speak(utterance);
+    }
+
+    // Nettoyer HTML pour lecture
+    function stripHTML(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
+    }
+
+    // Reconnaissance vocale
+    const micBtn = document.getElementById("micBtn");
+    let recognition;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'fr-FR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => micBtn.classList.add("listening");
+      recognition.onend = () => micBtn.classList.remove("listening");
+      recognition.onerror = (e) => console.error("Erreur micro :", e.error);
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        inputField.value = transcript;
+        sendMessage();
+      };
+
+      micBtn.addEventListener("click", () => {
+        recognition.start();
+      });
+    } else {
+      micBtn.disabled = true;
+      micBtn.title = "Reconnaissance vocale non supportée";
+    }
+
     inputField.addEventListener("keypress", function (e) {
       if (e.key === "Enter") sendMessage();
     });
   </script>
 </body>
-
 </html>
