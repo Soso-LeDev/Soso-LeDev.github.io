@@ -1,17 +1,11 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat avec Scout</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -20,7 +14,6 @@
       flex-direction: column;
       height: 100vh;
     }
-
     header {
       background-color: #075e54;
       color: white;
@@ -30,7 +23,6 @@
       text-align: center;
       position: relative;
     }
-
     #clearBtn {
       position: absolute;
       right: 16px;
@@ -42,7 +34,6 @@
       font-size: 20px;
       cursor: pointer;
     }
-
     #chat {
       flex: 1;
       padding: 10px;
@@ -53,7 +44,6 @@
       background-image: url('https://i.imgur.com/3eF1QTT.png');
       background-size: cover;
     }
-
     .message {
       max-width: 80%;
       padding: 10px 14px;
@@ -63,26 +53,22 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
-
     .user {
       align-self: flex-end;
       background-color: #dcf8c6;
       border-bottom-right-radius: 0;
     }
-
     .bot {
       align-self: flex-start;
       background-color: #ffffff;
       border-bottom-left-radius: 0;
     }
-
     #inputArea {
       display: flex;
       padding: 10px;
       border-top: 1px solid #ccc;
       background-color: #f0f0f0;
     }
-
     input {
       flex: 1;
       padding: 12px;
@@ -92,7 +78,6 @@
       outline: none;
       background-color: white;
     }
-
     button {
       margin-left: 8px;
       padding: 12px 16px;
@@ -103,11 +88,9 @@
       border-radius: 50%;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #128c7e;
     }
-
     @media (max-width: 600px) {
       header { font-size: 16px; }
       .message { font-size: 14px; }
@@ -115,9 +98,7 @@
     }
   </style>
 </head>
-
 <body>
-
   <header>
     Scout – Assistant IA
     <button id="clearBtn" onclick="resetConversation()" title="Effacer la conversation">🗑️</button>
@@ -131,11 +112,12 @@
   </div>
 
   <script>
-    const apiKey = "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"; // Ton API GPT
+    const apiKey = "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";
     const model = "meta-llama/llama-4-scout-17b-16e-instruct";
     const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
 
-    const googleApiKey = "TA_CLE_API_GOOGLE"; // Remplace par ta vraie clé API Google (YouTube + Programmable Search)
+    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
+    const googleCx = "24246487405284f60";
 
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
@@ -161,69 +143,19 @@
       localStorage.setItem("chatHistory", JSON.stringify(messages));
     }
 
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
     function displayMessage(sender, text, type) {
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", type);
-      if (type === "bot" && text.includes("<iframe")) {
-        // Afficher iframe et HTML
-        msgDiv.innerHTML = text;
-      } else {
-        msgDiv.textContent = text;
-      }
+      msgDiv.innerHTML = type === "bot" ? text : escapeHTML(text);
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // Détecte si l'utilisateur veut une vidéo YouTube
-    function wantsVideo(text) {
-      const lower = text.toLowerCase();
-      return lower.includes("vidéo") || lower.includes("youtube") || lower.includes("montre une vidéo") || lower.includes("montre video");
-    }
-
-    async function searchYouTube(userMessage) {
-      let query = "";
-      const lowerMsg = userMessage.toLowerCase();
-      const videoTriggers = ["vidéo de", "vidéo sur", "montre une vidéo de", "montre une vidéo sur", "youtube"];
-
-      for (const trigger of videoTriggers) {
-        if (lowerMsg.includes(trigger)) {
-          query = userMessage.toLowerCase().split(trigger)[1]?.trim();
-          break;
-        }
-      }
-
-      if (!query && lowerMsg.includes("vidéo")) {
-        query = userMessage.toLowerCase().split("vidéo")[1]?.trim();
-      }
-
-      if (!query) {
-        query = userMessage;
-      }
-
-      if (!query) return "❌ Je n'ai pas compris quel sujet vidéo vous souhaitez.";
-
-      const apiUrlYT = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&order=viewCount&q=${encodeURIComponent(query)}&key=${googleApiKey}`;
-
-      try {
-        const response = await fetch(apiUrlYT);
-        const data = await response.json();
-
-        if (data.items && data.items.length > 0) {
-          const video = data.items[0];
-          const videoId = video.id.videoId;
-          const title = video.snippet.title;
-
-          return `
-            Voici la vidéo la plus vue pour "${query}" :<br/>
-            <strong>${title}</strong><br/>
-            <iframe width="320" height="180" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
-          `;
-        } else {
-          return "❌ Désolé, je n'ai pas trouvé de vidéo correspondante.";
-        }
-      } catch (error) {
-        return `❌ Erreur lors de la recherche YouTube : ${error.message}`;
-      }
     }
 
     async function sendMessage() {
@@ -235,16 +167,50 @@
       inputField.value = "";
       saveMessages();
 
-      try {
-        if (wantsVideo(userMessage)) {
-          const reply = await searchYouTube(userMessage);
+      if (userMessage.toLowerCase().startsWith("/google ")) {
+        const query = userMessage.substring(8).trim();
+
+        if (query.length === 0) {
+          const reply = "⚠️ Veuillez entrer une requête après « /google ».";
           displayMessage("Scout", reply, "bot");
           messages.push({ role: "assistant", content: reply });
           saveMessages();
           return;
         }
 
-        // Sinon, appel IA classique
+        displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
+
+        try {
+          const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
+          const data = await response.json();
+
+          if (data.items && data.items.length > 0) {
+            let replyHTML = `<strong>🔎 Résultats pour : « ${query} »</strong><br><br>`;
+            data.items.slice(0, 3).forEach((item, index) => {
+              replyHTML += `<strong>${index + 1}. <a href="${item.link}" target="_blank" style="color:#1a0dab;">${item.title}</a></strong><br>`;
+              if (item.snippet) replyHTML += `<em>${item.snippet}</em><br><br>`;
+            });
+
+            displayMessage("Scout", replyHTML, "bot");
+            messages.push({ role: "assistant", content: replyHTML });
+            saveMessages();
+          } else {
+            const noResults = "❌ Aucun résultat trouvé.";
+            displayMessage("Scout", noResults, "bot");
+            messages.push({ role: "assistant", content: noResults });
+            saveMessages();
+          }
+        } catch (error) {
+          const errMsg = `❌ Erreur lors de la recherche : ${error.message}`;
+          displayMessage("Scout", errMsg, "bot");
+          messages.push({ role: "assistant", content: errMsg });
+          saveMessages();
+        }
+
+        return;
+      }
+
+      try {
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
@@ -259,8 +225,8 @@
 
         const data = await response.json();
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-        messages.push({ role: "assistant", content: botReply });
         displayMessage("Scout", botReply, "bot");
+        messages.push({ role: "assistant", content: botReply });
         saveMessages();
 
       } catch (error) {
@@ -268,8 +234,10 @@
       }
     }
 
-    inputField.addEventListener("keypress", function(e) {
-      if (e.key === "Enter") sendMessage();
+    inputField.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
     });
 
     function resetConversation() {
@@ -279,7 +247,5 @@
       }
     }
   </script>
-
 </body>
-
 </html>
