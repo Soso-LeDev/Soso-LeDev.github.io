@@ -25,6 +25,19 @@
       font-size: 18px;
       font-weight: bold;
       text-align: center;
+      position: relative;
+    }
+
+    #clearBtn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
     }
 
     #chat {
@@ -101,7 +114,10 @@
 </head>
 <body>
 
-  <header>Scout – Assistant IA</header>
+  <header>
+    Scout – Assistant IA
+    <button id="clearBtn" onclick="resetConversation()" title="Effacer la conversation">🗑️</button>
+  </header>
 
   <div id="chat"></div>
 
@@ -118,13 +134,28 @@
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
 
-    // Mémoire de la conversation
-    const messages = [
-      {
-        role: "system",
-        content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
-      }
-    ];
+    const SYSTEM_PROMPT = {
+      role: "system",
+      content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
+    };
+
+    // Charge l'historique ou démarre une nouvelle session
+    let messages = JSON.parse(localStorage.getItem("chatHistory")) || [SYSTEM_PROMPT];
+
+    // Affiche les messages sauvegardés au chargement
+    window.onload = () => {
+      messages.forEach(msg => {
+        if (msg.role === "user") {
+          displayMessage("Soan", msg.content, "user");
+        } else if (msg.role === "assistant") {
+          displayMessage("Scout", msg.content, "bot");
+        }
+      });
+    };
+
+    function saveMessages() {
+      localStorage.setItem("chatHistory", JSON.stringify(messages));
+    }
 
     function displayMessage(sender, text, type) {
       const msgDiv = document.createElement("div");
@@ -141,6 +172,7 @@
       messages.push({ role: "user", content: userMessage });
       displayMessage("Soan", userMessage, "user");
       inputField.value = "";
+      saveMessages();
 
       try {
         const response = await fetch(apiUrl, {
@@ -159,6 +191,7 @@
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
         messages.push({ role: "assistant", content: botReply });
         displayMessage("Scout", botReply, "bot");
+        saveMessages();
 
       } catch (error) {
         displayMessage("Scout", `❌ Erreur : ${error.message}`, "bot");
@@ -170,6 +203,13 @@
         sendMessage();
       }
     });
+
+    function resetConversation() {
+      if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
+        localStorage.removeItem("chatHistory");
+        location.reload();
+      }
+    }
   </script>
 </body>
 </html>
