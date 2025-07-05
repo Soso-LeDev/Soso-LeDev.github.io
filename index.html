@@ -2,76 +2,100 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Chat avec Scout</title>
+  <title>Assistant Scout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f4f8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
+    * {
+      box-sizing: border-box;
     }
 
-    h2 {
-      color: #333;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f0f2f5, #d9e4f5);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      margin-top: 40px;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      border-bottom: 1px solid #0056b3;
     }
 
     #chat {
-      width: 100%;
-      max-width: 600px;
+      padding: 20px;
       height: 400px;
-      border-radius: 10px;
-      background-color: #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      padding: 15px;
       overflow-y: auto;
-      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .message {
-      margin: 10px 0;
-      line-height: 1.4;
-      padding: 10px 14px;
-      border-radius: 16px;
       max-width: 80%;
-      word-wrap: break-word;
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.5;
+      white-space: pre-wrap;
     }
 
     .user {
       align-self: flex-end;
       background-color: #d0e6ff;
       color: #003366;
-      margin-left: auto;
+      border-bottom-right-radius: 4px;
     }
 
     .bot {
       align-self: flex-start;
       background-color: #e8ffe8;
       color: #1a3c1a;
-      margin-right: auto;
+      border-bottom-left-radius: 4px;
     }
 
     #inputArea {
       display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 600px;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+      background-color: #fafafa;
     }
 
     input {
       flex: 1;
-      padding: 12px;
+      padding: 10px 15px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
+      outline: none;
     }
 
     button {
-      padding: 12px 20px;
+      margin-left: 10px;
+      padding: 10px 20px;
       background-color: #007bff;
-      color: white;
       border: none;
+      color: white;
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
@@ -80,16 +104,23 @@
     button:hover {
       background-color: #0056b3;
     }
+
+    @media (max-width: 600px) {
+      header { font-size: 18px; }
+      .message { font-size: 14px; }
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>💬 Assistant Scout</header>
 
-  <h2>💬 Conversation avec Scout</h2>
-  <div id="chat"></div>
+    <div id="chat"></div>
 
-  <div id="inputArea">
-    <input type="text" id="userInput" placeholder="Écris un message..." />
-    <button onclick="sendMessage()">Envoyer</button>
+    <div id="inputArea">
+      <input type="text" id="userInput" placeholder="Écrivez votre message ici..." />
+      <button onclick="sendMessage()">Envoyer</button>
+    </div>
   </div>
 
   <script>
@@ -100,26 +131,29 @@
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
 
-    // Mémoire de conversation
-    const messages = [];
+    // 🧠 Mémoire : Scout se souvient de la conversation
+    const messages = [
+      {
+        role: "system",
+        content: `Vous êtes Scout, une intelligence artificielle bienveillante, respectueuse et polie. Vous parlez à Soan, une personne que vous devez toujours vouvoyer avec respect. Répondez de manière claire, chaleureuse et humaine. Ne tutoyez jamais. Soyez attentionné.`
+      }
+    ];
+
+    function displayMessage(sender, text, type) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", type);
+      msgDiv.textContent = text;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
     async function sendMessage() {
       const userMessage = inputField.value.trim();
       if (!userMessage) return;
 
-      // Ajoute message de l'utilisateur dans l'historique
       messages.push({ role: "user", content: userMessage });
-
-      // Affiche dans le chat
-      displayMessage("Tu", userMessage, "user");
-
+      displayMessage("Soan", userMessage, "user");
       inputField.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      const body = {
-        model: model,
-        messages: messages
-      };
 
       try {
         const response = await fetch(apiUrl, {
@@ -128,30 +162,23 @@
             "Content-Type": "application/json",
             "Authorization": `Bearer ${apiKey}`
           },
-          body: JSON.stringify(body)
+          body: JSON.stringify({
+            model: model,
+            messages: messages
+          })
         });
 
         const data = await response.json();
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-
         messages.push({ role: "assistant", content: botReply });
-
         displayMessage("Scout", botReply, "bot");
-        chatBox.scrollTop = chatBox.scrollHeight;
 
       } catch (error) {
         displayMessage("Scout", `❌ Erreur : ${error.message}`, "bot");
       }
     }
 
-    function displayMessage(sender, text, type) {
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add("message", type);
-      msgDiv.textContent = `${text}`;
-      chatBox.appendChild(msgDiv);
-    }
-
-    // Envoi avec la touche "Entrée"
+    // Envoi avec touche "Entrée"
     inputField.addEventListener("keypress", function (e) {
       if (e.key === "Enter") {
         sendMessage();
