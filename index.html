@@ -139,10 +139,8 @@
       content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
     };
 
-    // Charge l'historique ou démarre une nouvelle session
     let messages = JSON.parse(localStorage.getItem("chatHistory")) || [SYSTEM_PROMPT];
 
-    // Affiche les messages sauvegardés au chargement
     window.onload = () => {
       messages.forEach(msg => {
         if (msg.role === "user") {
@@ -169,11 +167,32 @@
       const userMessage = inputField.value.trim();
       if (!userMessage) return;
 
-      messages.push({ role: "user", content: userMessage });
       displayMessage("Soan", userMessage, "user");
+      messages.push({ role: "user", content: userMessage });
       inputField.value = "";
       saveMessages();
 
+      // 🔎 Détection de la commande /google
+      if (userMessage.toLowerCase().startsWith("/google ")) {
+        const searchQuery = userMessage.substring(8).trim();
+        if (searchQuery.length > 0) {
+          const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+          window.open(url, "_blank");
+
+          const reply = `🔎 J'ai effectué une recherche Google pour "${searchQuery}".`;
+          displayMessage("Scout", reply, "bot");
+          messages.push({ role: "assistant", content: reply });
+          saveMessages();
+        } else {
+          const reply = `⚠️ Veuillez spécifier une requête après "/google".`;
+          displayMessage("Scout", reply, "bot");
+          messages.push({ role: "assistant", content: reply });
+          saveMessages();
+        }
+        return;
+      }
+
+      // Sinon, envoie à l'IA
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -186,10 +205,6 @@
             messages: messages
           })
         });
-
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP ${response.status}`);
-        }
 
         const data = await response.json();
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
