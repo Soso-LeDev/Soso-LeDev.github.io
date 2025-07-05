@@ -2,44 +2,123 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Chat Groq</title>
+  <title>Chat avec Scout</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
-    .message { margin: 5px 0; }
-    .user { color: blue; font-weight: bold; }
-    .bot { color: green; }
-    input { width: 80%; padding: 10px; }
-    button { padding: 10px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    #chat {
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .message {
+      margin: 10px 0;
+      line-height: 1.4;
+      padding: 10px 14px;
+      border-radius: 16px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #d0e6ff;
+      color: #003366;
+      margin-left: auto;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background-color: #e8ffe8;
+      color: #1a3c1a;
+      margin-right: auto;
+    }
+
+    #inputArea {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
-  <h2>Chat avec Groq (LLaMA 4 Scout)</h2>
+
+  <h2>💬 Conversation avec Scout</h2>
   <div id="chat"></div>
-  <input type="text" id="userInput" placeholder="Ton message..." />
-  <button onclick="sendMessage()">Envoyer</button>
+
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="Écris un message..." />
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
 
   <script>
     const apiKey = "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";
     const model = "meta-llama/llama-4-scout-17b-16e-instruct";
     const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+
     const chatBox = document.getElementById("chat");
+    const inputField = document.getElementById("userInput");
+
+    // Mémoire de conversation
+    const messages = [];
 
     async function sendMessage() {
-      const input = document.getElementById("userInput");
-      const userMessage = input.value.trim();
+      const userMessage = inputField.value.trim();
       if (!userMessage) return;
 
-      // Affiche le message de l'utilisateur
-      chatBox.innerHTML += `<div class="message user">👤 ${userMessage}</div>`;
+      // Ajoute message de l'utilisateur dans l'historique
+      messages.push({ role: "user", content: userMessage });
+
+      // Affiche dans le chat
+      displayMessage("Tu", userMessage, "user");
+
+      inputField.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
-      input.value = "";
 
       const body = {
         model: model,
-        messages: [
-          { role: "user", content: userMessage }
-        ]
+        messages: messages
       };
 
       try {
@@ -54,12 +133,30 @@
 
         const data = await response.json();
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-        chatBox.innerHTML += `<div class="message bot">🤖 ${botReply}</div>`;
+
+        messages.push({ role: "assistant", content: botReply });
+
+        displayMessage("Scout", botReply, "bot");
         chatBox.scrollTop = chatBox.scrollHeight;
+
       } catch (error) {
-        chatBox.innerHTML += `<div class="message bot">❌ Erreur : ${error.message}</div>`;
+        displayMessage("Scout", `❌ Erreur : ${error.message}`, "bot");
       }
     }
+
+    function displayMessage(sender, text, type) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", type);
+      msgDiv.textContent = `${text}`;
+      chatBox.appendChild(msgDiv);
+    }
+
+    // Envoi avec la touche "Entrée"
+    inputField.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
   </script>
 </body>
 </html>
