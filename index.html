@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,24 +7,31 @@
   <style>
     * {
       box-sizing: border-box;
-    }
-    body {
       margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #ece5dd;
+    }
+
+    body {
+      background-color: #f4f7fc;
       display: flex;
       flex-direction: column;
       height: 100vh;
+      overflow: hidden;
     }
+
     header {
       background-color: #075e54;
-      color: white;
+      color: #fff;
       padding: 16px;
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 22px;
+      font-weight: 600;
       text-align: center;
       position: relative;
+      border-bottom: 2px solid #3c6e54;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     #clearBtn {
       position: absolute;
       right: 16px;
@@ -33,82 +39,133 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: white;
+      color: #fff;
       font-size: 20px;
       cursor: pointer;
+      transition: color 0.3s ease;
     }
+
+    #clearBtn:hover {
+      color: #ff4c4c;
+    }
+
     #chat {
       flex: 1;
-      padding: 10px;
+      padding: 15px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      background-image: url('https://i.imgur.com/3eF1QTT.png');
-      background-size: cover;
+      gap: 10px;
+      background-color: #f9f9f9;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease;
     }
+
+    #chat:hover {
+      background-color: #ececec;
+    }
+
     .message {
       max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 15px;
-      line-height: 1.4;
+      padding: 12px 18px;
+      border-radius: 20px;
+      font-size: 16px;
+      line-height: 1.5;
       white-space: pre-wrap;
       word-wrap: break-word;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, background 0.2s ease;
     }
+
     .user {
       align-self: flex-end;
       background-color: #dcf8c6;
       border-bottom-right-radius: 0;
+      transform: scale(1.02);
     }
+
     .bot {
       align-self: flex-start;
-      background-color: #ffffff;
+      background-color: #fff;
       border-bottom-left-radius: 0;
+      transform: scale(1.02);
     }
+
+    .user:hover, .bot:hover {
+      transform: scale(1.05);
+    }
+
     #inputArea {
       display: flex;
-      padding: 10px;
+      align-items: center;
+      padding: 15px;
+      background-color: #f1f1f1;
       border-top: 1px solid #ccc;
-      background-color: #f0f0f0;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
     }
+
     input {
       flex: 1;
-      padding: 12px;
+      padding: 12px 20px;
       font-size: 16px;
-      border-radius: 20px;
-      border: none;
+      border-radius: 30px;
+      border: 1px solid #ddd;
       outline: none;
-      background-color: white;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
+
+    input:focus {
+      border-color: #25d366;
+      box-shadow: 0 0 8px rgba(37, 211, 102, 0.5);
+    }
+
     button {
-      margin-left: 8px;
-      padding: 12px 16px;
+      margin-left: 10px;
+      padding: 12px 18px;
       background-color: #25d366;
-      color: white;
-      font-size: 16px;
+      color: #fff;
+      font-size: 18px;
       border: none;
       border-radius: 50%;
       cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
-    #micBtn {
-      background-color: #075e54;
-      color: white;
-    }
-    #micBtn.listening {
-      background-color: #ff9800;
-    }
+
     button:hover {
       background-color: #128c7e;
+      transform: scale(1.1);
     }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
     @media (max-width: 600px) {
-      header { font-size: 16px; }
-      .message { font-size: 14px; }
-      input { font-size: 15px; }
+      header {
+        font-size: 18px;
+      }
+
+      .message {
+        font-size: 14px;
+      }
+
+      input {
+        font-size: 15px;
+      }
+
+      button {
+        padding: 10px 14px;
+        font-size: 18px;
+      }
     }
   </style>
 </head>
-
 <body>
   <header>
     Scout – Assistant IA
@@ -120,7 +177,6 @@
   <div id="inputArea">
     <input type="text" id="userInput" placeholder="Écrivez un message..." />
     <button onclick="sendMessage()">▶️</button>
-    <button id="micBtn" title="Parler 🎤">🎤</button>
   </div>
 
   <script>
@@ -139,14 +195,12 @@
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
 
-    // Échappement classique pour les messages utilisateurs
     function escapeHTML(str) {
       return str.replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;");
     }
 
-    // Autoriser un sous-ensemble de balises dans les réponses du bot
     function sanitizeHTML(html) {
       const temp = document.createElement('div');
       temp.innerHTML = html;
@@ -155,10 +209,8 @@
       const cleanNode = (node) => {
         Array.from(node.children).forEach(child => {
           if (!allowedTags.includes(child.tagName)) {
-            // remplacer la balise interdite par son contenu
             child.replaceWith(...child.childNodes);
           } else {
-            // sécuriser les liens
             if (child.tagName === 'A') {
               child.setAttribute('target', '_blank');
               child.setAttribute('rel', 'noopener noreferrer');
@@ -171,7 +223,6 @@
       return temp.innerHTML;
     }
 
-    // Détection automatique d'URL dans le texte et transformation en lien
     function linkify(text) {
       const urlPattern = /(\bhttps?:\/\/[^\s<]+)/gi;
       return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
@@ -181,7 +232,6 @@
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", type);
       if (type === "bot") {
-        // on linkify puis sanitize
         const rich = sanitizeHTML(linkify(text).replace(/\n/g, '<br>'));
         msgDiv.innerHTML = rich;
       } else {
@@ -198,14 +248,12 @@
       displayMessage("Soan", userMessage, "user");
       messages.push({ role: "user", content: userMessage });
       inputField.value = "";
-      await logToFile(`Soan : ${userMessage}`);
-
+      
       if (userMessage.toLowerCase().startsWith("/google ")) {
         const query = userMessage.slice(8).trim();
         if (!query) {
           const msg = "⚠️ Veuillez entrer une requête après « /google ».";
           displayMessage("Scout", msg, "bot");
-          await logToFile(`Scout : ${msg}`);
           return;
         }
         displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
@@ -219,16 +267,13 @@
               if (item.snippet) reply += `<em>${item.snippet}</em><br><br>`;
             });
             displayMessage("Scout", reply, "bot");
-            await logToFile(`Scout : Résultats Google pour "${query}"`);
           } else {
             const msg = "❌ Aucun résultat trouvé.";
             displayMessage("Scout", msg, "bot");
-            await logToFile(`Scout : ${msg}`);
           }
         } catch (error) {
           const errMsg = `❌ Erreur Google : ${error.message}`;
           displayMessage("Scout", errMsg, "bot");
-          await logToFile(`Scout : ${errMsg}`);
         }
         return;
       }
@@ -246,33 +291,16 @@
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
         displayMessage("Scout", botReply, "bot");
         messages.push({ role: "assistant", content: botReply });
-        await logToFile(`Scout : ${botReply}`);
       } catch (error) {
         const err = `❌ Erreur : ${error.message}`;
         displayMessage("Scout", err, "bot");
-        await logToFile(`Scout : ${err}`);
-      }
-    }
-
-    async function logToFile(content) {
-      try {
-        await fetch("save.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: content })
-        });
-      } catch (e) {
-        console.error("Erreur de sauvegarde :", e);
       }
     }
 
     function resetConversation() {
       if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
-        fetch("save.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reset: true })
-        }).then(() => location.reload());
+        messages = [SYSTEM_PROMPT];
+        chatBox.innerHTML = '';
       }
     }
 
@@ -281,21 +309,7 @@
       utterance.lang = 'fr-FR';
       utterance.pitch = 1;
       utterance.rate = 1;
-      const setVoice = () => {
-        const voices = speechSynthesis.getVoices();
-        const maleVoices = voices.filter(v =>
-          v.lang.startsWith('fr') &&
-          (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('homme'))
-        );
-        utterance.voice = maleVoices[0] || voices.find(v => v.lang.startsWith('fr'));
-        speechSynthesis.speak(utterance);
-      };
-      if (speechSynthesis.getVoices().length === 0) {
-        speechSynthesis.onvoiceschanged = () => {
-          setVoice();
-          speechSynthesis.onvoiceschanged = null;
-        };
-      } else setVoice();
+      speechSynthesis.speak(utterance);
     }
 
     function stripHTML(html) {
@@ -304,31 +318,9 @@
       return div.textContent || div.innerText || "";
     }
 
-    const micBtn = document.getElementById("micBtn");
-    let recognition;
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.onstart = () => micBtn.classList.add("listening");
-      recognition.onend = () => micBtn.classList.remove("listening");
-      recognition.onerror = (e) => console.error("Erreur micro :", e.error);
-      recognition.onresult = (e) => {
-        inputField.value = e.results[0][0].transcript;
-        sendMessage();
-      };
-      micBtn.addEventListener("click", () => recognition.start());
-    } else {
-      micBtn.disabled = true;
-      micBtn.title = "Reconnaissance vocale non supportée";
-    }
-
     inputField.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendMessage();
     });
   </script>
 </body>
-
 </html>
