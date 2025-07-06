@@ -2,426 +2,333 @@
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat avec Scout</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #ece5dd;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            margin: 0;
-        }
-
-        header {
-            background-color: #075e54;
-            color: white;
-            padding: 16px;
-            font-size: 20px;
-            font-weight: 600;
-            text-align: center;
-            position: relative;
-            border-bottom: 2px solid #128c7e;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        #clearBtn {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-            transition: 0.3s ease;
-        }
-
-        #clearBtn:hover {
-            color: #ff4d4d;
-        }
-
-        #chat {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background-image: url('https://i.imgur.com/3eF1QTT.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            border-bottom: 2px solid #128c7e;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: 0.3s ease;
-        }
-
-        .message:hover {
-            transform: translateX(5px);
-        }
-
-        .user {
-            align-self: flex-end;
-            background-color: #dcf8c6;
-            border-bottom-right-radius: 0;
-        }
-
-        .bot {
-            align-self: flex-start;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-bottom-left-radius: 0;
-        }
-
-        #inputArea {
-            display: flex;
-            padding: 12px;
-            background-color: #f9f9f9;
-            border-top: 2px solid #ccc;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 30px;
-            border: 1px solid #ccc;
-            outline: none;
-            background-color: white;
-            transition: border 0.3s ease;
-            max-width: 500px;
-            width: 80%;
-        }
-
-        input:focus {
-            border-color: #128c7e;
-        }
-
-        button {
-            margin-left: 12px;
-            padding: 12px 18px;
-            background-color: #25d366;
-            color: white;
-            font-size: 18px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        button:hover {
-            background-color: #128c7e;
-            transform: scale(1.1);
-        }
-
-        #micBtn {
-            background-color: #075e54;
-        }
-
-        #micBtn.listening {
-            background-color: #ff9800;
-        }
-
-        button:focus {
-            outline: none;
-        }
-
-        #micBtn:active {
-            transform: scale(1.2);
-        }
-
-        .message a {
-            color: #128c7e;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .message a:hover {
-            color: #075e54;
-        }
-
-        @media (max-width: 768px) {
-            header {
-                font-size: 18px;
-            }
-
-            .message {
-                font-size: 14px;
-            }
-
-            input {
-                font-size: 14px;
-                width: 70%;
-            }
-
-            button {
-                font-size: 16px;
-            }
-
-            #inputArea {
-                justify-content: space-between;
-                padding: 8px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            input {
-                width: 100%;
-            }
-
-            button {
-                font-size: 14px;
-                padding: 10px 14px;
-            }
-
-            #micBtn {
-                padding: 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat avec Scout</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ece5dd;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background-color: #075e54;
+      color: white;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      position: relative;
+    }
+    #clearBtn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #chat {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-image: url('https://i.imgur.com/3eF1QTT.png');
+      background-size: cover;
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .user {
+      align-self: flex-end;
+      background-color: #dcf8c6;
+      border-bottom-right-radius: 0;
+    }
+    .bot {
+      align-self: flex-start;
+      background-color: #ffffff;
+      border-bottom-left-radius: 0;
+    }
+    #inputArea {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      background-color: #f0f0f0;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      background-color: white;
+    }
+    button {
+      margin-left: 8px;
+      padding: 12px 16px;
+      background-color: #25d366;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    #micBtn {
+      background-color: #075e54;
+      color: white;
+    }
+    #micBtn.listening {
+      background-color: #ff9800;
+    }
+    button:hover {
+      background-color: #128c7e;
+    }
+    @media (max-width: 600px) {
+      header { font-size: 16px; }
+      .message { font-size: 14px; }
+      input { font-size: 15px; }
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    Scout – Assistant IA
+    <button id="clearBtn" onclick="resetConversation()" title="Effacer la conversation">🗑️</button>
+  </header>
 
-    <header>
-        Scout – Assistant IA
-        <button id="clearBtn" onclick="resetConversation()" title="Effacer la conversation">🗑️</button>
-    </header>
+  <div id="chat"></div>
 
-    <div id="chat"></div>
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="Écrivez un message..." />
+    <button onclick="sendMessage()">▶️</button>
+    <button id="micBtn" title="Parler 🎤">🎤</button>
+  </div>
 
-    <div id="inputArea">
-        <input type="text" id="userInput" placeholder="Écrivez un message..." />
-        <button onclick="sendMessage()">▶️</button>
-        <button id="micBtn" title="Parler 🎤">🎤</button>
-    </div>
+  <script>
+    const apiKey = "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";
+    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
+    const googleCx = "24246487405284f60";
 
-    <script>
-        const apiKey = "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";
-        const model = "meta-llama/llama-4-scout-17b-16e-instruct";
-        const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
-        const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
-        const googleCx = "24246487405284f60";
+    const SYSTEM_PROMPT = {
+      role: "system",
+      content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
+    };
 
-        const SYSTEM_PROMPT = {
-            role: "system",
-            content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
-        };
+    let messages = [SYSTEM_PROMPT];
+    const chatBox = document.getElementById("chat");
+    const inputField = document.getElementById("userInput");
 
-        let messages = [SYSTEM_PROMPT];
-        const chatBox = document.getElementById("chat");
-        const inputField = document.getElementById("userInput");
+    // Échappement classique pour les messages utilisateurs
+    function escapeHTML(str) {
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+    }
 
-        function escapeHTML(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
+    // Autoriser un sous-ensemble de balises dans les réponses du bot
+    function sanitizeHTML(html) {
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
 
-        function sanitizeHTML(html) {
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-
-            const allowedTags = ['B', 'STRONG', 'I', 'EM', 'A', 'BR'];
-            const cleanNode = (node) => {
-                Array.from(node.children).forEach(child => {
-                    if (!allowedTags.includes(child.tagName)) {
-                        child.replaceWith(...child.childNodes);
-                    } else {
-                        if (child.tagName === 'A') {
-                            child.setAttribute('target', '_blank');
-                            child.setAttribute('rel', 'noopener noreferrer');
-                        }
-                        cleanNode(child);
-                    }
-                });
-            };
-            cleanNode(temp);
-            return temp.innerHTML;
-        }
-
-        function linkify(text) {
-            const urlPattern = /(\bhttps?:\/\/[^\s<]+)/gi;
-            return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-        }
-
-        function displayMessage(sender, text, type) {
-            const msgDiv = document.createElement("div");
-            msgDiv.classList.add("message", type);
-            if (type === "bot") {
-                const rich = sanitizeHTML(linkify(text).replace(/\n/g, '<br>'));
-                msgDiv.innerHTML = rich;
-            } else {
-                msgDiv.innerHTML = escapeHTML(text);
+      const allowedTags = ['B', 'STRONG', 'I', 'EM', 'A', 'BR'];
+      const cleanNode = (node) => {
+        Array.from(node.children).forEach(child => {
+          if (!allowedTags.includes(child.tagName)) {
+            // remplacer la balise interdite par son contenu
+            child.replaceWith(...child.childNodes);
+          } else {
+            // sécuriser les liens
+            if (child.tagName === 'A') {
+              child.setAttribute('target', '_blank');
+              child.setAttribute('rel', 'noopener noreferrer');
             }
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            if (type === "bot") speak(stripHTML(text));
-        }
-
-        async function sendMessage() {
-            const userMessage = inputField.value.trim();
-            if (!userMessage) return;
-
-            displayMessage("Soan", userMessage, "user");
-            messages.push({ role: "user", content: userMessage });
-            inputField.value = "";
-
-            await logToFile(`Soan : ${userMessage}`);
-
-            if (userMessage.toLowerCase().startsWith("/google ")) {
-                const query = userMessage.slice(8).trim();
-                if (!query) {
-                    const msg = "⚠️ Veuillez entrer une requête après « /google ».";
-                    displayMessage("Scout", msg, "bot");
-                    await logToFile(`Scout : ${msg}`);
-                    return;
-                }
-                displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
-                try {
-                    const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
-                    const data = await res.json();
-                    if (data.items && data.items.length > 0) {
-                        let reply = `<strong>🔎 Résultats pour : « ${query} »</strong><br><br>`;
-                        data.items.slice(0, 3).forEach((item, i) => {
-                            reply += `<strong>${i + 1}. <a href="${item.link}" target="_blank">${item.title}</a></strong><br>`;
-                            if (item.snippet) reply += `<em>${item.snippet}</em><br><br>`;
-                        });
-                        displayMessage("Scout", reply, "bot");
-                        await logToFile(`Scout : Résultats Google pour "${query}"`);
-                    } else {
-                        const msg = "❌ Aucun résultat trouvé.";
-                        displayMessage("Scout", msg, "bot");
-                        await logToFile(`Scout : ${msg}`);
-                    }
-                } catch (error) {
-                    const errMsg = `❌ Erreur Google : ${error.message}`;
-                    displayMessage("Scout", errMsg, "bot");
-                    await logToFile(`Scout : ${errMsg}`);
-                }
-                return;
-            }
-
-            try {
-                const res = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({ model: model, messages: messages })
-                });
-                const data = await res.json();
-                const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-                displayMessage("Scout", botReply, "bot");
-                messages.push({ role: "assistant", content: botReply });
-                await logToFile(`Scout : ${botReply}`);
-            } catch (error) {
-                const err = `❌ Erreur : ${error.message}`;
-                displayMessage("Scout", err, "bot");
-                await logToFile(`Scout : ${err}`);
-            }
-        }
-
-        async function logToFile(content) {
-            try {
-                await fetch("save.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: content })
-                });
-            } catch (e) {
-                console.error("Erreur de sauvegarde :", e);
-            }
-        }
-
-        function resetConversation() {
-            if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
-                fetch("save.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ reset: true })
-                }).then(() => location.reload());
-            }
-        }
-
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'fr-FR';
-            utterance.pitch = 1;
-            utterance.rate = 1;
-            const setVoice = () => {
-                const voices = speechSynthesis.getVoices();
-                const maleVoices = voices.filter(v =>
-                    v.lang.startsWith('fr') &&
-                    (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('homme'))
-                );
-                utterance.voice = maleVoices[0] || voices.find(v => v.lang.startsWith('fr'));
-                speechSynthesis.speak(utterance);
-            };
-            if (speechSynthesis.getVoices().length === 0) {
-                speechSynthesis.onvoiceschanged = () => {
-                    setVoice();
-                    speechSynthesis.onvoiceschanged = null;
-                };
-            } else setVoice();
-        }
-
-        function stripHTML(html) {
-            const div = document.createElement("div");
-            div.innerHTML = html;
-            return div.textContent || div.innerText || "";
-        }
-
-        const micBtn = document.getElementById("micBtn");
-        let recognition;
-
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'fr-FR';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.onstart = () => micBtn.classList.add("listening");
-            recognition.onend = () => micBtn.classList.remove("listening");
-            recognition.onerror = (e) => console.error("Erreur micro :", e.error);
-            recognition.onresult = (e) => {
-                inputField.value = e.results[0][0].transcript;
-                sendMessage();
-            };
-            micBtn.addEventListener("click", () => recognition.start());
-        } else {
-            micBtn.disabled = true;
-            micBtn.title = "Reconnaissance vocale non supportée";
-        }
-
-        inputField.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
+            cleanNode(child);
+          }
         });
-    </script>
+      };
+      cleanNode(temp);
+      return temp.innerHTML;
+    }
+
+    // Détection automatique d'URL dans le texte et transformation en lien
+    function linkify(text) {
+      const urlPattern = /(\bhttps?:\/\/[^\s<]+)/gi;
+      return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    }
+
+    function displayMessage(sender, text, type) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", type);
+      if (type === "bot") {
+        // on linkify puis sanitize
+        const rich = sanitizeHTML(linkify(text).replace(/\n/g, '<br>'));
+        msgDiv.innerHTML = rich;
+      } else {
+        msgDiv.innerHTML = escapeHTML(text);
+      }
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      if (type === "bot") speak(stripHTML(text));
+    }
+
+    async function sendMessage() {
+      const userMessage = inputField.value.trim();
+      if (!userMessage) return;
+      displayMessage("Soan", userMessage, "user");
+      messages.push({ role: "user", content: userMessage });
+      inputField.value = "";
+      await logToFile(`Soan : ${userMessage}`);
+
+      if (userMessage.toLowerCase().startsWith("/google ")) {
+        const query = userMessage.slice(8).trim();
+        if (!query) {
+          const msg = "⚠️ Veuillez entrer une requête après « /google ».";
+          displayMessage("Scout", msg, "bot");
+          await logToFile(`Scout : ${msg}`);
+          return;
+        }
+        displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
+        try {
+          const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            let reply = `<strong>🔎 Résultats pour : « ${query} »</strong><br><br>`;
+            data.items.slice(0, 3).forEach((item, i) => {
+              reply += `<strong>${i + 1}. <a href="${item.link}" target="_blank">${item.title}</a></strong><br>`;
+              if (item.snippet) reply += `<em>${item.snippet}</em><br><br>`;
+            });
+            displayMessage("Scout", reply, "bot");
+            await logToFile(`Scout : Résultats Google pour "${query}"`);
+          } else {
+            const msg = "❌ Aucun résultat trouvé.";
+            displayMessage("Scout", msg, "bot");
+            await logToFile(`Scout : ${msg}`);
+          }
+        } catch (error) {
+          const errMsg = `❌ Erreur Google : ${error.message}`;
+          displayMessage("Scout", errMsg, "bot");
+          await logToFile(`Scout : ${errMsg}`);
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({ model: model, messages: messages })
+        });
+        const data = await res.json();
+        const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
+        displayMessage("Scout", botReply, "bot");
+        messages.push({ role: "assistant", content: botReply });
+        await logToFile(`Scout : ${botReply}`);
+      } catch (error) {
+        const err = `❌ Erreur : ${error.message}`;
+        displayMessage("Scout", err, "bot");
+        await logToFile(`Scout : ${err}`);
+      }
+    }
+
+    async function logToFile(content) {
+      try {
+        await fetch("save.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: content })
+        });
+      } catch (e) {
+        console.error("Erreur de sauvegarde :", e);
+      }
+    }
+
+    function resetConversation() {
+      if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
+        fetch("save.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reset: true })
+        }).then(() => location.reload());
+      }
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      const setVoice = () => {
+        const voices = speechSynthesis.getVoices();
+        const maleVoices = voices.filter(v =>
+          v.lang.startsWith('fr') &&
+          (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('homme'))
+        );
+        utterance.voice = maleVoices[0] || voices.find(v => v.lang.startsWith('fr'));
+        speechSynthesis.speak(utterance);
+      };
+      if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.onvoiceschanged = () => {
+          setVoice();
+          speechSynthesis.onvoiceschanged = null;
+        };
+      } else setVoice();
+    }
+
+    function stripHTML(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
+    }
+
+    const micBtn = document.getElementById("micBtn");
+    let recognition;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'fr-FR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.onstart = () => micBtn.classList.add("listening");
+      recognition.onend = () => micBtn.classList.remove("listening");
+      recognition.onerror = (e) => console.error("Erreur micro :", e.error);
+      recognition.onresult = (e) => {
+        inputField.value = e.results[0][0].transcript;
+        sendMessage();
+      };
+      micBtn.addEventListener("click", () => recognition.start());
+    } else {
+      micBtn.disabled = true;
+      micBtn.title = "Reconnaissance vocale non supportée";
+    }
+
+    inputField.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
 </body>
 
 </html>
