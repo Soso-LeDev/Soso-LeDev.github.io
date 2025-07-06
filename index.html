@@ -100,6 +100,9 @@
             padding: 12px;
             background-color: #f9f9f9;
             border-top: 2px solid #ccc;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         input {
@@ -111,6 +114,8 @@
             outline: none;
             background-color: white;
             transition: border 0.3s ease;
+            max-width: 500px;
+            width: 80%;
         }
 
         input:focus {
@@ -160,18 +165,42 @@
             color: #075e54;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             header {
                 font-size: 18px;
             }
+
             .message {
                 font-size: 14px;
             }
+
             input {
                 font-size: 14px;
+                width: 70%;
             }
+
+            button {
+                font-size: 16px;
+            }
+
+            #inputArea {
+                justify-content: space-between;
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            input {
+                width: 100%;
+            }
+
             button {
                 font-size: 14px;
+                padding: 10px 14px;
+            }
+
+            #micBtn {
+                padding: 10px;
             }
         }
     </style>
@@ -393,7 +422,6 @@
             if (e.key === "Enter") sendMessage();
         });
     </script>
-
 </body>
 
 </html>
