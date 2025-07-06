@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -138,24 +139,62 @@
     const chatBox = document.getElementById("chat");
     const inputField = document.getElementById("userInput");
 
+    // Échappement classique pour les messages utilisateurs
     function escapeHTML(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+    }
+
+    // Autoriser un sous-ensemble de balises dans les réponses du bot
+    function sanitizeHTML(html) {
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+
+      const allowedTags = ['B', 'STRONG', 'I', 'EM', 'A', 'BR'];
+      const cleanNode = (node) => {
+        Array.from(node.children).forEach(child => {
+          if (!allowedTags.includes(child.tagName)) {
+            // remplacer la balise interdite par son contenu
+            child.replaceWith(...child.childNodes);
+          } else {
+            // sécuriser les liens
+            if (child.tagName === 'A') {
+              child.setAttribute('target', '_blank');
+              child.setAttribute('rel', 'noopener noreferrer');
+            }
+            cleanNode(child);
+          }
+        });
+      };
+      cleanNode(temp);
+      return temp.innerHTML;
+    }
+
+    // Détection automatique d'URL dans le texte et transformation en lien
+    function linkify(text) {
+      const urlPattern = /(\bhttps?:\/\/[^\s<]+)/gi;
+      return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
     }
 
     function displayMessage(sender, text, type) {
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", type);
-      msgDiv.innerHTML = type === "bot" ? text : escapeHTML(text);
+      if (type === "bot") {
+        // on linkify puis sanitize
+        const rich = sanitizeHTML(linkify(text).replace(/\n/g, '<br>'));
+        msgDiv.innerHTML = rich;
+      } else {
+        msgDiv.innerHTML = escapeHTML(text);
+      }
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
-
       if (type === "bot") speak(stripHTML(text));
     }
 
     async function sendMessage() {
       const userMessage = inputField.value.trim();
       if (!userMessage) return;
-
       displayMessage("Soan", userMessage, "user");
       messages.push({ role: "user", content: userMessage });
       inputField.value = "";
@@ -169,16 +208,14 @@
           await logToFile(`Scout : ${msg}`);
           return;
         }
-
         displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
         try {
           const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
           const data = await res.json();
-
           if (data.items && data.items.length > 0) {
             let reply = `<strong>🔎 Résultats pour : « ${query} »</strong><br><br>`;
             data.items.slice(0, 3).forEach((item, i) => {
-              reply += `<strong>${i + 1}. <a href="${item.link}" target="_blank" style="color:#1a0dab;">${item.title}</a></strong><br>`;
+              reply += `<strong>${i + 1}. <a href="${item.link}" target="_blank">${item.title}</a></strong><br>`;
               if (item.snippet) reply += `<em>${item.snippet}</em><br><br>`;
             });
             displayMessage("Scout", reply, "bot");
@@ -205,7 +242,6 @@
           },
           body: JSON.stringify({ model: model, messages: messages })
         });
-
         const data = await res.json();
         const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
         displayMessage("Scout", botReply, "bot");
@@ -240,84 +276,59 @@
       }
     }
 
-    // Synthèse vocale avec voix masculine française si possible
     function speak(text) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'fr-FR';
       utterance.pitch = 1;
       utterance.rate = 1;
-
-      // Attendre que les voix soient chargées
       const setVoice = () => {
         const voices = speechSynthesis.getVoices();
-
-        // Rechercher une voix masculine française
-        const maleVoices = voices.filter(voice => 
-          voice.lang.startsWith('fr') &&
-          (voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('homme') || voice.name.toLowerCase().includes('man'))
+        const maleVoices = voices.filter(v =>
+          v.lang.startsWith('fr') &&
+          (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('homme'))
         );
-
-        if (maleVoices.length > 0) {
-          utterance.voice = maleVoices[0];
-        } else {
-          // Sinon, choisir une voix française par défaut
-          const frenchVoices = voices.filter(voice => voice.lang.startsWith('fr'));
-          if (frenchVoices.length > 0) {
-            utterance.voice = frenchVoices[0];
-          }
-        }
+        utterance.voice = maleVoices[0] || voices.find(v => v.lang.startsWith('fr'));
         speechSynthesis.speak(utterance);
       };
-
       if (speechSynthesis.getVoices().length === 0) {
-        // Voix non chargées, attendre
         speechSynthesis.onvoiceschanged = () => {
           setVoice();
           speechSynthesis.onvoiceschanged = null;
         };
-      } else {
-        setVoice();
-      }
+      } else setVoice();
     }
 
-    // Nettoyer HTML pour lecture vocale
     function stripHTML(html) {
       const div = document.createElement("div");
       div.innerHTML = html;
       return div.textContent || div.innerText || "";
     }
 
-    // Reconnaissance vocale
     const micBtn = document.getElementById("micBtn");
     let recognition;
-
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRecognition();
       recognition.lang = 'fr-FR';
       recognition.continuous = false;
       recognition.interimResults = false;
-
       recognition.onstart = () => micBtn.classList.add("listening");
       recognition.onend = () => micBtn.classList.remove("listening");
       recognition.onerror = (e) => console.error("Erreur micro :", e.error);
       recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        inputField.value = transcript;
+        inputField.value = e.results[0][0].transcript;
         sendMessage();
       };
-
-      micBtn.addEventListener("click", () => {
-        recognition.start();
-      });
+      micBtn.addEventListener("click", () => recognition.start());
     } else {
       micBtn.disabled = true;
       micBtn.title = "Reconnaissance vocale non supportée";
     }
 
-    inputField.addEventListener("keypress", function (e) {
+    inputField.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendMessage();
     });
   </script>
 </body>
+
 </html>
