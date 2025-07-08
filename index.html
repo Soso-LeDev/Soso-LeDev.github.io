@@ -1,11 +1,13 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat avec Scout</title>
+
+  <!-- Marked.js pour conversion Markdown → HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -101,9 +103,6 @@
     }
   </style>
 
-  <!-- Manifest JSON -->
-  <link rel="manifest" href="data:application/json;base64,eyJuaW1lIjoiQ2hhdCBhdmVjIFNjb3V0IiwiY2hhcnQiOiJTY291dCIsImRlc2NyaXB0aW9uIjoiVW4gYXNzaXN0YW50IElBIHBvdXIgdGlmIHRoZSBpbnRlcm5ldCByZXNwb25zZSBldmVyaWZpYW50ZSwgYW5kIGF0IGRlc3MgYnJvYWRkIHdpdGggc2Nob3RhLiIsInN0YXJ0VXJsIjoiLi9pbmRleC5odG1sIiwibmFtZSI6IkNoYXQgYXZlYyBTY291dCIsInNob3J0X25hbWUiOiJTY291dCIsImljb25zIjpbeyJzY3IiOiJpY29uLnBuZyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InN3YyI6Imljb24ucG5nIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyJ9XSwib3V0bGluZV9wb3NpdGlvbnMiOlt7InN0YXIiOiIvIiwiaW5kZXguaHRtbCIsIm5hbWUiOiJBZGRpdCBhIHNjcmVlbiBkdCwgbm9jdSByZXNwb25zZS8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIgfSwiYmFja2dyb3VuZF9jb2xvciI6IiMwZWY1ZGRkIiwibG9naW5fY29sb3IiOiIjMDEwNGRmIiwiZ3JlZW4iOiIiY29sb3IiOnNjaGVtZQ==">
-  
 </head>
 
 <body>
@@ -162,7 +161,15 @@
     function displayMessage(sender, text, type) {
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", type);
-      msgDiv.innerHTML = type === "bot" ? text : escapeHTML(text);
+
+      if (type === "bot") {
+        // Convertir le Markdown en HTML
+        msgDiv.innerHTML = marked.parse(text);
+      } else {
+        // Texte utilisateur échappé (pas de HTML injecté)
+        msgDiv.innerHTML = escapeHTML(text);
+      }
+
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -192,13 +199,13 @@
           const data = await response.json();
 
           if (data.items && data.items.length > 0) {
-            let replyHTML = `<strong>🔎 Résultats pour : « ${query} »</strong><br><br>`;
+            let replyMarkdown = `**🔎 Résultats pour : « ${query} »**\n\n`;
             data.items.slice(0, 3).forEach((item, index) => {
-              replyHTML += `<strong>${index + 1}. <a href="${item.link}" target="_blank" style="color:#1a0dab;">${item.title}</a></strong><br>`;
-              if (item.snippet) replyHTML += `<em>${item.snippet}</em><br><br>`;
+              replyMarkdown += `**${index + 1}. [${item.title}](${item.link})**\n`;
+              if (item.snippet) replyMarkdown += `_${item.snippet}_\n\n`;
             });
-            displayMessage("Scout", replyHTML, "bot");
-            messages.push({ role: "assistant", content: replyHTML });
+            displayMessage("Scout", replyMarkdown, "bot");
+            messages.push({ role: "assistant", content: replyMarkdown });
             saveMessages();
           } else {
             const noResults = "❌ Aucun résultat trouvé.";
