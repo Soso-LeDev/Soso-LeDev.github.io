@@ -1,251 +1,265 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat avec Scout</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #ece5dd;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    header {
-      background-color: #075e54;
-      color: white;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      position: relative;
-    }
-    #clearBtn {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-    }
-    #chat {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background-image: url('https://i.imgur.com/3eF1QTT.png');
-      background-size: cover;
-    }
-    .message {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 15px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    .user {
-      align-self: flex-end;
-      background-color: #dcf8c6;
-      border-bottom-right-radius: 0;
-    }
-    .bot {
-      align-self: flex-start;
-      background-color: #ffffff;
-      border-bottom-left-radius: 0;
-    }
-    #inputArea {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-      background-color: #f0f0f0;
-    }
-    input {
-      flex: 1;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 20px;
-      border: none;
-      outline: none;
-      background-color: white;
-    }
-    button {
-      margin-left: 8px;
-      padding: 12px 16px;
-      background-color: #25d366;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #128c7e;
-    }
-    @media (max-width: 600px) {
-      header { font-size: 16px; }
-      .message { font-size: 14px; }
-      input { font-size: 15px; }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat avec Scout</title>
+
+  <!-- Marked.js pour conversion Markdown → HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ece5dd;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background-color: #075e54;
+      color: white;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      position: relative;
+    }
+    #clearBtn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #chat {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-image: url('https://i.imgur.com/3eF1QTT.png');
+      background-size: cover;
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .user {
+      align-self: flex-end;
+      background-color: #dcf8c6;
+      border-bottom-right-radius: 0;
+    }
+    .bot {
+      align-self: flex-start;
+      background-color: #ffffff;
+      border-bottom-left-radius: 0;
+    }
+    #inputArea {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      background-color: #f0f0f0;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      background-color: white;
+    }
+    button {
+      margin-left: 8px;
+      padding: 12px 16px;
+      background-color: #25d366;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #128c7e;
+    }
+    @media (max-width: 600px) {
+      header { font-size: 16px; }
+      .message { font-size: 14px; }
+      input { font-size: 15px; }
+    }
+  </style>
+
 </head>
+
 <body>
-  <header>
-    Scout – Assistant IA
-    <button id="clearBtn" onclick="resetConversation()" title="Effacer la conversation">🗑️</button>
-  </header>
 
-  <div id="chat"></div>
+  <header>
+    Scout – Assistant IA
+    <button id="clearBtn" onclick="resetConversation()" title="Effacer la conversation">🗑️</button>
+  </header>
 
-  <div id="inputArea">
-    <input type="text" id="userInput" placeholder="Écrivez un message..." />
-    <button onclick="sendMessage()">▶️</button>
-  </div>
+  <div id="chat"></div>
 
-  <script>
-    const apiKey = "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";
-    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
-    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="Écrivez un message..." />
+    <button onclick="sendMessage()">▶️</button>
+  </div>
 
-    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
-    const googleCx = "24246487405284f60";
+  <script>
+    const apiKey = "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";
+    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
 
-    const chatBox = document.getElementById("chat");
-    const inputField = document.getElementById("userInput");
+    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
+    const googleCx = "24246487405284f60";
 
-    const SYSTEM_PROMPT = {
-      role: "system",
-      content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie.`
-    };
+    const chatBox = document.getElementById("chat");
+    const inputField = document.getElementById("userInput");
 
-    let messages = JSON.parse(localStorage.getItem("chatHistory")) || [SYSTEM_PROMPT];
+    const SYSTEM_PROMPT = {
+      role: "system",
+      content: `Vous êtes Scout, un assistant IA humain, respectueux et chaleureux. Vous parlez à Soan. Vous devez toujours le vouvoyer avec bienveillance. Répondez clairement, poliment, et avec empathie. Vous devez apprendre de lui, le comprendre. Faites des reponses courtes et clair, il faut que vos rep soit coherentes. Répondez avec des sentiments, tu doit e le humanisé. Ajoute des emojis à tes reponses quand il le faut.`
+    };
 
-    window.onload = () => {
-      messages.forEach(msg => {
-        if (msg.role === "user") {
-          displayMessage("Soan", msg.content, "user");
-        } else if (msg.role === "assistant") {
-          displayMessage("Scout", msg.content, "bot");
-        }
-      });
-    };
+    let messages = JSON.parse(localStorage.getItem("chatHistory")) || [SYSTEM_PROMPT];
 
-    function saveMessages() {
-      localStorage.setItem("chatHistory", JSON.stringify(messages));
-    }
+    window.onload = () => {
+      messages.forEach(msg => {
+        if (msg.role === "user") {
+          displayMessage("Soan", msg.content, "user");
+        } else if (msg.role === "assistant") {
+          displayMessage("Scout", msg.content, "bot");
+        }
+      });
+    };
 
-    function escapeHTML(str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
+    function saveMessages() {
+      localStorage.setItem("chatHistory", JSON.stringify(messages));
+    }
 
-    function displayMessage(sender, text, type) {
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add("message", type);
-      msgDiv.innerHTML = type === "bot" ? text : escapeHTML(text);
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
 
-    async function sendMessage() {
-      const userMessage = inputField.value.trim();
-      if (!userMessage) return;
+    function displayMessage(sender, text, type) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", type);
 
-      displayMessage("Soan", userMessage, "user");
-      messages.push({ role: "user", content: userMessage });
-      inputField.value = "";
-      saveMessages();
+      if (type === "bot") {
+        // Convertir le Markdown en HTML
+        msgDiv.innerHTML = marked.parse(text);
+      } else {
+        // Texte utilisateur échappé (pas de HTML injecté)
+        msgDiv.innerHTML = escapeHTML(text);
+      }
 
-      if (userMessage.toLowerCase().startsWith("/google ")) {
-        const query = userMessage.substring(8).trim();
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        if (query.length === 0) {
-          const reply = "⚠️ Veuillez entrer une requête après « /google ».";
-          displayMessage("Scout", reply, "bot");
-          messages.push({ role: "assistant", content: reply });
-          saveMessages();
-          return;
-        }
+    async function sendMessage() {
+      const userMessage = inputField.value.trim();
+      if (!userMessage) return;
 
-        displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
+      displayMessage("Soan", userMessage, "user");
+      messages.push({ role: "user", content: userMessage });
+      inputField.value = "";
+      saveMessages();
 
-        try {
-          const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
-          const data = await response.json();
+      if (userMessage.toLowerCase().startsWith("/google ")) {
+        const query = userMessage.substring(8).trim();
+        if (query.length === 0) {
+          const reply = "⚠️ Veuillez entrer une requête après « /google ».";
+          displayMessage("Scout", reply, "bot");
+          messages.push({ role: "assistant", content: reply });
+          saveMessages();
+          return;
+        }
+        displayMessage("Scout", "🔍 Je recherche, un instant...", "bot");
 
-          if (data.items && data.items.length > 0) {
-            let replyHTML = `<strong>🔎 Résultats pour : « ${query} »</strong><br><br>`;
-            data.items.slice(0, 3).forEach((item, index) => {
-              replyHTML += `<strong>${index + 1}. <a href="${item.link}" target="_blank" style="color:#1a0dab;">${item.title}</a></strong><br>`;
-              if (item.snippet) replyHTML += `<em>${item.snippet}</em><br><br>`;
-            });
+        try {
+          const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
+          const data = await response.json();
 
-            displayMessage("Scout", replyHTML, "bot");
-            messages.push({ role: "assistant", content: replyHTML });
-            saveMessages();
-          } else {
-            const noResults = "❌ Aucun résultat trouvé.";
-            displayMessage("Scout", noResults, "bot");
-            messages.push({ role: "assistant", content: noResults });
-            saveMessages();
-          }
-        } catch (error) {
-          const errMsg = `❌ Erreur lors de la recherche : ${error.message}`;
-          displayMessage("Scout", errMsg, "bot");
-          messages.push({ role: "assistant", content: errMsg });
-          saveMessages();
-        }
+          if (data.items && data.items.length > 0) {
+            let replyMarkdown = `**🔎 Résultats pour : « ${query} »**\n\n`;
+            data.items.slice(0, 3).forEach((item, index) => {
+              replyMarkdown += `**${index + 1}. [${item.title}](${item.link})**\n`;
+              if (item.snippet) replyMarkdown += `_${item.snippet}_\n\n`;
+            });
+            displayMessage("Scout", replyMarkdown, "bot");
+            messages.push({ role: "assistant", content: replyMarkdown });
+            saveMessages();
+          } else {
+            const noResults = "❌ Aucun résultat trouvé.";
+            displayMessage("Scout", noResults, "bot");
+            messages.push({ role: "assistant", content: noResults });
+            saveMessages();
+          }
+        } catch (error) {
+          const errMsg = `❌ Erreur lors de la recherche : ${error.message}`;
+          displayMessage("Scout", errMsg, "bot");
+          messages.push({ role: "assistant", content: errMsg });
+          saveMessages();
+        }
+        return;
+      }
 
-        return;
-      }
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: messages
+          })
+        });
 
-      try {
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: model,
-            messages: messages
-          })
-        });
+        const data = await response.json();
+        const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
+        displayMessage("Scout", botReply, "bot");
+        messages.push({ role: "assistant", content: botReply });
+        saveMessages();
+      } catch (error) {
+        displayMessage("Scout", `❌ Erreur : ${error.message}`, "bot");
+      }
+    }
 
-        const data = await response.json();
-        const botReply = data.choices?.[0]?.message?.content || "[Réponse vide]";
-        displayMessage("Scout", botReply, "bot");
-        messages.push({ role: "assistant", content: botReply });
-        saveMessages();
+    inputField.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage()
+;
+      }
+    });
 
-      } catch (error) {
-        displayMessage("Scout", `❌ Erreur : ${error.message}`, "bot");
-      }
-    }
+    function resetConversation() {
+      if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
+        localStorage.removeItem("chatHistory");
+        location.reload();
+      }
+    }
+  </script>
 
-    inputField.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        sendMessage();
-      }
-    });
-
-    function resetConversation() {
-      if (confirm("Souhaitez-vous vraiment effacer cette conversation ?")) {
-        localStorage.removeItem("chatHistory");
-        location.reload();
-      }
-    }
-  </script>
 </body>
+
 </html>
