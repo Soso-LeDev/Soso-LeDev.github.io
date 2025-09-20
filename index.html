@@ -1,219 +1,177 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scout — Assistant IA Interactif</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scout — Assistant IA Interactif Fullscreen</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
 
-  <style>
-    :root{--bg:#ece5dd;--primary:#075e54;--accent:#25d366;--muted:#f0f0f0;--card:#fff;--radius:12px;font-family: Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;}
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{display:flex;flex-direction:column;background:var(--bg);gap:8px}
-    header{background:linear-gradient(90deg,var(--primary),#0b7867);color:white;padding:14px 16px;display:flex;align-items:center;gap:12px}
-    header h1{font-size:17px;margin:0}
-    header .spacer{flex:1}
-    .icon-btn{background:none;border:none;color:inherit;padding:8px;border-radius:8px;cursor:pointer}
-    main{display:flex;flex:1;gap:12px;padding:12px}
-    .panel{flex:1;display:flex;flex-direction:column;gap:10px}
-    .chat-window{flex:1;overflow:auto;padding:16px;border-radius:var(--radius);background:var(--bg);box-shadow:0 6px 18px rgba(0,0,0,0.08)}
-    .messages{display:flex;flex-direction:column;gap:10px}
-    .msg{max-width:82%;padding:10px 14px;border-radius:12px;font-size:15px;line-height:1.45;word-wrap:break-word}
-    .msg.user{align-self:flex-end;background:#dcf8c6;border-bottom-right-radius:4px}
-    .msg.assistant{align-self:flex-start;background:var(--card);border-bottom-left-radius:4px}
-    .meta{display:flex;gap:8px;align-items:center;font-size:12px;color:#666;margin-bottom:6px}
-    .sender{font-weight:600}
-    .input-area{display:flex;gap:8px;padding:10px;border-radius:12px;background:var(--muted);align-items:center}
-    .input-area textarea{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);resize:none;font-size:15px}
-    .actions{display:flex;gap:8px}
-    .btn{background:var(--accent);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer}
-    .btn.secondary{background:#fff;color:#333;border:1px solid rgba(0,0,0,0.06)}
-    aside{width:320px;display:flex;flex-direction:column;gap:10px}
-    .card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,0.06)}
-    .small{font-size:13px;color:#444}
-    footer{padding:8px 12px;font-size:12px;color:#444;text-align:center}
-    @media (max-width:900px){aside{display:none}header h1{font-size:15px}}
-  </style>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,'Segoe UI',sans-serif;}
+  html,body{height:100%;width:100%;background:#ece5dd;display:flex;flex-direction:column;}
+  #chatContainer{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  #messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:15px;line-height:1.4;word-wrap:break-word;}
+  .msg.user{align-self:flex-end;background:#dcf8c6;border-bottom-right-radius:4px;}
+  .msg.assistant{align-self:flex-start;background:#fff;border-bottom-left-radius:4px;}
+  .meta{display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px;}
+  #inputArea{display:flex;padding:10px;background:#f0f0f0;gap:8px;}
+  #input{flex:1;padding:12px;border-radius:20px;border:none;font-size:16px;outline:none;}
+  .btn{padding:12px 16px;border:none;border-radius:50%;cursor:pointer;background:#25d366;color:#fff;font-size:16px;}
+  .btn:hover{background:#128c7e;}
+  #btnGoogle{border-radius:12px;padding:10px 14px;}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Scout — Assistant IA Interactif</h1>
-    <div class="spacer"></div>
-    <div class="controls">
-      <button class="icon-btn" id="btnClear">🗑️</button>
-    </div>
-  </header>
 
-  <main>
-    <section class="panel">
-      <div class="chat-window" id="chatWindow" aria-live="polite">
-        <div class="messages" id="messages"></div>
-      </div>
-      <div class="input-area" role="region" aria-label="Zone de saisie">
-        <textarea id="input" rows="2" placeholder="Écrivez un message... (ou /google pour rechercher)"></textarea>
-        <div class="actions">
-          <button class="btn secondary" id="btnGoogle">🔍 Google</button>
-          <button class="btn" id="btnSend">Envoyer</button>
-        </div>
-      </div>
-    </section>
-    <aside>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <strong>Conversation</strong>
-          <small id="messageCount">0 messages</small>
-        </div>
-        <p class="small" style="margin-top:8px">La conversation est sauvegardée localement et Scout peut interagir avec le site.</p>
-      </div>
-    </aside>
-  </main>
+<div id="chatContainer">
+  <div id="messages"></div>
+  <div id="inputArea">
+    <input type="text" id="input" placeholder="Écrivez un message... (ou /google recherche)" />
+    <button class="btn" id="btnSend">▶️</button>
+    <button id="btnGoogle">🔍 Google</button>
+    <button class="btn" id="btnClear">🗑️</button>
+  </div>
+</div>
 
-  <footer>
-    Version fonctionnelle — Clés intégrées dans le script
-  </footer>
+<script>
+  // === Clés API ===
+  const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+  const apiKey = "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";
+  const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
+  const googleCx = "24246487405284f60";
 
-  <script>
-    // === Clés API ===
-    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
-    const apiKey = "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";
-    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
-    const googleCx = "24246487405284f60";
+  const messagesNode = document.getElementById('messages');
+  const input = document.getElementById('input');
+  const btnSend = document.getElementById('btnSend');
+  const btnGoogle = document.getElementById('btnGoogle');
+  const btnClear = document.getElementById('btnClear');
 
-    const messagesNode = document.getElementById('messages');
-    const chatWindow = document.getElementById('chatWindow');
-    const input = document.getElementById('input');
-    const btnSend = document.getElementById('btnSend');
-    const btnGoogle = document.getElementById('btnGoogle');
-    const btnClear = document.getElementById('btnClear');
+  // Fonctions sécurisées que Scout peut appeler
+  function addMessage(text){
+    const div = document.createElement('div');
+    div.textContent = text;
+    messagesNode.appendChild(div);
+    messagesNode.scrollTop = messagesNode.scrollHeight;
+  }
+  function setBackgroundColor(color){
+    document.body.style.backgroundColor = color;
+  }
+  function clearInput(){
+    input.value = '';
+  }
 
-    // Fonctions accessibles par Scout
-    function addMessage(text){
-      const div = document.createElement('div');
-      div.textContent = text;
-      document.body.appendChild(div);
-    }
-    function setBackgroundColor(color){
-      document.body.style.backgroundColor = color;
-    }
-    function clearInput(){
-      input.value = '';
-    }
-
-    // Exécution des commandes Scout
-    function executeScoutCommands(text){
-      const commandRegex = /\[COMMAND\](.*?)\[\/COMMAND\]/gs;
-      let match;
-      while(match = commandRegex.exec(text)){
-        try{
-          eval(match[1]);
-        } catch(e){
-          console.error("Erreur en exécutant une commande Scout :", e);
-        }
-      }
-    }
-
-    // Gestion des messages
-    let messages = JSON.parse(localStorage.getItem('chatHistory')) || [
-      { role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux. Scout peut interagir avec la page via [COMMAND]...', time: new Date().toISOString() }
-    ];
-
-    function renderMessage(msg){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'msg ' + (msg.role==='user'?'user':'assistant');
-      const meta = document.createElement('div'); meta.className='meta';
-      const sender = document.createElement('div'); sender.className='sender'; sender.textContent = msg.role==='user'?'Vous':'Scout';
-      const time = document.createElement('div'); time.className='time'; time.textContent = new Date(msg.time).toLocaleTimeString();
-      meta.appendChild(sender); meta.appendChild(time);
-      const content = document.createElement('div'); content.className='content';
-      content.innerHTML = msg.role==='user'?msg.content:DOMPurify.sanitize(marked.parse(msg.content));
-      wrapper.appendChild(meta); wrapper.appendChild(content);
-      messagesNode.appendChild(wrapper);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
-
-    function saveMessages(){ localStorage.setItem('chatHistory', JSON.stringify(messages)); }
-    function updateMessageCount(){ document.getElementById('messageCount').textContent = messages.length + ' messages'; }
-    function addUserMessage(text){ const msg={role:'user',content:text,time:new Date().toISOString()}; messages.push(msg); renderMessage(msg); saveMessages(); updateMessageCount(); }
-    function addAssistantMessage(text){ const msg={role:'assistant',content:text,time:new Date().toISOString()}; messages.push(msg); renderMessage(msg); saveMessages(); updateMessageCount(); executeScoutCommands(text); }
-
-    messages.forEach(msg => renderMessage(msg));
-    updateMessageCount();
-
-    // Envoyer un message à Scout
-    btnSend.addEventListener('click', async () => {
-      const text = input.value.trim(); if(!text) return;
-      addUserMessage(text);
-      input.value = '';
-      addAssistantMessage('⏳ Scout réfléchit...');
-
+  // Exécuter les commandes de Scout
+  function executeScoutCommands(text){
+    const commandRegex = /\[COMMAND\](.*?)\[\/COMMAND\]/gs;
+    let match;
+    while(match = commandRegex.exec(text)){
       try{
-        const siteContext = {
-          pageTitle: document.title,
-          numMessages: messages.length,
-          lastUserMessage: messages.filter(m=>m.role==='user').slice(-1)[0]?.content || '',
-          inputValue: input.value
-        };
-
-        const res = await fetch(apiUrl, {
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization':`Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model:'meta-llama/llama-4-scout-17b-16e-instruct',
-            messages:[
-              {role:'system', content:`Vous êtes Scout, un assistant IA humain et chaleureux. Contexte du site : ${JSON.stringify(siteContext)}. Scout peut interagir avec la page via [COMMAND]...`},
-              {role:'user', content:text}
-            ]
-          })
-        });
-
-        const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content || '[Réponse vide]';
-        addAssistantMessage(reply);
-      } catch(err){
-        addAssistantMessage('❌ Erreur Scout: '+err.message);
+        eval(match[1]);
+      } catch(e){
+        console.error("Erreur en exécutant une commande Scout :", e);
       }
-    });
+    }
+  }
 
-    // Recherche Google
-    btnGoogle.addEventListener('click', async () => {
-      const query = input.value.trim(); if(!query) return;
-      addUserMessage(`/google ${query}`);
-      input.value = '';
-      addAssistantMessage('🔍 Recherche Google en cours...');
+  // Gestion des messages persistants
+  let messages = JSON.parse(localStorage.getItem('chatHistory')) || [
+    { role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux. Scout peut interagir avec le site via [COMMAND]...', time: new Date().toISOString() }
+  ];
 
-      try{
-        const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        let results = '❌ Aucun résultat trouvé.';
-        if(data.items && data.items.length > 0){
-          results = data.items.slice(0,3)
-            .map((item,i)=>`**${i+1}. [${item.title}](${item.link})**\n${item.snippet || ''}`)
-            .join('\n\n');
-        }
-        addAssistantMessage(results);
-      }catch(err){
-        addAssistantMessage('❌ Erreur Google: '+err.message);
+  function saveMessages(){ localStorage.setItem('chatHistory', JSON.stringify(messages)); }
+  function renderMessage(msg){
+    const wrapper = document.createElement('div');
+    wrapper.className = 'msg ' + (msg.role==='user'?'user':'assistant');
+    const meta = document.createElement('div'); meta.className='meta';
+    meta.innerHTML = `<span>${msg.role==='user'?'Vous':'Scout'}</span><span>${new Date(msg.time).toLocaleTimeString()}</span>`;
+    const content = document.createElement('div');
+    content.innerHTML = msg.role==='user'?msg.content:DOMPurify.sanitize(marked.parse(msg.content));
+    wrapper.appendChild(meta); wrapper.appendChild(content);
+    messagesNode.appendChild(wrapper);
+    messagesNode.scrollTop = messagesNode.scrollHeight;
+    if(msg.role==='assistant') executeScoutCommands(msg.content);
+  }
+
+  function addUserMessage(text){
+    const msg = { role:'user', content:text, time:new Date().toISOString() };
+    messages.push(msg); renderMessage(msg); saveMessages();
+  }
+  function addAssistantMessage(text){
+    const msg = { role:'assistant', content:text, time:new Date().toISOString() };
+    messages.push(msg); renderMessage(msg); saveMessages();
+  }
+
+  // Afficher l'historique au chargement
+  messages.forEach(renderMessage);
+
+  // Envoyer un message
+  btnSend.addEventListener('click', async () => {
+    const text = input.value.trim(); if(!text) return;
+    addUserMessage(text); input.value='';
+    addAssistantMessage('⏳ Scout réfléchit...');
+
+    try{
+      const siteContext = {
+        pageTitle: document.title,
+        numMessages: messages.length,
+        lastUserMessage: messages.filter(m=>m.role==='user').slice(-1)[0]?.content || '',
+        inputValue: input.value
+      };
+
+      const res = await fetch(apiUrl, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model:'meta-llama/llama-4-scout-17b-16e-instruct',
+          messages:[
+            {role:'system', content:`Vous êtes Scout, un assistant IA humain et chaleureux. Contexte du site : ${JSON.stringify(siteContext)}. Scout peut interagir avec la page via [COMMAND]...`},
+            {role:'user', content:text}
+          ]
+        })
+      });
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || '[Réponse vide]';
+      addAssistantMessage(reply);
+    }catch(err){
+      addAssistantMessage('❌ Erreur Scout: '+err.message);
+    }
+  });
+
+  // Recherche Google
+  btnGoogle.addEventListener('click', async () => {
+    const query = input.value.trim(); if(!query) return;
+    addUserMessage(`/google ${query}`); input.value='';
+    addAssistantMessage('🔍 Recherche Google en cours...');
+
+    try{
+      const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      let results = '❌ Aucun résultat trouvé.';
+      if(data.items && data.items.length>0){
+        results = data.items.slice(0,3).map((item,i)=>`**${i+1}. [${item.title}](${item.link})**\n${item.snippet||''}`).join('\n\n');
       }
-    });
+      addAssistantMessage(results);
+    }catch(err){
+      addAssistantMessage('❌ Erreur Google: '+err.message);
+    }
+  });
 
-    // Effacer conversation
-    btnClear.addEventListener('click', ()=>{
-      if(confirm('Voulez-vous vraiment effacer la conversation ?')){
-        messages = [{ role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.', time: new Date().toISOString() }];
-        localStorage.setItem('chatHistory', JSON.stringify(messages));
-        messagesNode.innerHTML='';
-        renderMessage(messages[0]);
-        updateMessageCount();
-      }
-    });
+  // Effacer conversation
+  btnClear.addEventListener('click', ()=>{
+    if(confirm('Voulez-vous vraiment effacer la conversation ?')){
+      messages = [{ role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux. Scout peut interagir avec le site via [COMMAND]...', time:new Date().toISOString() }];
+      localStorage.setItem('chatHistory', JSON.stringify(messages));
+      messagesNode.innerHTML='';
+      messages.forEach(renderMessage);
+    }
+  });
 
-    input.addEventListener('keydown', e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();btnSend.click();}});
-  </script>
+  // Entrée avec Enter
+  input.addEventListener('keydown', e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();btnSend.click();}});
+</script>
+
 </body>
 </html>
