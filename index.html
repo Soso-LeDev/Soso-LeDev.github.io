@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scout — Assistant IA (fonctionnel)</title>
+  <title>Scout — Assistant IA</title>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
@@ -43,8 +43,6 @@
     <h1>Scout — Assistant IA</h1>
     <div class="spacer"></div>
     <div class="controls">
-      <button class="icon-btn" id="btnExport">⬇️ Export</button>
-      <button class="icon-btn" id="btnSettings">⚙️</button>
       <button class="icon-btn" id="btnClear">🗑️</button>
     </div>
   </header>
@@ -68,7 +66,7 @@
           <strong>Conversation</strong>
           <small id="messageCount">0 messages</small>
         </div>
-        <p class="small" style="margin-top:8px">Paramétrez vos clés directement dans le script pour que tout fonctionne dans le navigateur.</p>
+        <p class="small" style="margin-top:8px">Les réponses proviennent de Scout et des recherches Google.</p>
       </div>
     </aside>
   </main>
@@ -78,7 +76,7 @@
   </footer>
 
   <script>
-    // Variables API (fonctionnel dans navigateur)
+    // === Clés API ===
     const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
     const apiKey = "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";
     const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
@@ -89,6 +87,7 @@
     const input = document.getElementById('input');
     const btnSend = document.getElementById('btnSend');
     const btnGoogle = document.getElementById('btnGoogle');
+    const btnClear = document.getElementById('btnClear');
 
     let messages = [
       { role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.', time: new Date().toISOString() }
@@ -96,7 +95,7 @@
 
     function renderMessage(msg){
       const wrapper = document.createElement('div');
-      wrapper.className = 'msg ' + (msg.role === 'user' ? 'user' : 'assistant');
+      wrapper.className = 'msg ' + (msg.role==='user'?'user':'assistant');
       const meta = document.createElement('div'); meta.className='meta';
       const sender = document.createElement('div'); sender.className='sender'; sender.textContent = msg.role==='user'?'Vous':'Scout';
       const time = document.createElement('div'); time.className='time'; time.textContent = new Date(msg.time).toLocaleTimeString();
@@ -110,44 +109,72 @@
 
     function addUserMessage(text){
       const msg={role:'user',content:text,time:new Date().toISOString()};
-      messages.push(msg); renderMessage(msg);
+      messages.push(msg); renderMessage(msg); updateMessageCount();
     }
 
     function addAssistantMessage(text){
       const msg={role:'assistant',content:text,time:new Date().toISOString()};
-      messages.push(msg); renderMessage(msg);
+      messages.push(msg); renderMessage(msg); updateMessageCount();
     }
 
     function updateMessageCount(){
       document.getElementById('messageCount').textContent = messages.length + ' messages';
     }
 
-    btnSend.addEventListener('click', ()=>{
+    btnSend.addEventListener('click', async () => {
       const text = input.value.trim(); if(!text) return;
       addUserMessage(text);
-      input.value='';
-      // Simuler réponse API
-      addAssistantMessage('Réponse générée par Scout.');
-      updateMessageCount();
+      input.value = '';
+      addAssistantMessage('⏳ Scout réfléchit...');
+      
+      try{
+        const res = await fetch(apiUrl, {
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':`Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model:'meta-llama/llama-4-scout-17b-16e-instruct',
+            messages:[
+              {role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.'},
+              {role:'user', content:text}
+            ]
+          })
+        });
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || '[Réponse vide]';
+        addAssistantMessage(reply);
+      }catch(err){
+        addAssistantMessage('❌ Erreur Scout: '+err.message);
+      }
     });
 
-    btnGoogle.addEventListener('click', async ()=>{
+    btnGoogle.addEventListener('click', async () => {
       const query = input.value.trim(); if(!query) return;
-      addUserMessage(query);
-      input.value='';
+      addUserMessage(`/google ${query}`);
+      input.value = '';
       addAssistantMessage('🔍 Recherche Google en cours...');
-      updateMessageCount();
+      
       try{
         const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
         const data = await res.json();
         let results = '❌ Aucun résultat trouvé.';
         if(data.items && data.items.length > 0){
-          results = data.items.slice(0,3).map((it,i)=>`**${i+1}. [${it.title}](${it.link})**\n${it.snippet || ''}`).join('\n\n');
+          results = data.items.slice(0,3)
+            .map((item,i)=>`**${i+1}. [${item.title}](${item.link})**\n${item.snippet || ''}`)
+            .join('\n\n');
         }
         addAssistantMessage(results);
-        updateMessageCount();
       }catch(err){
-        addAssistantMessage('❌ Erreur: '+err.message);
+        addAssistantMessage('❌ Erreur Google: '+err.message);
+      }
+    });
+
+    btnClear.addEventListener('click', ()=>{
+      if(confirm('Voulez-vous vraiment effacer la conversation ?')){
+        messages = [{ role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.', time: new Date().toISOString() }];
+        messagesNode.innerHTML='';
         updateMessageCount();
       }
     });
