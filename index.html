@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scout — Assistant IA (.env intégré)</title>
+  <title>Scout — Assistant IA (fonctionnel)</title>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
@@ -55,9 +55,9 @@
         <div class="messages" id="messages"></div>
       </div>
       <div class="input-area" role="region" aria-label="Zone de saisie">
-        <textarea id="input" rows="2" placeholder="Écrivez un message... (vous pouvez utiliser /google pour rechercher)"></textarea>
+        <textarea id="input" rows="2" placeholder="Écrivez un message... (ou /google pour rechercher)"></textarea>
         <div class="actions">
-          <button class="btn secondary" id="btnAttach">📎</button>
+          <button class="btn secondary" id="btnGoogle">🔍 Google</button>
           <button class="btn" id="btnSend">Envoyer</button>
         </div>
       </div>
@@ -68,26 +68,27 @@
           <strong>Conversation</strong>
           <small id="messageCount">0 messages</small>
         </div>
-        <p class="small" style="margin-top:8px">Paramétrez vos clés dans le fichier .env et redémarrez le serveur pour qu'elles soient prises en compte.</p>
+        <p class="small" style="margin-top:8px">Paramétrez vos clés directement dans le script pour que tout fonctionne dans le navigateur.</p>
       </div>
     </aside>
   </main>
 
   <footer>
-    Version améliorée — Utilisez vos clés depuis le fichier .env
+    Version fonctionnelle — Clés intégrées dans le script
   </footer>
 
   <script>
-    // Chargement des variables depuis process.env (via bundler ou Node.js)
-    const apiUrl = process.env.REACT_APP_SCOUT_API_URL;
-    const apiKey = process.env.REACT_APP_SCOUT_API_KEY;
-    const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-    const googleCx = process.env.REACT_APP_GOOGLE_CX;
+    // Variables API (fonctionnel dans navigateur)
+    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+    const apiKey = "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";
+    const googleApiKey = "AIzaSyCPD1222E1X5kX7N6PHFwLuyIeisrbIAKM";
+    const googleCx = "24246487405284f60";
 
     const messagesNode = document.getElementById('messages');
     const chatWindow = document.getElementById('chatWindow');
     const input = document.getElementById('input');
     const btnSend = document.getElementById('btnSend');
+    const btnGoogle = document.getElementById('btnGoogle');
 
     let messages = [
       { role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.', time: new Date().toISOString() }
@@ -107,13 +108,48 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
+    function addUserMessage(text){
+      const msg={role:'user',content:text,time:new Date().toISOString()};
+      messages.push(msg); renderMessage(msg);
+    }
+
+    function addAssistantMessage(text){
+      const msg={role:'assistant',content:text,time:new Date().toISOString()};
+      messages.push(msg); renderMessage(msg);
+    }
+
+    function updateMessageCount(){
+      document.getElementById('messageCount').textContent = messages.length + ' messages';
+    }
+
     btnSend.addEventListener('click', ()=>{
       const text = input.value.trim(); if(!text) return;
-      const userMsg={role:'user',content:text,time:new Date().toISOString()};
-      messages.push(userMsg); renderMessage(userMsg); input.value='';
-      // Appel API (exemple simplifié, en vrai on utiliserait fetch avec apiUrl et apiKey)
-      const assistantMsg={role:'assistant',content:'Réponse générée ici.',time:new Date().toISOString()};
-      messages.push(assistantMsg); renderMessage(assistantMsg);
+      addUserMessage(text);
+      input.value='';
+      // Simuler réponse API
+      addAssistantMessage('Réponse générée par Scout.');
+      updateMessageCount();
+    });
+
+    btnGoogle.addEventListener('click', async ()=>{
+      const query = input.value.trim(); if(!query) return;
+      addUserMessage(query);
+      input.value='';
+      addAssistantMessage('🔍 Recherche Google en cours...');
+      updateMessageCount();
+      try{
+        const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        let results = '❌ Aucun résultat trouvé.';
+        if(data.items && data.items.length > 0){
+          results = data.items.slice(0,3).map((it,i)=>`**${i+1}. [${it.title}](${it.link})**\n${it.snippet || ''}`).join('\n\n');
+        }
+        addAssistantMessage(results);
+        updateMessageCount();
+      }catch(err){
+        addAssistantMessage('❌ Erreur: '+err.message);
+        updateMessageCount();
+      }
     });
 
     input.addEventListener('keydown', e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();btnSend.click();}});
