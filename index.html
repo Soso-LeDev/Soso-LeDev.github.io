@@ -3,75 +3,62 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fleurs — Animation & Poème</title>
+  <title>Fleurs — Mot de passe & Poème</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f1724; /* deep navy */
-      --card: rgba(255,255,255,0.04);
+      --bg:#0f1724;
       --accent: linear-gradient(90deg,#ff8a5b,#ffd86b);
-      --glass: rgba(255,255,255,0.06);
     }
     html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial}
-    body{background:radial-gradient(1200px 600px at 10% 10%, rgba(255,146,146,0.06), transparent),
-                 radial-gradient(900px 500px at 90% 90%, rgba(101,130,255,0.04), transparent),
-                 var(--bg);overflow:hidden;color:#fff}
+    body{background:var(--bg);overflow:hidden;color:#fff}
     canvas{display:block;position:fixed;inset:0;z-index:0}
 
     .ui{
       position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;
-      width:min(900px,92vw);max-height:90vh;padding:28px;border-radius:18px;backdrop-filter:blur(6px);
-      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      box-shadow:0 10px 40px rgba(2,6,23,0.6);display:flex;gap:24px;align-items:center;flex-direction:column;text-align:center
+      width:min(500px,92vw);padding:28px;border-radius:18px;backdrop-filter:blur(6px);
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow:0 10px 40px rgba(2,6,23,0.6);text-align:center
     }
-    h1{font-family:'Playfair Display',serif;margin:0;font-size:clamp(20px,3vw,36px);letter-spacing:0.6px}
-    p.lead{margin:8px 0 18px;color:rgba(255,255,255,0.8)}
-    .btn{
-      padding:10px 18px;border-radius:999px;border:0;background:var(--accent);color:#111;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(255,138,91,0.12)
+    h1{font-family:'Playfair Display',serif;margin:0 0 18px;font-size:clamp(20px,3vw,32px)}
+    input{
+      padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.06);color:#fff;width:70%;font-size:16px;outline:none
+    }
+    button{
+      margin-top:12px;padding:10px 18px;border-radius:999px;border:0;background:var(--accent);
+      color:#111;font-weight:600;cursor:pointer
     }
 
-    /* Poem modal */
     .poem{
       position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;pointer-events:none;opacity:0;transition:opacity .45s ease;
     }
     .poem.open{pointer-events:auto;opacity:1}
     .poem .card{
-      width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));backdrop-filter:blur(6px);
-      box-shadow:0 20px 60px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.04)
+      width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));backdrop-filter:blur(6px);
+      box-shadow:0 20px 60px rgba(2,6,23,0.6);
     }
-    .poem .close{position:absolute;right:20px;top:20px;background:none;border:0;color:rgba(255,255,255,0.9);font-size:20px;cursor:pointer}
-
-    .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;opacity:0;transform:translateY(8px);transition:all .6s cubic-bezier(.2,.9,.2,1)}
-    .poem.open .text{opacity:1;transform:none;transition-delay:.12s}
-
-    footer.note{position:fixed;left:18px;bottom:18px;font-size:13px;color:rgba(255,255,255,0.6);z-index:6}
-
-    @media (max-width:600px){.ui{padding:18px;border-radius:14px}}
+    .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
   </style>
 </head>
 <body>
   <canvas id="c"></canvas>
 
-  <div class="ui" role="dialog" aria-label="Bienvenue">
-    <h1>Fleurs en mouvement</h1>
-    <p class="lead">Cliquez n'importe où pour rassembler les fleurs et révéler un poème.</p>
-    <div>
-      <button class="btn" id="revealBtn">Révéler le poème</button>
-      <button class="btn" id="shuffleBtn" style="margin-left:10px;background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff;box-shadow:none">Redisperser</button>
-    </div>
+  <div class="ui" id="loginBox">
+    <h1>Mot de passe :</h1>
+    <input type="password" id="passwordInput" placeholder="Entrez le mot de passe..." />
+    <br />
+    <button id="checkBtn">Valider</button>
   </div>
 
-  <div class="poem" id="poemModal" aria-hidden="true">
+  <div class="poem" id="poemModal">
     <div class="card">
-      <button class="close" id="closePoem">✕</button>
       <div class="text" id="poemText"></div>
     </div>
   </div>
 
-  <footer class="note">Design animé • Poème interactif</footer>
-
   <script>
-  // Canvas flower particle system with gentle motion. Click to gather and reveal poem.
+  // Canvas flower animation
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d', { alpha: true });
   let DPR = Math.max(1, window.devicePixelRatio || 1);
@@ -86,18 +73,14 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // Utility: random, lerp
   const rand = (a,b)=> Math.random()*(b-a)+a;
   const lerp = (a,b,t)=> a + (b-a)*t;
 
   class Flower{
-    constructor(){
-      this.reset(true);
-    }
+    constructor(){ this.reset(true); }
     reset(init){
       this.x = rand(0, width());
       this.y = rand(-40, height()+40);
-      this.baseY = this.y;
       this.vx = rand(-0.15,0.15);
       this.vy = rand(0.1,0.6);
       this.scale = rand(0.6,1.6);
@@ -105,11 +88,8 @@
       this.rotSpeed = rand(-0.002, 0.002);
       this.petals = ~~rand(4,7);
       this.size = rand(8,22);
-      this.hue = ~~rand(300,360);
-      if(Math.random()<0.5) this.hue = ~~rand(10,60);
+      this.hue = Math.random()<0.5 ? ~~rand(10,60) : ~~rand(300,360);
       this.saturation = ~~rand(60,95);
-      this.gathering = false;
-      this.target = null;
       this.alpha = rand(0.75,1);
       if(init) this.y = rand(0, height());
     }
@@ -118,50 +98,29 @@
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rotation + Math.sin(t/300 + this.x/80) * 0.12);
       ctx.scale(this.scale, this.scale);
-      // petals
       for(let i=0;i<this.petals;i++){
         const a = (i/this.petals) * Math.PI*2;
-        ctx.save();
-        ctx.rotate(a);
+        ctx.save(); ctx.rotate(a);
         ctx.beginPath();
         ctx.ellipse(this.size, 0, this.size*0.9, this.size*0.35, 0, 0, Math.PI*2);
         ctx.fillStyle = `hsla(${this.hue}deg, ${this.saturation}%, 62%, ${this.alpha})`;
-        ctx.fill();
-        ctx.restore();
+        ctx.fill(); ctx.restore();
       }
-      // center
       ctx.beginPath();
       ctx.arc(0,0,this.size*0.45,0,Math.PI*2);
       ctx.fillStyle = `rgba(255,244,184,${this.alpha})`;
-      ctx.fill();
-      ctx.restore();
+      ctx.fill(); ctx.restore();
     }
     step(dt){
-      if(this.gathering && this.target){
-        // move toward target
-        const dx = this.target.x - this.x;
-        const dy = this.target.y - this.y;
-        this.vx = lerp(this.vx, dx*0.0025, 0.05);
-        this.vy = lerp(this.vy, dy*0.003+0.1, 0.03);
-        this.x += this.vx * dt;
-        this.y += this.vy * dt;
-        this.rotation += this.rotSpeed * dt * 0.6;
-        // if close, shrink a bit
-        const d = Math.hypot(dx,dy);
-        if(d < 12) this.scale *= 0.985;
-      } else {
-        this.x += this.vx * dt;
-        this.y += this.vy * dt;
-        this.rotation += this.rotSpeed * dt;
-        // wrap sides
-        if(this.x < -60) this.x = width() + 60;
-        if(this.x > width() + 60) this.x = -60;
-        if(this.y > height()+80) this.reset(false);
-      }
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      this.rotation += this.rotSpeed * dt;
+      if(this.x < -60) this.x = width() + 60;
+      if(this.x > width() + 60) this.x = -60;
+      if(this.y > height()+80) this.reset(false);
     }
   }
 
-  // create many flowers
   let flowers = [];
   const COUNT = Math.max(30, Math.floor((width()*height())/6500));
   for(let i=0;i<COUNT;i++) flowers.push(new Flower());
@@ -171,85 +130,43 @@
     const dt = Math.min(40, now - last);
     last = now;
     ctx.clearRect(0,0,width(),height());
-    // subtle background glow
-    // draw flowers depth-sorted by scale
     flowers.sort((a,b)=> a.scale - b.scale);
     for(const f of flowers){ f.step(dt); f.draw(ctx, now); }
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
 
-  // Interaction: gather toward center and show poem
+  // Password check
+  const checkBtn = document.getElementById('checkBtn');
+  const passwordInput = document.getElementById('passwordInput');
+  const loginBox = document.getElementById('loginBox');
   const poemModal = document.getElementById('poemModal');
   const poemText = document.getElementById('poemText');
-  const revealBtn = document.getElementById('revealBtn');
-  const shuffleBtn = document.getElementById('shuffleBtn');
-  const closePoem = document.getElementById('closePoem');
 
-  const poem = `Sur un souffle léger les pétales s'ouvrent,
-Un murmure de soie, un rêve qui s'évertue.
-Chaque fleur est une page où le ciel découvre
-Les mots que la lumière grave à la rue.
+  const poem = `Sur un souffle léger les pétales s'ouvrent,\nUn murmure de soie, un rêve qui s'évertue.\nChaque fleur est une page où le ciel découvre\nLes mots que la lumière grave à la rue.\n\nViens, approche — que nos doigts effleurent\nLa saison qui sourit et qui ne fuit plus.\nJe t'offre ce jardin où le temps se meurt\nPour que naisse enfin le secret d'un élu.`;
 
-Viens, approche — que nos doigts effleurent
-La saison qui sourit et qui ne fuit plus.
-Je t'offre ce jardin où le temps se meurt
-Pour que naisse enfin le secret d'un élu.`;
-
-  function gatherTo(x,y){
-    for(let i=0;i<flowers.length;i++){
-      const f = flowers[i];
-      f.gathering = true;
-      // small spread so they don't stack perfectly
-      f.target = { x: x + Math.cos(i)*8, y: y + Math.sin(i)*6 };
+  function scatter(){
+    for(const f of flowers){
+      f.vx = rand(-2,2);
+      f.vy = rand(-2,2);
     }
   }
-  function disperse(){
-    for(const f of flowers){ f.gathering=false; f.scale = rand(0.6,1.6); }
-  }
 
-  revealBtn.addEventListener('click', ()=>{
-    // center point
-    const cx = width()/2; const cy = height()/2;
-    gatherTo(cx,cy);
-    openPoem();
+  checkBtn.addEventListener('click', ()=>{
+    if(passwordInput.value.trim().toLowerCase() === 'coeur'){
+      loginBox.style.display = 'none';
+      scatter();
+      showPoem();
+    } else {
+      passwordInput.style.borderColor = 'red';
+      setTimeout(()=> passwordInput.style.borderColor = 'rgba(255,255,255,0.1)', 1000);
+    }
   });
-  shuffleBtn.addEventListener('click', ()=>{ disperse(); closeModal(); });
-  closePoem.addEventListener('click', ()=>{ disperse(); closeModal(); });
 
-  // open poem overlay and type text
-  let typingTimeouts = [];
-  function openPoem(){
+  function showPoem(){
     poemModal.classList.add('open');
-    poemModal.setAttribute('aria-hidden','false');
-    poemText.textContent = '';
-    // typing effect
-    let i = 0;
-    for(const ch of poem){
-      const t = setTimeout(()=>{ poemText.textContent += ch; }, i*22);
-      typingTimeouts.push(t);
-      i++;
-    }
+    poemText.textContent = poem;
   }
-  function closeModal(){
-    poemModal.classList.remove('open');
-    poemModal.setAttribute('aria-hidden','true');
-    for(const t of typingTimeouts) clearTimeout(t);
-    typingTimeouts.length = 0;
-  }
-
-  // click anywhere to gather to that point and open poem
-  window.addEventListener('pointerdown', (e)=>{
-    const x = e.clientX; const y = e.clientY;
-    gatherTo(x,y);
-    openPoem();
-  });
-
-  // initial gentle drift
-  setInterval(()=>{
-    // small natural wind effect
-    for(const f of flowers){ f.vx += rand(-0.05,0.05); }
-  }, 2500);
   </script>
 </body>
 </html>
