@@ -31,12 +31,12 @@
     }
 
     .poem{
-      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;pointer-events:none;opacity:0;transition:opacity .45s ease;
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;pointer-events:none;opacity:0;transition:opacity .45s ease;
     }
     .poem.open{pointer-events:auto;opacity:1}
     .poem .card{
-      width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));backdrop-filter:blur(6px);
-      box-shadow:0 20px 60px rgba(2,6,23,0.6);
+      width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:rgba(15,23,36,0.96);
+      box-shadow:0 20px 60px rgba(2,6,23,0.8);
     }
     .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
   </style>
@@ -74,15 +74,14 @@
   resize();
 
   const rand = (a,b)=> Math.random()*(b-a)+a;
-  const lerp = (a,b,t)=> a + (b-a)*t;
 
   class Flower{
     constructor(){ this.reset(true); }
     reset(init){
-      this.x = rand(0, width());
-      this.y = rand(-40, height()+40);
-      this.vx = rand(-0.15,0.15);
-      this.vy = rand(0.1,0.6);
+      this.x = width()/2;
+      this.y = height()/2;
+      this.vx = rand(-2,2);
+      this.vy = rand(-2,2);
       this.scale = rand(0.6,1.6);
       this.rotation = rand(0,Math.PI*2);
       this.rotSpeed = rand(-0.002, 0.002);
@@ -91,12 +90,11 @@
       this.hue = Math.random()<0.5 ? ~~rand(10,60) : ~~rand(300,360);
       this.saturation = ~~rand(60,95);
       this.alpha = rand(0.75,1);
-      if(init) this.y = rand(0, height());
     }
     draw(ctx,t){
       ctx.save();
       ctx.translate(this.x, this.y);
-      ctx.rotate(this.rotation + Math.sin(t/300 + this.x/80) * 0.12);
+      ctx.rotate(this.rotation);
       ctx.scale(this.scale, this.scale);
       for(let i=0;i<this.petals;i++){
         const a = (i/this.petals) * Math.PI*2;
@@ -112,26 +110,23 @@
       ctx.fill(); ctx.restore();
     }
     step(dt){
-      this.x += this.vx * dt;
-      this.y += this.vy * dt;
+      this.x += this.vx * dt*0.05;
+      this.y += this.vy * dt*0.05;
       this.rotation += this.rotSpeed * dt;
-      if(this.x < -60) this.x = width() + 60;
-      if(this.x > width() + 60) this.x = -60;
-      if(this.y > height()+80) this.reset(false);
     }
   }
 
   let flowers = [];
-  const COUNT = Math.max(30, Math.floor((width()*height())/6500));
-  for(let i=0;i<COUNT;i++) flowers.push(new Flower());
+  let animate = false;
 
   let last = performance.now();
   function loop(now){
     const dt = Math.min(40, now - last);
     last = now;
     ctx.clearRect(0,0,width(),height());
-    flowers.sort((a,b)=> a.scale - b.scale);
-    for(const f of flowers){ f.step(dt); f.draw(ctx, now); }
+    if(animate){
+      for(const f of flowers){ f.step(dt); f.draw(ctx, now); }
+    }
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -146,10 +141,9 @@
   const poem = `Sur un souffle léger les pétales s'ouvrent,\nUn murmure de soie, un rêve qui s'évertue.\nChaque fleur est une page où le ciel découvre\nLes mots que la lumière grave à la rue.\n\nViens, approche — que nos doigts effleurent\nLa saison qui sourit et qui ne fuit plus.\nJe t'offre ce jardin où le temps se meurt\nPour que naisse enfin le secret d'un élu.`;
 
   function scatter(){
-    for(const f of flowers){
-      f.vx = rand(-2,2);
-      f.vy = rand(-2,2);
-    }
+    flowers = [];
+    for(let i=0;i<60;i++) flowers.push(new Flower());
+    animate = true;
   }
 
   checkBtn.addEventListener('click', ()=>{
