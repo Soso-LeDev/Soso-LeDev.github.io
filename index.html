@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scout — Assistant IA</title>
+  <title>Scout — Assistant IA Interactif</title>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
 
   <style>
-    :root{--bg:#ece5dd;--primary:#075e54;--accent:#25d366;--muted:#f0f0f0;--card:#fff;--radius:12px;--gap:10px;font-family: Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;}
+    :root{--bg:#ece5dd;--primary:#075e54;--accent:#25d366;--muted:#f0f0f0;--card:#fff;--radius:12px;font-family: Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;}
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
     body{display:flex;flex-direction:column;background:var(--bg);gap:8px}
@@ -19,7 +19,7 @@
     .icon-btn{background:none;border:none;color:inherit;padding:8px;border-radius:8px;cursor:pointer}
     main{display:flex;flex:1;gap:12px;padding:12px}
     .panel{flex:1;display:flex;flex-direction:column;gap:10px}
-    .chat-window{flex:1;overflow:auto;padding:16px;border-radius:var(--radius);background-image:url('https://i.imgur.com/3eF1QTT.png');background-size:cover;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    .chat-window{flex:1;overflow:auto;padding:16px;border-radius:var(--radius);background:var(--bg);box-shadow:0 6px 18px rgba(0,0,0,0.08)}
     .messages{display:flex;flex-direction:column;gap:10px}
     .msg{max-width:82%;padding:10px 14px;border-radius:12px;font-size:15px;line-height:1.45;word-wrap:break-word}
     .msg.user{align-self:flex-end;background:#dcf8c6;border-bottom-right-radius:4px}
@@ -40,7 +40,7 @@
 </head>
 <body>
   <header>
-    <h1>Scout — Assistant IA</h1>
+    <h1>Scout — Assistant IA Interactif</h1>
     <div class="spacer"></div>
     <div class="controls">
       <button class="icon-btn" id="btnClear">🗑️</button>
@@ -66,7 +66,7 @@
           <strong>Conversation</strong>
           <small id="messageCount">0 messages</small>
         </div>
-        <p class="small" style="margin-top:8px">Les réponses proviennent de Scout et des recherches Google.</p>
+        <p class="small" style="margin-top:8px">La conversation est sauvegardée localement et Scout peut interagir avec le site.</p>
       </div>
     </aside>
   </main>
@@ -89,8 +89,35 @@
     const btnGoogle = document.getElementById('btnGoogle');
     const btnClear = document.getElementById('btnClear');
 
-    let messages = [
-      { role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.', time: new Date().toISOString() }
+    // Fonctions accessibles par Scout
+    function addMessage(text){
+      const div = document.createElement('div');
+      div.textContent = text;
+      document.body.appendChild(div);
+    }
+    function setBackgroundColor(color){
+      document.body.style.backgroundColor = color;
+    }
+    function clearInput(){
+      input.value = '';
+    }
+
+    // Exécution des commandes Scout
+    function executeScoutCommands(text){
+      const commandRegex = /\[COMMAND\](.*?)\[\/COMMAND\]/gs;
+      let match;
+      while(match = commandRegex.exec(text)){
+        try{
+          eval(match[1]);
+        } catch(e){
+          console.error("Erreur en exécutant une commande Scout :", e);
+        }
+      }
+    }
+
+    // Gestion des messages
+    let messages = JSON.parse(localStorage.getItem('chatHistory')) || [
+      { role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux. Scout peut interagir avec la page via [COMMAND]...', time: new Date().toISOString() }
     ];
 
     function renderMessage(msg){
@@ -107,27 +134,29 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    function addUserMessage(text){
-      const msg={role:'user',content:text,time:new Date().toISOString()};
-      messages.push(msg); renderMessage(msg); updateMessageCount();
-    }
+    function saveMessages(){ localStorage.setItem('chatHistory', JSON.stringify(messages)); }
+    function updateMessageCount(){ document.getElementById('messageCount').textContent = messages.length + ' messages'; }
+    function addUserMessage(text){ const msg={role:'user',content:text,time:new Date().toISOString()}; messages.push(msg); renderMessage(msg); saveMessages(); updateMessageCount(); }
+    function addAssistantMessage(text){ const msg={role:'assistant',content:text,time:new Date().toISOString()}; messages.push(msg); renderMessage(msg); saveMessages(); updateMessageCount(); executeScoutCommands(text); }
 
-    function addAssistantMessage(text){
-      const msg={role:'assistant',content:text,time:new Date().toISOString()};
-      messages.push(msg); renderMessage(msg); updateMessageCount();
-    }
+    messages.forEach(msg => renderMessage(msg));
+    updateMessageCount();
 
-    function updateMessageCount(){
-      document.getElementById('messageCount').textContent = messages.length + ' messages';
-    }
-
+    // Envoyer un message à Scout
     btnSend.addEventListener('click', async () => {
       const text = input.value.trim(); if(!text) return;
       addUserMessage(text);
       input.value = '';
       addAssistantMessage('⏳ Scout réfléchit...');
-      
+
       try{
+        const siteContext = {
+          pageTitle: document.title,
+          numMessages: messages.length,
+          lastUserMessage: messages.filter(m=>m.role==='user').slice(-1)[0]?.content || '',
+          inputValue: input.value
+        };
+
         const res = await fetch(apiUrl, {
           method:'POST',
           headers:{
@@ -137,25 +166,27 @@
           body: JSON.stringify({
             model:'meta-llama/llama-4-scout-17b-16e-instruct',
             messages:[
-              {role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.'},
+              {role:'system', content:`Vous êtes Scout, un assistant IA humain et chaleureux. Contexte du site : ${JSON.stringify(siteContext)}. Scout peut interagir avec la page via [COMMAND]...`},
               {role:'user', content:text}
             ]
           })
         });
+
         const data = await res.json();
         const reply = data.choices?.[0]?.message?.content || '[Réponse vide]';
         addAssistantMessage(reply);
-      }catch(err){
+      } catch(err){
         addAssistantMessage('❌ Erreur Scout: '+err.message);
       }
     });
 
+    // Recherche Google
     btnGoogle.addEventListener('click', async () => {
       const query = input.value.trim(); if(!query) return;
       addUserMessage(`/google ${query}`);
       input.value = '';
       addAssistantMessage('🔍 Recherche Google en cours...');
-      
+
       try{
         const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCx}&q=${encodeURIComponent(query)}`);
         const data = await res.json();
@@ -171,10 +202,13 @@
       }
     });
 
+    // Effacer conversation
     btnClear.addEventListener('click', ()=>{
       if(confirm('Voulez-vous vraiment effacer la conversation ?')){
         messages = [{ role:'system', content:'Vous êtes Scout, un assistant IA humain et chaleureux.', time: new Date().toISOString() }];
+        localStorage.setItem('chatHistory', JSON.stringify(messages));
         messagesNode.innerHTML='';
+        renderMessage(messages[0]);
         updateMessageCount();
       }
     });
