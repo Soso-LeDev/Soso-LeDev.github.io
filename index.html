@@ -47,27 +47,25 @@
     }
     .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
     
-    /* Cadeau */
+    /* Cadeau animé */
     .gift{
       font-size:60px;
       cursor:pointer;
       margin-top:20px;
-      transition:transform 0.3s ease;
+      display:inline-block;
+      animation:wiggle 1.2s ease-in-out infinite;
     }
-    .gift:hover{ transform:scale(1.2) rotate(-5deg); }
+    @keyframes wiggle{
+      0%,100%{transform:rotate(0deg);}
+      25%{transform:rotate(-8deg);}
+      75%{transform:rotate(8deg);}
+    }
 
-    /* Confettis */
-    .confetti{
-      position:fixed;
-      width:8px;height:8px;
-      background:red;
-      top:50%;left:50%;
-      opacity:0.9;
-      pointer-events:none;
-      animation:fall 3s linear forwards;
-    }
-    @keyframes fall{
-      to{ transform:translateY(100vh) rotate(720deg); opacity:0; }
+    /* Animation clic cadeau */
+    .gift.opening{
+      animation:none;
+      transform:scale(1.3) rotate(20deg);
+      transition:transform 0.6s ease;
     }
   </style>
 </head>
@@ -107,7 +105,7 @@
 
   const rand = (a,b)=> Math.random()*(b-a)+a;
 
-  // Flower class (Tulipes + Hibiscus)
+  // Flower class
   class Flower{
     constructor(){ this.reset(true); }
     reset(){
@@ -119,7 +117,6 @@
       this.rotation = rand(0,Math.PI*2);
       this.rotSpeed = rand(-0.001, 0.001);
       this.size = rand(20,35);
-      this.alpha = rand(0.8,1);
       this.type = Math.random() < 0.5 ? 'tulip' : 'hibiscus';
       this.color = (this.type==='tulip') 
         ? (Math.random()<0.5 ? '#ff9ecf' : '#fff')
@@ -147,7 +144,6 @@
       ctx.fill();
 
       if(this.type==='tulip'){
-        // 3 pétales tulipe
         for(let i=0;i<3;i++){
           ctx.save();
           ctx.rotate((i-1)*0.6);
@@ -159,7 +155,6 @@
           ctx.restore();
         }
       }else{
-        // Hibiscus
         for(let i=0;i<5;i++){
           const a=(i/5)*Math.PI*2;
           ctx.save();
@@ -170,13 +165,11 @@
           ctx.fill();
           ctx.restore();
         }
-        // Pistil
         ctx.beginPath();
         ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
         ctx.fillStyle="yellow";
         ctx.fill();
       }
-
       ctx.restore();
     }
 
@@ -247,19 +240,10 @@ Pour que naisse enfin le secret d'un élu.`;
     poemText.textContent=poem;
   }
 
-  // Confettis quand on clique sur le cadeau
+  // Clic cadeau
   gift.addEventListener("click",()=>{
-    for(let i=0;i<80;i++){
-      const c=document.createElement("div");
-      c.className="confetti";
-      c.style.background=`hsl(${Math.random()*360},100%,60%)`;
-      c.style.left=50+"%";
-      c.style.top=50+"%";
-      c.style.transform=`translate(${(Math.random()-0.5)*200}px, ${(Math.random()-0.5)*200}px)`;
-      document.body.appendChild(c);
-      setTimeout(()=>c.remove(),3000);
-    }
-    gift.textContent="🎉";
+    gift.classList.add("opening");
+    setTimeout(()=> window.location.href="surprise.html", 800);
   });
   </script>
 </body>
