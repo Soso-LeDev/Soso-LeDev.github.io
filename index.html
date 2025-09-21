@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fleurs — Mot de passe & Poème</title>
+  <title>Fleurs Réalistes — Mot de passe & Poème</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -47,7 +47,6 @@
     }
     .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
 
-    /* Cadeau */
     #gift{
       width:80px;
       height:80px;
@@ -89,7 +88,6 @@
   </div>
 
   <script>
-  // Canvas flower animation
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d', { alpha: true });
   let DPR = Math.max(1, window.devicePixelRatio || 1);
@@ -116,21 +114,16 @@
       this.y = height()/2;
       this.vx = rand(-2,2);
       this.vy = rand(-2,2);
-      this.scale = rand(0.6,1.4);
+      this.scale = rand(0.6,1.2);
       this.rotation = rand(0,Math.PI*2);
       this.rotSpeed = rand(-0.002, 0.002);
-      this.size = rand(12,25);
-      this.alpha = rand(0.75,1);
+      this.size = rand(40,70); // taille globale
+      this.alpha = rand(0.85,1);
 
       this.type = Math.random() < 0.5 ? 'tulip' : 'hibiscus';
-
-      if(this.type === 'tulip'){
-        this.petals = 3;
-        this.color = Math.random() < 0.5 ? '#ff9ecf' : '#ffffff';
-      } else {
-        this.petals = ~~rand(5,7);
-        this.color = '#ff5a5f';
-      }
+      this.color = this.type === 'tulip'
+        ? (Math.random() < 0.5 ? '#ff9ecf' : '#fff')
+        : '#ff4d4d';
     }
 
     draw(ctx){
@@ -139,34 +132,62 @@
       ctx.rotate(this.rotation);
       ctx.scale(this.scale, this.scale);
 
+      // Tige
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(0,this.size*1.5);
+      ctx.strokeStyle = '#3ba34d';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Feuilles
+      ctx.beginPath();
+      ctx.ellipse(-10,this.size*0.7,20,10,Math.PI/4,0,Math.PI*2);
+      ctx.fillStyle = '#3ba34d';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(10,this.size,20,10,-Math.PI/4,0,Math.PI*2);
+      ctx.fill();
+
+      // Fleur
       if(this.type === 'tulip'){
-        for(let i=0;i<this.petals;i++){
+        // 3-4 pétales pointus
+        for(let i=0;i<3;i++){
           ctx.save();
-          ctx.rotate((i-1)*0.5);
+          ctx.rotate((i-1)*0.4);
           ctx.beginPath();
           ctx.moveTo(0,0);
-          ctx.bezierCurveTo(-this.size/2,-this.size*1.5,this.size/2,-this.size*1.5,0,0);
+          ctx.bezierCurveTo(-this.size/2,-this.size, this.size/2,-this.size, 0,-this.size*1.5);
+          ctx.closePath();
           ctx.fillStyle = this.color;
           ctx.fill();
           ctx.restore();
         }
       } else {
-        for(let i=0;i<this.petals;i++){
-          const a = (i/this.petals) * Math.PI*2;
+        // Hibiscus avec 5 pétales arrondis
+        for(let i=0;i<5;i++){
+          const angle = (i/5)*Math.PI*2;
           ctx.save();
-          ctx.rotate(a);
+          ctx.rotate(angle);
           ctx.beginPath();
-          ctx.ellipse(this.size, 0, this.size*0.9, this.size*0.35, 0, 0, Math.PI*2);
+          ctx.ellipse(0,-this.size*0.8,this.size*0.6,this.size*0.9,0,0,Math.PI*2);
           ctx.fillStyle = this.color;
           ctx.fill();
           ctx.restore();
         }
+        // Pistil
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(0,-this.size*1.2);
+        ctx.strokeStyle = 'yellow';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0,-this.size*1.2,6,0,Math.PI*2);
+        ctx.fillStyle = 'yellow';
+        ctx.fill();
       }
 
-      ctx.beginPath();
-      ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
-      ctx.fillStyle = 'rgba(255,244,184,'+this.alpha+')';
-      ctx.fill();
       ctx.restore();
     }
 
@@ -211,7 +232,7 @@ Pour que naisse enfin le secret d'un élu.`;
 
   function scatter(){
     flowers = [];
-    for(let i=0;i<60;i++) flowers.push(new Flower());
+    for(let i=0;i<20;i++) flowers.push(new Flower());
     animate = true;
   }
 
@@ -231,7 +252,7 @@ Pour que naisse enfin le secret d'un élu.`;
     poemText.textContent = poem;
   }
 
-  // Confetti animation
+  // Confetti
   const confettiCanvas = document.getElementById('confettiCanvas');
   const confettiCtx = confettiCanvas.getContext('2d');
   let confettiParticles = [];
@@ -269,7 +290,6 @@ Pour que naisse enfin le secret d'un élu.`;
   }
 
   document.getElementById('gift').addEventListener('click', ()=>{
-    // Changement d'emoji pour montrer l'ouverture
     const gift = document.getElementById('gift');
     gift.textContent = '🎉';
     createConfetti();
