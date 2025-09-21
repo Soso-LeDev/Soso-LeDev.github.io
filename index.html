@@ -43,8 +43,32 @@
     .poem .card{
       width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:rgba(15,23,36,0.96);
       box-shadow:0 20px 60px rgba(2,6,23,0.8);
+      text-align:center;
     }
     .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
+    
+    /* Cadeau */
+    .gift{
+      font-size:60px;
+      cursor:pointer;
+      margin-top:20px;
+      transition:transform 0.3s ease;
+    }
+    .gift:hover{ transform:scale(1.2) rotate(-5deg); }
+
+    /* Confettis */
+    .confetti{
+      position:fixed;
+      width:8px;height:8px;
+      background:red;
+      top:50%;left:50%;
+      opacity:0.9;
+      pointer-events:none;
+      animation:fall 3s linear forwards;
+    }
+    @keyframes fall{
+      to{ transform:translateY(100vh) rotate(720deg); opacity:0; }
+    }
   </style>
 </head>
 <body>
@@ -61,11 +85,12 @@
   <div class="poem" id="poemModal">
     <div class="card">
       <div class="text" id="poemText"></div>
+      <div class="gift" id="gift">🎁</div>
     </div>
   </div>
 
   <script>
-  // Canvas flower animation
+  // Canvas setup
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d', { alpha: true });
   let DPR = Math.max(1, window.devicePixelRatio || 1);
@@ -82,39 +107,50 @@
 
   const rand = (a,b)=> Math.random()*(b-a)+a;
 
+  // Flower class (Tulipes + Hibiscus)
   class Flower{
     constructor(){ this.reset(true); }
-    reset(init){
-      this.x = width()/2;
-      this.y = height()/2;
-      this.vx = rand(-2,2);
-      this.vy = rand(-2,2);
-      this.scale = rand(0.6,1.4);
+    reset(){
+      this.x = rand(50,width()-50);
+      this.y = rand(50,height()-50);
+      this.vx = rand(-1,1);
+      this.vy = rand(-1,1);
+      this.scale = rand(0.6,1.2);
       this.rotation = rand(0,Math.PI*2);
-      this.rotSpeed = rand(-0.002, 0.002);
-      this.size = rand(12,25);
-      this.alpha = rand(0.75,1);
-
+      this.rotSpeed = rand(-0.001, 0.001);
+      this.size = rand(20,35);
+      this.alpha = rand(0.8,1);
       this.type = Math.random() < 0.5 ? 'tulip' : 'hibiscus';
-      if(this.type === 'tulip'){
-        this.petals = 3;
-        this.color = Math.random() < 0.5 ? '#ff9ecf' : '#ffffff'; // Rose ou blanc
-      } else {
-        this.petals = ~~rand(5,7);
-        this.color = '#ff5a5f'; // Hibiscus rouge
-      }
+      this.color = (this.type==='tulip') 
+        ? (Math.random()<0.5 ? '#ff9ecf' : '#fff')
+        : '#ff5a5f';
     }
 
     draw(ctx){
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rotation);
-      ctx.scale(this.scale, this.scale);
+      ctx.scale(this.scale,this.scale);
 
-      if(this.type === 'tulip'){
-        for(let i=0;i<this.petals;i++){
+      // Tige
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(0,this.size*2);
+      ctx.strokeStyle = "green";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Feuille
+      ctx.beginPath();
+      ctx.ellipse(5,this.size*1.2,10,20,Math.PI/4,0,Math.PI*2);
+      ctx.fillStyle="green";
+      ctx.fill();
+
+      if(this.type==='tulip'){
+        // 3 pétales tulipe
+        for(let i=0;i<3;i++){
           ctx.save();
-          ctx.rotate((i-1)*0.5);
+          ctx.rotate((i-1)*0.6);
           ctx.beginPath();
           ctx.moveTo(0,0);
           ctx.bezierCurveTo(-this.size/2,-this.size*1.5,this.size/2,-this.size*1.5,0,0);
@@ -122,40 +158,41 @@
           ctx.fill();
           ctx.restore();
         }
-      } else {
-        for(let i=0;i<this.petals;i++){
-          const a = (i/this.petals) * Math.PI*2;
+      }else{
+        // Hibiscus
+        for(let i=0;i<5;i++){
+          const a=(i/5)*Math.PI*2;
           ctx.save();
           ctx.rotate(a);
           ctx.beginPath();
-          ctx.ellipse(this.size, 0, this.size*0.9, this.size*0.35, 0, 0, Math.PI*2);
-          ctx.fillStyle = this.color;
+          ctx.ellipse(this.size,0,this.size*0.9,this.size*0.5,0,0,Math.PI*2);
+          ctx.fillStyle=this.color;
           ctx.fill();
           ctx.restore();
         }
+        // Pistil
+        ctx.beginPath();
+        ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
+        ctx.fillStyle="yellow";
+        ctx.fill();
       }
 
-      // Centre
-      ctx.beginPath();
-      ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
-      ctx.fillStyle = 'rgba(255,244,184,'+this.alpha+')';
-      ctx.fill();
       ctx.restore();
     }
 
     step(dt){
       this.x += this.vx * dt*0.05;
       this.y += this.vy * dt*0.05;
-      this.rotation += this.rotSpeed * dt;
+      this.rotation += this.rotSpeed*dt;
     }
   }
 
   let flowers = [];
   let animate = false;
-
   let last = performance.now();
+
   function loop(now){
-    const dt = Math.min(40, now - last);
+    const dt = Math.min(40, now-last);
     last = now;
     ctx.clearRect(0,0,width(),height());
     if(animate){
@@ -165,14 +202,15 @@
   }
   requestAnimationFrame(loop);
 
-  // Password check
-  const checkBtn = document.getElementById('checkBtn');
-  const passwordInput = document.getElementById('passwordInput');
-  const loginBox = document.getElementById('loginBox');
-  const poemModal = document.getElementById('poemModal');
-  const poemText = document.getElementById('poemText');
+  // Password
+  const checkBtn=document.getElementById("checkBtn");
+  const passwordInput=document.getElementById("passwordInput");
+  const loginBox=document.getElementById("loginBox");
+  const poemModal=document.getElementById("poemModal");
+  const poemText=document.getElementById("poemText");
+  const gift=document.getElementById("gift");
 
-  const poem = `Sur un souffle léger les pétales s'ouvrent,
+  const poem=`Sur un souffle léger les pétales s'ouvrent,
 Un murmure de soie, un rêve qui s'évertue.
 Chaque fleur est une page où le ciel découvre
 Les mots que la lumière grave à la rue.
@@ -183,32 +221,46 @@ Je t'offre ce jardin où le temps se meurt
 Pour que naisse enfin le secret d'un élu.`;
 
   function scatter(){
-    flowers = [];
-    for(let i=0;i<60;i++) flowers.push(new Flower());
-    animate = true;
+    flowers=[];
+    for(let i=0;i<40;i++) flowers.push(new Flower());
+    animate=true;
   }
 
-  checkBtn.addEventListener('click', ()=>{
-    let val = passwordInput.value
+  checkBtn.addEventListener("click",()=>{
+    let val=passwordInput.value
       .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")   // supprime les accents
-      .replace(/\s+/g,"");              // supprime les espaces
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/\s+/g,"");
 
-    if(val === 'coeur'){
-      loginBox.style.display = 'none';
+    if(val==="coeur"){
+      loginBox.style.display="none";
       scatter();
       showPoem();
-    } else {
-      passwordInput.style.borderColor = 'red';
-      setTimeout(()=> passwordInput.style.borderColor = 'rgba(255,255,255,0.1)', 1000);
+    }else{
+      passwordInput.style.borderColor="red";
+      setTimeout(()=> passwordInput.style.borderColor="rgba(255,255,255,0.1)",1000);
     }
   });
 
   function showPoem(){
-    poemModal.classList.add('open');
-    poemText.textContent = poem;
+    poemModal.classList.add("open");
+    poemText.textContent=poem;
   }
+
+  // Confettis quand on clique sur le cadeau
+  gift.addEventListener("click",()=>{
+    for(let i=0;i<80;i++){
+      const c=document.createElement("div");
+      c.className="confetti";
+      c.style.background=`hsl(${Math.random()*360},100%,60%)`;
+      c.style.left=50+"%";
+      c.style.top=50+"%";
+      c.style.transform=`translate(${(Math.random()-0.5)*200}px, ${(Math.random()-0.5)*200}px)`;
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),3000);
+    }
+    gift.textContent="🎉";
+  });
   </script>
 </body>
 </html>
