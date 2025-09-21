@@ -21,6 +21,12 @@
       box-shadow:0 10px 40px rgba(2,6,23,0.6);text-align:center
     }
     h1{font-family:'Playfair Display',serif;margin:0 0 18px;font-size:clamp(20px,3vw,32px)}
+    .riddle{
+      font-family:'Playfair Display',serif;
+      margin-bottom:20px;
+      font-size:clamp(14px,1.8vw,18px);
+      color:#ffd86b;
+    }
     input{
       padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);
       background:rgba(255,255,255,0.06);color:#fff;width:70%;font-size:16px;outline:none
@@ -45,6 +51,7 @@
   <canvas id="c"></canvas>
 
   <div class="ui" id="loginBox">
+    <div class="riddle">Je bat dans la poitrine, sans jamais faiblir. Qui suis-je ?</div>
     <h1>Mot de passe :</h1>
     <input type="password" id="passwordInput" placeholder="Entrez le mot de passe..." />
     <br />
@@ -82,33 +89,64 @@
       this.y = height()/2;
       this.vx = rand(-2,2);
       this.vy = rand(-2,2);
-      this.scale = rand(0.6,1.6);
+      this.scale = rand(0.6,1.4);
       this.rotation = rand(0,Math.PI*2);
       this.rotSpeed = rand(-0.002, 0.002);
-      this.petals = ~~rand(4,7);
-      this.size = rand(8,22);
-      this.hue = Math.random()<0.5 ? ~~rand(10,60) : ~~rand(300,360);
-      this.saturation = ~~rand(60,95);
+      this.size = rand(12,25);
       this.alpha = rand(0.75,1);
+
+      // Choix du type de fleur : tulipe ou hibiscus
+      this.type = Math.random() < 0.5 ? 'tulip' : 'hibiscus';
+
+      if(this.type === 'tulip'){
+        this.petals = 3; // Tulipe simple
+        this.color = Math.random() < 0.5 ? '#ff9ecf' : '#ffffff'; // Rose ou blanc
+      } else {
+        this.petals = ~~rand(5,7);
+        this.color = '#ff5a5f'; // Hibiscus rouge
+      }
     }
-    draw(ctx,t){
+
+    draw(ctx){
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rotation);
       ctx.scale(this.scale, this.scale);
-      for(let i=0;i<this.petals;i++){
-        const a = (i/this.petals) * Math.PI*2;
-        ctx.save(); ctx.rotate(a);
-        ctx.beginPath();
-        ctx.ellipse(this.size, 0, this.size*0.9, this.size*0.35, 0, 0, Math.PI*2);
-        ctx.fillStyle = `hsla(${this.hue}deg, ${this.saturation}%, 62%, ${this.alpha})`;
-        ctx.fill(); ctx.restore();
+
+      if(this.type === 'tulip'){
+        // Tulipe : 3 pétales simples
+        for(let i=0;i<this.petals;i++){
+          ctx.save();
+          ctx.rotate((i-1)*0.5);
+          ctx.beginPath();
+          ctx.moveTo(0,0);
+          ctx.bezierCurveTo(-this.size/2,-this.size*1.5,this.size/2,-this.size*1.5,0,0);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.restore();
+        }
+      } else {
+        // Hibiscus : pétales arrondis
+        for(let i=0;i<this.petals;i++){
+          const a = (i/this.petals) * Math.PI*2;
+          ctx.save();
+          ctx.rotate(a);
+          ctx.beginPath();
+          ctx.ellipse(this.size, 0, this.size*0.9, this.size*0.35, 0, 0, Math.PI*2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.restore();
+        }
       }
+
+      // Centre de la fleur
       ctx.beginPath();
-      ctx.arc(0,0,this.size*0.45,0,Math.PI*2);
-      ctx.fillStyle = `rgba(255,244,184,${this.alpha})`;
-      ctx.fill(); ctx.restore();
+      ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
+      ctx.fillStyle = 'rgba(255,244,184,'+this.alpha+')';
+      ctx.fill();
+      ctx.restore();
     }
+
     step(dt){
       this.x += this.vx * dt*0.05;
       this.y += this.vy * dt*0.05;
@@ -125,7 +163,7 @@
     last = now;
     ctx.clearRect(0,0,width(),height());
     if(animate){
-      for(const f of flowers){ f.step(dt); f.draw(ctx, now); }
+      for(const f of flowers){ f.step(dt); f.draw(ctx); }
     }
     requestAnimationFrame(loop);
   }
@@ -138,7 +176,15 @@
   const poemModal = document.getElementById('poemModal');
   const poemText = document.getElementById('poemText');
 
-  const poem = `Sur un souffle léger les pétales s'ouvrent,\nUn murmure de soie, un rêve qui s'évertue.\nChaque fleur est une page où le ciel découvre\nLes mots que la lumière grave à la rue.\n\nViens, approche — que nos doigts effleurent\nLa saison qui sourit et qui ne fuit plus.\nJe t'offre ce jardin où le temps se meurt\nPour que naisse enfin le secret d'un élu.`;
+  const poem = `Sur un souffle léger les pétales s'ouvrent,
+Un murmure de soie, un rêve qui s'évertue.
+Chaque fleur est une page où le ciel découvre
+Les mots que la lumière grave à la rue.
+
+Viens, approche — que nos doigts effleurent
+La saison qui sourit et qui ne fuit plus.
+Je t'offre ce jardin où le temps se meurt
+Pour que naisse enfin le secret d'un élu.`;
 
   function scatter(){
     flowers = [];
