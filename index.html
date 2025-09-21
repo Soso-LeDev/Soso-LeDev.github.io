@@ -38,17 +38,40 @@
 
     .poem{
       position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;pointer-events:none;opacity:0;transition:opacity .45s ease;
+      flex-direction:column;
     }
     .poem.open{pointer-events:auto;opacity:1}
     .poem .card{
-      width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:rgba(15,23,36,0.96);
-      box-shadow:0 20px 60px rgba(2,6,23,0.8);
+      width:min(820px,92vw);max-height:60vh;overflow:auto;padding:28px;border-radius:16px;background:rgba(15,23,36,0.96);
+      box-shadow:0 20px 60px rgba(2,6,23,0.8); margin-bottom:20px;
     }
     .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
+
+    /* Cadeau */
+    #gift{
+      width:80px;
+      height:80px;
+      background: linear-gradient(#ff5a5f,#ff8a5b);
+      border-radius:12px;
+      position:relative;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:40px;
+      color:#fff;
+      transition: transform 0.3s;
+      margin-top:10px;
+    }
+    #gift:hover{transform: scale(1.2);}
+    #confettiCanvas{
+      position:fixed; inset:0; pointer-events:none; z-index:30;
+    }
   </style>
 </head>
 <body>
   <canvas id="c"></canvas>
+  <canvas id="confettiCanvas"></canvas>
 
   <div class="ui" id="loginBox">
     <div class="riddle">Je bat dans la poitrine, sans jamais faiblir. Qui suis-je ?</div>
@@ -62,6 +85,7 @@
     <div class="card">
       <div class="text" id="poemText"></div>
     </div>
+    <div id="gift">🎁</div>
   </div>
 
   <script>
@@ -76,6 +100,9 @@
     canvas.width = width() * DPR; canvas.height = height() * DPR;
     canvas.style.width = width() + 'px'; canvas.style.height = height() + 'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
+    confettiCanvas.width = width()*DPR;
+    confettiCanvas.height = height()*DPR;
+    confettiCtx.setTransform(DPR,0,0,DPR,0,0);
   }
   window.addEventListener('resize', resize);
   resize();
@@ -95,15 +122,14 @@
       this.size = rand(12,25);
       this.alpha = rand(0.75,1);
 
-      // Choix du type de fleur : tulipe ou hibiscus
       this.type = Math.random() < 0.5 ? 'tulip' : 'hibiscus';
 
       if(this.type === 'tulip'){
-        this.petals = 3; // Tulipe simple
-        this.color = Math.random() < 0.5 ? '#ff9ecf' : '#ffffff'; // Rose ou blanc
+        this.petals = 3;
+        this.color = Math.random() < 0.5 ? '#ff9ecf' : '#ffffff';
       } else {
         this.petals = ~~rand(5,7);
-        this.color = '#ff5a5f'; // Hibiscus rouge
+        this.color = '#ff5a5f';
       }
     }
 
@@ -114,7 +140,6 @@
       ctx.scale(this.scale, this.scale);
 
       if(this.type === 'tulip'){
-        // Tulipe : 3 pétales simples
         for(let i=0;i<this.petals;i++){
           ctx.save();
           ctx.rotate((i-1)*0.5);
@@ -126,7 +151,6 @@
           ctx.restore();
         }
       } else {
-        // Hibiscus : pétales arrondis
         for(let i=0;i<this.petals;i++){
           const a = (i/this.petals) * Math.PI*2;
           ctx.save();
@@ -139,7 +163,6 @@
         }
       }
 
-      // Centre de la fleur
       ctx.beginPath();
       ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
       ctx.fillStyle = 'rgba(255,244,184,'+this.alpha+')';
@@ -207,6 +230,51 @@ Pour que naisse enfin le secret d'un élu.`;
     poemModal.classList.add('open');
     poemText.textContent = poem;
   }
+
+  // Confetti animation
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const confettiCtx = confettiCanvas.getContext('2d');
+  let confettiParticles = [];
+
+  function createConfetti(){
+    for(let i=0;i<150;i++){
+      confettiParticles.push({
+        x: rand(0,width()),
+        y: rand(-height(),0),
+        size: rand(5,12),
+        color: `hsl(${rand(0,360)},100%,50%)`,
+        vy: rand(2,6),
+        vx: rand(-1,1),
+        rotation: rand(0,360),
+        vr: rand(-5,5)
+      });
+    }
+  }
+
+  function updateConfetti(){
+    confettiCtx.clearRect(0,0,width(),height());
+    for(const p of confettiParticles){
+      p.y += p.vy;
+      p.x += p.vx;
+      p.rotation += p.vr*0.1;
+      if(p.y > height()) p.y = rand(-50,0);
+      confettiCtx.save();
+      confettiCtx.translate(p.x,p.y);
+      confettiCtx.rotate(p.rotation*Math.PI/180);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+      confettiCtx.restore();
+    }
+    requestAnimationFrame(updateConfetti);
+  }
+
+  document.getElementById('gift').addEventListener('click', ()=>{
+    // Changement d'emoji pour montrer l'ouverture
+    const gift = document.getElementById('gift');
+    gift.textContent = '🎉';
+    createConfetti();
+    updateConfetti();
+  });
   </script>
 </body>
 </html>
