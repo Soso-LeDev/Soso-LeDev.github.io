@@ -67,6 +67,20 @@
       transform:scale(1.3) rotate(20deg);
       transition:transform 0.6s ease;
     }
+
+    /* Confettis */
+    .confetti{
+      position:fixed;
+      width:10px;height:10px;
+      background:red;
+      top:0;left:50%;
+      opacity:0.9;
+      z-index:100;
+      animation:fall linear forwards;
+    }
+    @keyframes fall{
+      to{ transform:translateY(100vh) rotate(360deg); opacity:0; }
+    }
   </style>
 </head>
 <body>
@@ -240,10 +254,27 @@ Pour que naisse enfin le secret d'un élu.`;
     poemText.textContent=poem;
   }
 
+  // Confettis
+  function launchConfetti(){
+    for(let i=0;i<80;i++){
+      const conf=document.createElement("div");
+      conf.className="confetti";
+      conf.style.left=Math.random()*100+"vw";
+      conf.style.background=`hsl(${Math.random()*360},80%,60%)`;
+      conf.style.animationDuration=(2+Math.random()*3)+"s";
+      conf.style.transform=`rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(conf);
+      setTimeout(()=>conf.remove(),5000);
+    }
+  }
+
   // Clic cadeau
   gift.addEventListener("click",()=>{
     gift.classList.add("opening");
-    setTimeout(()=> window.location.href="surprise.html", 800);
+    setTimeout(()=>{
+      gift.style.display="none"; // le cadeau disparaît
+      launchConfetti();
+    },600);
   });
   </script>
 </body>
