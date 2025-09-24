@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fleurs — Mot de passe & Poème</title>
+  <title>Bonne anniv</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -108,7 +108,7 @@
   <canvas id="c"></canvas>
 
   <div class="ui" id="loginBox">
-    <div class="riddle">Je bats dans la poitrine, sans jamais faiblir. Qui suis-je ?</div>
+    <div class="riddle">Quel est le mot de passe ?</div>
     <h1>Mot de passe :</h1>
     <input type="text" id="passwordInput" placeholder="Entrez le mot de passe..." />
     <br />
@@ -119,7 +119,7 @@
     <div class="card">
       <div class="text" id="poemText"></div>
       <div class="gift" id="gift">🎁</div>
-      <div class="gift-card" id="giftCard">✨ Carte Cadeau ✨</div>
+      <div class="gift-card" id="giftCard">✨ Code de la carte ✨</div>
     </div>
   </div>
 
@@ -239,15 +239,13 @@
   const gift=document.getElementById("gift");
   const giftCard=document.getElementById("giftCard");
 
-  const poem=`Sur un souffle léger les pétales s'ouvrent,
-Un murmure de soie, un rêve qui s'évertue.
-Chaque fleur est une page où le ciel découvre
-Les mots que la lumière grave à la rue.
-
-Viens, approche — que nos doigts effleurent
-La saison qui sourit et qui ne fuit plus.
-Je t'offre ce jardin où le temps se meurt
-Pour que naisse enfin le secret d'un élu.`;
+  const poem=`Bon anniversaire (un peu en retard 😅🎂) !!
+J’ai essayé de vous faire un petit cadeau à ma façon 🎁 (un site codé a la main, avec une petite surprise ).
+Je suis vraiment super content de vous avoir rencontré 🙏✨ Vous êtes une prof géniale 💖 
+et même en dehors des cours, vous restez gentille, attentionnée et toujours aussi indispensable🌟.
+J’espère que cette nouvelle année vous apportera plein de bonheur 🌸, de réussite 🎯 et de beaux moments 🌍🥰 !!!!!! 
+(c'est quelque chose que j'aimerais qui reste entre nous)
+(pensez a cliqué sur l'emojis cadeau en bas !!`;
 
   function scatter(){
     flowers=[];
@@ -297,9 +295,10 @@ Pour que naisse enfin le secret d'un élu.`;
       gift.style.display="none";
       launchConfetti();
       giftCard.classList.add("show");
-      poemText.textContent="💌 Voici ta carte cadeau... (remplis-moi avec ton message 💖)";
+      poemText.textContent="💌 Hihihi faites vous plaisir ;) 💖)";
     },600);
   });
   </script>
 </body>
 </html>
+
