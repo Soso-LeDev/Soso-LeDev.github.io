@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bonne anniv</title>
+  <title>Bonne anniv — Carte H&M</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -46,7 +46,7 @@
       text-align:center;
     }
     .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
-    
+
     /* Cadeau animé */
     .gift{
       font-size:60px;
@@ -56,9 +56,9 @@
       animation:wiggle 1.2s ease-in-out infinite;
     }
     @keyframes wiggle{
-      0%,100%{transform:rotate(0deg);}
-      25%{transform:rotate(-8deg);}
-      75%{transform:rotate(8deg);}
+      0%,100%{transform:rotate(0deg);} 
+      25%{transform:rotate(-8deg);} 
+      75%{transform:rotate(8deg);} 
     }
 
     .gift.opening{
@@ -102,6 +102,21 @@
     @keyframes fall{
       to{ transform:translateY(100vh) rotate(360deg); opacity:0; }
     }
+
+    /* H&M gift card style */
+    .hm-card{
+      width:320px;max-width:86vw;margin:0 auto;padding:18px;border-radius:12px;background:#fff;color:#111;box-shadow:0 12px 30px rgba(0,0,0,0.4);text-align:left;font-family:Inter, Arial;
+    }
+    .hm-top{display:flex;align-items:center;justify-content:space-between}
+    .hm-logo{font-weight:800;font-size:34px;font-family:Inter, Arial;margin:0}
+    .hm-amount{font-size:20px;font-weight:700;color:#e5000f}
+    .hm-desc{margin-top:10px;font-size:14px;color:#222}
+    .hm-code{
+      margin-top:14px;padding:12px;border-radius:8px;background:#f6f6f6;border:1px dashed #ddd;display:flex;align-items:center;justify-content:space-between;font-family:monospace;font-size:16px
+    }
+    .small-btn{padding:8px 12px;border-radius:8px;border:0;background:#111;color:#fff;font-weight:600;cursor:pointer}
+    .link-btn{background:transparent;color:#111;border:0;text-decoration:underline;cursor:pointer}
+
   </style>
 </head>
 <body>
@@ -119,7 +134,7 @@
     <div class="card">
       <div class="text" id="poemText"></div>
       <div class="gift" id="gift">🎁</div>
-      <div class="gift-card" id="giftCard">✨ Code de la carte ✨</div>
+      <div id="giftContainer"></div>
     </div>
   </div>
 
@@ -237,15 +252,9 @@
   const poemModal=document.getElementById("poemModal");
   const poemText=document.getElementById("poemText");
   const gift=document.getElementById("gift");
-  const giftCard=document.getElementById("giftCard");
+  const giftContainer=document.getElementById("giftContainer");
 
-  const poem=`Bonne anniversaire (un peu en retard 😅🎂) !!
-J’ai essayé de vous faire un petit cadeau à ma façon 🎁 (un site codé a la main, avec une petite surprise ).
-Je suis vraiment super content de vous avoir rencontré 🙏✨ Vous êtes une prof géniale 💖 
-et même en dehors des cours, vous restez gentille, attentionnée et toujours aussi indispensable🌟.
-J’espère que cette nouvelle année vous apportera plein de bonheur 🌸, de réussite 🎯 et de beaux moments 🌍🥰 !!!!!! 
-(c'est quelque chose que j'aimerais qui reste entre nous)
-(pensez a cliqué sur l'emojis cadeau en bas !!`;
+  const poem=`Bonne anniversaire (un peu en retard 😅🎂) !!\nJ’ai essayé de vous faire un petit cadeau à ma façon 🎁 (un site codé a la main, avec une petite surprise ).\nJe suis vraiment super content de vous avoir rencontré 🙏✨ Vous êtes une prof géniale 💖 \net même en dehors des cours, vous restez gentille, attentionnée et toujours aussi indispensable🌟.\nJ’espère que cette nouvelle année vous apportera plein de bonheur 🌸, de réussite 🎯 et de beaux moments 🌍🥰 !!!!!! \n(c'est quelque chose que j'aimerais qui reste entre nous)\n(pensez a cliqué sur l'emojis cadeau en bas !!`;
 
   function scatter(){
     flowers=[];
@@ -288,18 +297,131 @@ J’espère que cette nouvelle année vous apportera plein de bonheur 🌸, de r
     }
   }
 
-  // Clic cadeau
+  // Génère un code aléatoire lisible
+  function randomCode(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let s='';
+    for(let i=0;i<12;i++){
+      if(i>0 && i%4===0) s += '-';
+      s += chars.charAt(Math.floor(Math.random()*chars.length));
+    }
+    return s;
+  }
+
+  // Génère l'aperçu / télécharge la carte comme image via un canvas
+  function drawCardToDataURL(amount, code, callback){
+    const w = 900, h = 500;
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const g = off.getContext('2d');
+
+    // Fond blanc
+    g.fillStyle = '#ffffff';
+    g.fillRect(0,0,w,h);
+
+    // Bande rouge H&M
+    g.fillStyle = '#e5000f';
+    g.fillRect(40,40,w-80,120);
+
+    // Logo H&M (simple texte)
+    g.fillStyle = '#ffffff';
+    g.font = 'bold 120px Arial';
+    g.textBaseline = 'middle';
+    g.fillText('H&M', 70, 100);
+
+    // Montant
+    g.fillStyle = '#111';
+    g.font = 'bold 48px Arial';
+    g.fillText(amount + ' EUR', 70, 220);
+
+    // Description
+    g.font = '20px Arial';
+    g.fillStyle = '#333';
+    g.fillText('Carte cadeau valable en magasin et en ligne', 70, 260);
+
+    // Code box
+    g.fillStyle = '#f6f6f6';
+    g.fillRect(70,300,w-140,70);
+    g.strokeStyle = '#ddd'; g.strokeRect(70,300,w-140,70);
+    g.fillStyle = '#111';
+    g.font = '26px monospace';
+    g.fillText(code, 90, 344);
+
+    callback(off.toDataURL('image/png'));
+  }
+
+  // Clic cadeau: affiche carte H&M
   gift.addEventListener("click",()=>{
     gift.classList.add("opening");
     setTimeout(()=>{
       gift.style.display="none";
       launchConfetti();
-      giftCard.classList.add("show");
-      poemText.textContent="💌 Hihihi faites vous plaisir ;) 💖)";
+
+      // crée le contenu de la carte H&M
+      const amount = '50'; // vous pouvez modifier le montant ici
+      const code = randomCode();
+
+      const cardHtml = `
+        <div class="gift-card show" id="hmCard">
+          <div class="hm-card" id="hmBox">
+            <div class="hm-top">
+              <h2 class="hm-logo">H&amp;M</h2>
+              <div class="hm-amount">${amount} EUR</div>
+            </div>
+            <div class="hm-desc">Joyeux anniversaire ! Profitez-en pour vous faire plaisir ✨</div>
+            <div class="hm-code">
+              <div id="hmCodeText">${code}</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="small-btn" id="copyBtn">Copier</button>
+                <button class="small-btn" id="downloadBtn">Télécharger</button>
+              </div>
+            </div>
+            <div style="margin-top:12px;text-align:right"><button class="link-btn" id="closeCard">Fermer</button></div>
+          </div>
+        </div>
+      `;
+
+      giftContainer.innerHTML = cardHtml;
+      poemText.textContent = "💌 Hihihi faites vous plaisir ;) 💖";
+
+      // actions copy & download
+      const copyBtn = document.getElementById('copyBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const closeCard = document.getElementById('closeCard');
+
+      copyBtn.addEventListener('click', async ()=>{
+        try{
+          await navigator.clipboard.writeText(code);
+          copyBtn.textContent = 'Copié !';
+          setTimeout(()=> copyBtn.textContent = 'Copier',1500);
+        }catch(e){
+          alert('Impossible de copier automatiquement — copiez manuellement : ' + code);
+        }
+      });
+
+      downloadBtn.addEventListener('click', ()=>{
+        downloadBtn.textContent = 'Génération...';
+        drawCardToDataURL(amount, code, (dataUrl)=>{
+          const a = document.createElement('a');
+          a.href = dataUrl;
+          a.download = 'carte-hm-' + code.replace(/-/g,'') + '.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          downloadBtn.textContent = 'Télécharger';
+        });
+      });
+
+      closeCard.addEventListener('click', ()=>{
+        const hmCard = document.getElementById('hmCard');
+        if(hmCard) hmCard.remove();
+        // remettre l'emoji cadeau
+        gift.style.display = 'inline-block';
+        gift.classList.remove('opening');
+      });
+
     },600);
   });
   </script>
 </body>
 </html>
-
-
