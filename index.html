@@ -68,13 +68,26 @@
                 faceapi.matchDimensions(canvas, displaySize);
 
                 detectionInterval = setInterval(async () => {
-                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                    // Options pour détection plus précise (seuil de confiance)
+                    const options = new faceapi.TinyFaceDetectorOptions({ minDetectionConfidence: 0.5 });
+                    const detections = await faceapi.detectAllFaces(video, options)
                         .withFaceLandmarks().withFaceDescriptors();
                     const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    
+                    // Effacer et redessiner
                     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                    faceapi.draw.drawDetections(canvas, resizedDetections);
-                    status.textContent = `Visages détectés : ${detections.length}`;
-                }, 100);  // Toutes les 100ms
+                    
+                    // Dessiner les carrés avec style custom (épais, vert)
+                    const drawOptions = {
+                        withLabels: true,
+                        lineWidth: 3,  // Épaisseur pour visibilité
+                        boxColor: '#00FF00',  // Vert fluo
+                        labelColor: '#00FF00'
+                    };
+                    faceapi.draw.drawDetections(canvas, resizedDetections, drawOptions);
+                    
+                    status.textContent = `Visages détectés : ${detections.length} (carré suit en live)`;
+                }, 50);  // Plus réactif : 50ms pour tracking fluide
             });
         }
 
