@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détection Visages - Webcam Live (OpenCV.js)</title>
-    <script async src="https://docs.opencv.org/4.10.0/opencv.js" onload="onOpenCvReady();"></script>
+    <script src="https://docs.opencv.org/4.10.0/opencv.js" onload="onScriptLoaded();"></script>
     <style>
         body { margin: 0; font-family: Arial; text-align: center; background: #f0f0f0; }
         #videoInput { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
@@ -19,8 +19,8 @@
     <h1>Détection de Visages en Live</h1>
     <p id="status">Chargement OpenCV.js... Clique pour autoriser la caméra.</p>
     <br>
-    <button id="startBtn" onclick="requestCamera()">Autoriser la Caméra</button>
-    <video id="videoInput" autoplay muted></video>
+    <button id="startBtn" onclick="requestCamera()" disabled>Au chargement...</button>
+    <video id="videoInput" autoplay muted playsinline></video>
     <canvas id="canvasOutput"></canvas>
     <br>
     <button id="stopBtn" onclick="stopDetection()" style="display: none;">Arrêter</button>
@@ -32,15 +32,28 @@
         let startBtn = document.getElementById('startBtn');
         let stopBtn = document.getElementById('stopBtn');
         let stream = null;
-        let faceCascade = new cv.CascadeClassifier();
+        let faceCascade = null;
         let detectionInterval = null;
+
+        function onScriptLoaded() {
+            // Assigner cv globalement pour compat
+            let cv = window.cv;
+            if (cv) {
+                cv.onRuntimeInitialized = onOpenCvReady;
+            } else {
+                status.textContent = 'Erreur : OpenCV.js non chargé.';
+            }
+        }
 
         function onOpenCvReady() {
             console.log('OpenCV.js prêt !');
+            let cv = window.cv;
+            faceCascade = new cv.CascadeClassifier();
             loadCascade();
         }
 
         function loadCascade() {
+            let cv = window.cv;
             let cascadeUrl = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml';
             let xhr = new XMLHttpRequest();
             xhr.open('get', cascadeUrl, true);
@@ -48,11 +61,15 @@
             xhr.onload = function() {
                 let data = new Uint8Array(xhr.response);
                 cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', data, true, false, false);
-                faceCascade.load('haarcascade_frontalface_default.xml');
-                status.textContent = 'Cascade chargée ! Clique pour autoriser la caméra.';
+                if (faceCascade.load('haarcascade_frontalface_default.xml')) {
+                    status.textContent = 'Cascade chargée ! Clique pour autoriser la caméra.';
+                    startBtn.disabled = false;
+                } else {
+                    status.textContent = 'Erreur chargement cascade.';
+                }
             };
             xhr.onerror = function() {
-                status.textContent = 'Erreur chargement cascade. Vérifie ta connexion.';
+                status.textContent = 'Erreur réseau pour cascade. Vérifie connexion.';
             };
             xhr.send();
         }
@@ -75,15 +92,18 @@
             startBtn.style.display = 'none';
             stopBtn.style.display = 'inline-block';
             status.textContent = 'Caméra activée ! Détection en cours...';
-
-            videoInput.onloadedmetadata = function() {
-                canvasOutput.width = videoInput.videoWidth;
-                canvasOutput.height = videoInput.videoHeight;
-                detectionInterval = setInterval(processVideo, 30);  // 30ms pour tracking fluide
-            };
         }
 
+        // Lancer détection seulement quand vidéo joue
+        videoInput.addEventListener('play', function() {
+            let cv = window.cv;
+            canvasOutput.width = videoInput.videoWidth;
+            canvasOutput.height = videoInput.videoHeight;
+            detectionInterval = setInterval(processVideo, 33);  // ~30fps pour tracking fluide
+        });
+
         function processVideo() {
+            let cv = window.cv;
             let src = cv.imread(videoInput);
             let gray = new cv.Mat();
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
@@ -95,7 +115,7 @@
                 let face = faces.get(i);
                 let point1 = new cv.Point(face.x, face.y);
                 let point2 = new cv.Point(face.x + face.width, face.y + face.height);
-                cv.rectangle(src, point1, point2, [0, 255, 0, 255], 3);  // Vert épais
+                cv.rectangle(src, point1, point2, [0, 255, 0, 255], 3);  // Vert épais qui suit
             }
 
             cv.imshow('canvasOutput', src);
