@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détection Visages - Webcam Live (OpenCV.js)</title>
-    <script src="https://docs.opencv.org/4.10.0/opencv.js" onload="onScriptLoaded();"></script>
+    <script async src="https://docs.opencv.org/4.10.0/opencv.js" id="opencv-script"></script>
     <style>
         body { margin: 0; font-family: Arial; text-align: center; background: #f0f0f0; }
         #videoInput { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
@@ -35,31 +35,28 @@
         let faceCascade = null;
         let detectionInterval = null;
 
-        function onScriptLoaded() {
-            // Assigner cv globalement pour compat
-            let cv = window.cv;
-            if (cv) {
-                cv.onRuntimeInitialized = onOpenCvReady;
-            } else {
-                status.textContent = 'Erreur : OpenCV.js non chargé.';
-            }
-        }
+        // Setup pour OpenCV.js async
+        const opencvScript = document.getElementById('opencv-script');
+        opencvScript.onload = () => {
+            console.log('OpenCV.js script chargé ! Attente runtime...');
+            window.cv.onRuntimeInitialized = onOpenCvReady;
+        };
 
         function onOpenCvReady() {
-            console.log('OpenCV.js prêt !');
-            let cv = window.cv;
+            console.log('OpenCV.js runtime prêt !');
+            const cv = window.cv;
             faceCascade = new cv.CascadeClassifier();
             loadCascade();
         }
 
         function loadCascade() {
-            let cv = window.cv;
-            let cascadeUrl = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml';
-            let xhr = new XMLHttpRequest();
+            const cv = window.cv;
+            const cascadeUrl = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml';
+            const xhr = new XMLHttpRequest();
             xhr.open('get', cascadeUrl, true);
             xhr.responseType = 'arraybuffer';
             xhr.onload = function() {
-                let data = new Uint8Array(xhr.response);
+                const data = new Uint8Array(xhr.response);
                 cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', data, true, false, false);
                 if (faceCascade.load('haarcascade_frontalface_default.xml')) {
                     status.textContent = 'Cascade chargée ! Clique pour autoriser la caméra.';
@@ -94,16 +91,16 @@
             status.textContent = 'Caméra activée ! Détection en cours...';
         }
 
-        // Lancer détection seulement quand vidéo joue
+        // Lancer détection quand vidéo joue
         videoInput.addEventListener('play', function() {
-            let cv = window.cv;
+            const cv = window.cv;
             canvasOutput.width = videoInput.videoWidth;
             canvasOutput.height = videoInput.videoHeight;
             detectionInterval = setInterval(processVideo, 33);  // ~30fps pour tracking fluide
         });
 
         function processVideo() {
-            let cv = window.cv;
+            const cv = window.cv;
             let src = cv.imread(videoInput);
             let gray = new cv.Mat();
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
