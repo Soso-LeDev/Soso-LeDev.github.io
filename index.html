@@ -1,429 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bonne anniv — Carte H&M</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0f1724;
-      --accent: linear-gradient(90deg,#ff8a5b,#ffd86b);
-    }
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial}
-    body{background:var(--bg);overflow:hidden;color:#fff}
-    canvas{display:block;position:fixed;inset:0;z-index:0}
-
-    .ui{
-      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;
-      width:min(500px,92vw);padding:28px;border-radius:18px;backdrop-filter:blur(6px);
-      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      box-shadow:0 10px 40px rgba(2,6,23,0.6);text-align:center
-    }
-    h1{font-family:'Playfair Display',serif;margin:0 0 18px;font-size:clamp(20px,3vw,32px)}
-    .riddle{
-      font-family:'Playfair Display',serif;
-      margin-bottom:20px;
-      font-size:clamp(14px,1.8vw,18px);
-      color:#ffd86b;
-    }
-    input{
-      padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);
-      background:rgba(255,255,255,0.06);color:#fff;width:70%;font-size:16px;outline:none
-    }
-    button{
-      margin-top:12px;padding:10px 18px;border-radius:999px;border:0;background:var(--accent);
-      color:#111;font-weight:600;cursor:pointer
-    }
-
-    .poem{
-      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;pointer-events:none;opacity:0;transition:opacity .45s ease;
-    }
-    .poem.open{pointer-events:auto;opacity:1}
-    .poem .card{
-      width:min(820px,92vw);max-height:86vh;overflow:auto;padding:28px;border-radius:16px;background:rgba(15,23,36,0.96);
-      box-shadow:0 20px 60px rgba(2,6,23,0.8);
-      text-align:center;
-    }
-    .poem .text{white-space:pre-wrap;font-family:'Playfair Display',serif;font-size:clamp(16px,2vw,20px);line-height:1.5;color:#fff;text-align:center}
-
-    /* Cadeau animé */
-    .gift{
-      font-size:60px;
-      cursor:pointer;
-      margin-top:20px;
-      display:inline-block;
-      animation:wiggle 1.2s ease-in-out infinite;
-    }
-    @keyframes wiggle{
-      0%,100%{transform:rotate(0deg);} 
-      25%{transform:rotate(-8deg);} 
-      75%{transform:rotate(8deg);} 
-    }
-
-    .gift.opening{
-      animation:none;
-      transform:scale(1.3) rotate(20deg);
-      transition:transform 0.6s ease;
-    }
-
-    /* Carte cadeau */
-    .gift-card{
-      display:none;
-      margin-top:20px;
-      padding:20px;
-      border-radius:12px;
-      background:linear-gradient(135deg,#ffd86b,#ff8a5b);
-      color:#111;
-      font-family:'Playfair Display',serif;
-      font-size:20px;
-      font-weight:600;
-      box-shadow:0 10px 40px rgba(0,0,0,0.4);
-      transform:scale(0.8);
-      opacity:0;
-      transition:all .6s ease;
-    }
-    .gift-card.show{
-      display:inline-block;
-      transform:scale(1);
-      opacity:1;
-    }
-
-    /* Confettis */
-    .confetti{
-      position:fixed;
-      width:10px;height:10px;
-      background:red;
-      top:0;left:50%;
-      opacity:0.9;
-      z-index:100;
-      animation:fall linear forwards;
-    }
-    @keyframes fall{
-      to{ transform:translateY(100vh) rotate(360deg); opacity:0; }
-    }
-
-    /* H&M gift card style */
-    .hm-card{
-      width:320px;max-width:86vw;margin:0 auto;padding:18px;border-radius:12px;background:#fff;color:#111;box-shadow:0 12px 30px rgba(0,0,0,0.4);text-align:left;font-family:Inter, Arial;
-    }
-    .hm-top{display:flex;align-items:center;justify-content:space-between}
-    .hm-logo{font-weight:800;font-size:34px;font-family:Inter, Arial;margin:0}
-    .hm-amount{font-size:20px;font-weight:700;color:#e5000f}
-    .hm-desc{margin-top:10px;font-size:14px;color:#222}
-    .hm-code{
-      margin-top:14px;padding:12px;border-radius:8px;background:#f6f6f6;border:1px dashed #ddd;display:flex;align-items:center;justify-content:space-between;font-family:monospace;font-size:16px
-    }
-    .small-btn{padding:8px 12px;border-radius:8px;border:0;background:#111;color:#fff;font-weight:600;cursor:pointer}
-    .link-btn{background:transparent;color:#111;border:0;text-decoration:underline;cursor:pointer}
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détection Visages - Webcam Live</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <style>
+        body { margin: 0; font-family: Arial; text-align: center; background: #f0f0f0; }
+        #video { width: 640px; height: 480px; border: 2px solid #ccc; }
+        #status { margin: 10px; font-size: 18px; color: #333; }
+    </style>
 </head>
 <body>
-  <canvas id="c"></canvas>
+    <h1>Détection de Visages en Live</h1>
+    <p id="status">Chargement des modèles... Autorise l'accès à la caméra.</p>
+    <video id="video" autoplay muted></video>
+    <br>
+    <button onclick="stopDetection()">Arrêter</button>
 
-  <div class="ui" id="loginBox">
-    <div class="riddle">Quel est le mot de passe ?</div>
-    <h1>Mot de passe :</h1>
-    <input type="text" id="passwordInput" placeholder="Entrez le mot de passe..." />
-    <br />
-    <button id="checkBtn">Valider</button>
-  </div>
+    <script>
+        const video = document.getElementById('video');
+        const status = document.getElementById('status');
 
-  <div class="poem" id="poemModal">
-    <div class="card">
-      <div class="text" id="poemText"></div>
-      <div class="gift" id="gift">🎁</div>
-      <div id="giftContainer"></div>
-    </div>
-  </div>
+        // Charger les modèles face-api.js
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.face-api.net/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.face-api.net/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.face-api.net/models')
+        ]).then(startVideo);
 
-  <script>
-  // --- Canvas fleurs (inchangé, comme avant) ---
-  const canvas = document.getElementById('c');
-  const ctx = canvas.getContext('2d', { alpha: true });
-  let DPR = Math.max(1, window.devicePixelRatio || 1);
-  const width = () => window.innerWidth;
-  const height = () => window.innerHeight;
-  function resize(){
-    DPR = Math.max(1, window.devicePixelRatio || 1);
-    canvas.width = width() * DPR; canvas.height = height() * DPR;
-    canvas.style.width = width() + 'px'; canvas.style.height = height() + 'px';
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  const rand = (a,b)=> Math.random()*(b-a)+a;
-
-  class Flower{
-    constructor(){ this.reset(true); }
-    reset(){
-      this.x = rand(50,width()-50);
-      this.y = rand(50,height()-50);
-      this.vx = rand(-1,1);
-      this.vy = rand(-1,1);
-      this.scale = rand(0.6,1.2);
-      this.rotation = rand(0,Math.PI*2);
-      this.rotSpeed = rand(-0.001, 0.001);
-      this.size = rand(20,35);
-      this.type = Math.random() < 0.5 ? 'tulip' : 'hibiscus';
-      this.color = (this.type==='tulip') 
-        ? (Math.random()<0.5 ? '#ff9ecf' : '#fff')
-        : '#ff5a5f';
-    }
-
-    draw(ctx){
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.rotation);
-      ctx.scale(this.scale,this.scale);
-
-      // Tige
-      ctx.beginPath();
-      ctx.moveTo(0,0);
-      ctx.lineTo(0,this.size*2);
-      ctx.strokeStyle = "green";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // Feuille
-      ctx.beginPath();
-      ctx.ellipse(5,this.size*1.2,10,20,Math.PI/4,0,Math.PI*2);
-      ctx.fillStyle="green";
-      ctx.fill();
-
-      if(this.type==='tulip'){
-        for(let i=0;i<3;i++){
-          ctx.save();
-          ctx.rotate((i-1)*0.6);
-          ctx.beginPath();
-          ctx.moveTo(0,0);
-          ctx.bezierCurveTo(-this.size/2,-this.size*1.5,this.size/2,-this.size*1.5,0,0);
-          ctx.fillStyle = this.color;
-          ctx.fill();
-          ctx.restore();
+        function startVideo() {
+            status.textContent = 'Modèles chargés ! Accès caméra...';
+            navigator.mediaDevices.getUserMedia({ video: {} })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.addEventListener('play', () => {
+                        const canvas = faceapi.createCanvasFromMedia(video);
+                        document.body.append(canvas);
+                        const displaySize = { width: video.width, height: video.height };
+                        faceapi.matchDimensions(canvas, displaySize);
+                        setInterval(async () => {
+                            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                                .withFaceLandmarks().withFaceDescriptors();
+                            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                            faceapi.draw.drawDetections(canvas, resizedDetections);
+                            status.textContent = `Visages détectés : ${detections.length}`;
+                        }, 100);  // Détection toutes les 100ms (ajustable pour perf)
+                    });
+                })
+                .catch(err => {
+                    status.textContent = `Erreur caméra : ${err.message}`;
+                });
         }
-      }else{
-        for(let i=0;i<5;i++){
-          const a=(i/5)*Math.PI*2;
-          ctx.save();
-          ctx.rotate(a);
-          ctx.beginPath();
-          ctx.ellipse(this.size,0,this.size*0.9,this.size*0.5,0,0,Math.PI*2);
-          ctx.fillStyle=this.color;
-          ctx.fill();
-          ctx.restore();
+
+        function stopDetection() {
+            video.srcObject.getTracks().forEach(track => track.stop());
+            status.textContent = 'Détection arrêtée.';
         }
-        ctx.beginPath();
-        ctx.arc(0,0,this.size*0.3,0,Math.PI*2);
-        ctx.fillStyle="yellow";
-        ctx.fill();
-      }
-      ctx.restore();
-    }
-
-    step(dt){
-      this.x += this.vx * dt*0.05;
-      this.y += this.vy * dt*0.05;
-      this.rotation += this.rotSpeed*dt;
-    }
-  }
-
-  let flowers = [];
-  let animate = false;
-  let last = performance.now();
-
-  function loop(now){
-    const dt = Math.min(40, now-last);
-    last = now;
-    ctx.clearRect(0,0,width(),height());
-    if(animate){
-      for(const f of flowers){ f.step(dt); f.draw(ctx); }
-    }
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-
-  // --- Mot de passe ---
-  const checkBtn=document.getElementById("checkBtn");
-  const passwordInput=document.getElementById("passwordInput");
-  const loginBox=document.getElementById("loginBox");
-  const poemModal=document.getElementById("poemModal");
-  const poemText=document.getElementById("poemText");
-  const gift=document.getElementById("gift");
-  const giftContainer=document.getElementById("giftContainer");
-
-  const poem=`Bonne anniversaire (un peu en retard 😅🎂) !!\nJ’ai essayé de vous faire un petit cadeau à ma façon 🎁 (un site codé a la main, avec une petite surprise ).\nJe suis vraiment super content de vous avoir rencontré 🙏✨ Vous êtes une prof géniale 💖 \net même en dehors des cours, vous restez gentille, attentionnée et toujours aussi indispensable🌟.\nJ’espère que cette nouvelle année vous apportera plein de bonheur 🌸, de réussite 🎯 et de beaux moments 🌍🥰 !!!!!! \n(c'est quelque chose que j'aimerais qui reste entre nous)\n(pensez a cliqué sur l'emojis cadeau en bas !!`;
-
-  function scatter(){
-    flowers=[];
-    for(let i=0;i<40;i++) flowers.push(new Flower());
-    animate=true;
-  }
-
-  checkBtn.addEventListener("click",()=>{
-    let val=passwordInput.value
-      .toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-      .replace(/\s+/g,"");
-
-    if(val==="coeur"){
-      loginBox.style.display="none";
-      scatter();
-      showPoem();
-    }else{
-      passwordInput.style.borderColor="red";
-      setTimeout(()=> passwordInput.style.borderColor="rgba(255,255,255,0.1)",1000);
-    }
-  });
-
-  function showPoem(){
-    poemModal.classList.add("open");
-    poemText.textContent=poem;
-  }
-
-  // Confettis
-  function launchConfetti(){
-    for(let i=0;i<80;i++){
-      const conf=document.createElement("div");
-      conf.className="confetti";
-      conf.style.left=Math.random()*100+"vw";
-      conf.style.background=`hsl(${Math.random()*360},80%,60%)`;
-      conf.style.animationDuration=(2+Math.random()*3)+"s";
-      conf.style.transform=`rotate(${Math.random()*360}deg)`;
-      document.body.appendChild(conf);
-      setTimeout(()=>conf.remove(),5000);
-    }
-  }
-
-  // Génère un code aléatoire lisible
-  function randomCode(){
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let s='';
-    for(let i=0;i<12;i++){
-      if(i>0 && i%4===0) s += '-';
-      s += chars.charAt(Math.floor(Math.random()*chars.length));
-    }
-    return s;
-  }
-
-  // Génère l'aperçu / télécharge la carte comme image via un canvas
-  function drawCardToDataURL(amount, code, callback){
-    const w = 900, h = 500;
-    const off = document.createElement('canvas');
-    off.width = w; off.height = h;
-    const g = off.getContext('2d');
-
-    // Fond blanc
-    g.fillStyle = '#ffffff';
-    g.fillRect(0,0,w,h);
-
-    // Bande rouge H&M
-    g.fillStyle = '#e5000f';
-    g.fillRect(40,40,w-80,120);
-
-    // Logo H&M (simple texte)
-    g.fillStyle = '#ffffff';
-    g.font = 'bold 120px Arial';
-    g.textBaseline = 'middle';
-    g.fillText('H&M', 70, 100);
-
-    // Montant
-    g.fillStyle = '#111';
-    g.font = 'bold 48px Arial';
-    g.fillText(amount + ' EUR', 70, 220);
-
-    // Description
-    g.font = '20px Arial';
-    g.fillStyle = '#333';
-    g.fillText('Carte cadeau valable en magasin et en ligne', 70, 260);
-
-    // Code box
-    g.fillStyle = '#f6f6f6';
-    g.fillRect(70,300,w-140,70);
-    g.strokeStyle = '#ddd'; g.strokeRect(70,300,w-140,70);
-    g.fillStyle = '#111';
-    g.font = '26px monospace';
-    g.fillText(code, 90, 344);
-
-    callback(off.toDataURL('image/png'));
-  }
-
-  // Clic cadeau: affiche carte H&M
-  gift.addEventListener("click",()=>{
-    gift.classList.add("opening");
-    setTimeout(()=>{
-      gift.style.display="none";
-      launchConfetti();
-
-      // crée le contenu de la carte H&M
-      const amount = '15'; // vous pouvez modifier le montant ici
-      const code = 'Montant: 15 €\nNuméro de carte:6006491550082499691\nCode PIN: 8995';
-
-      const cardHtml = `
-        <div class="gift-card show" id="hmCard">
-          <div class="hm-card" id="hmBox">
-            <div class="hm-top">
-              <h2 class="hm-logo">H&amp;M</h2>
-              <div class="hm-amount">${amount} EUR</div>
-            </div>
-            <div class="hm-desc">Joyeux anniversaire ! Profitez-en pour vous faire plaisir ✨</div>
-            <div class="hm-code">
-              <div id="hmCodeText">${code}</div>
-              <div style="display:flex;gap:8px;align-items:center">
-                <button class="small-btn" id="copyBtn">Copier</button>
-                <button class="small-btn" id="downloadBtn">Télécharger</button>
-              </div>
-            </div>
-            <div style="margin-top:12px;text-align:right"><button class="link-btn" id="closeCard">Fermer</button></div>
-          </div>
-        </div>
-      `;
-
-      giftContainer.innerHTML = cardHtml;
-      poemText.textContent = "💌 Hihihi faites vous plaisir ;) 💖";
-
-      // actions copy & download
-      const copyBtn = document.getElementById('copyBtn');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const closeCard = document.getElementById('closeCard');
-
-      copyBtn.addEventListener('click', async ()=>{
-        try{
-          await navigator.clipboard.writeText(code);
-          copyBtn.textContent = 'Copié !';
-          setTimeout(()=> copyBtn.textContent = 'Copier',1500);
-        }catch(e){
-          alert('Impossible de copier automatiquement — copiez manuellement : ' + code);
-        }
-      });
-
-      downloadBtn.addEventListener('click', ()=>{
-        downloadBtn.textContent = 'Génération...';
-        drawCardToDataURL(amount, code, (dataUrl)=>{
-          const a = document.createElement('a');
-          a.href = dataUrl;
-          a.download = 'carte-hm-' + code.replace(/-/g,'') + '.png';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          downloadBtn.textContent = 'Télécharger';
-        });
-      });
-
-      closeCard.addEventListener('click', ()=>{
-        const hmCard = document.getElementById('hmCard');
-        if(hmCard) hmCard.remove();
-        // remettre l'emoji cadeau
-        gift.style.display = 'inline-block';
-        gift.classList.remove('opening');
-      });
-
-    },600);
-  });
-  </script>
+    </script>
 </body>
 </html>
-
-
