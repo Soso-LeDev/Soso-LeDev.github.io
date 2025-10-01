@@ -8,56 +8,103 @@
     <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
     <style>
         body { margin: 0; font-family: Arial; text-align: center; background: #f0f0f0; }
-        #video { width: 640px; height: 480px; border: 2px solid #ccc; }
+        #video { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
         #status { margin: 10px; font-size: 18px; color: #333; }
+        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <h1>Détection de Visages en Live</h1>
-    <p id="status">Chargement des modèles... Autorise l'accès à la caméra.</p>
+    <p id="status">Clique sur "Autoriser la Caméra" pour commencer. Les modèles se chargent en fond...</p>
+    <br>
+    <button id="startBtn" onclick="requestCamera()">Autoriser la Caméra</button>
     <video id="video" autoplay muted></video>
     <br>
-    <button onclick="stopDetection()">Arrêter</button>
+    <button id="stopBtn" onclick="stopDetection()" style="display: none;">Arrêter</button>
 
     <script>
         const video = document.getElementById('video');
         const status = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        let stream = null;
+        let detectionInterval = null;
 
-        // Charger les modèles face-api.js
+        // Charger les modèles en fond
         Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.face-api.net/models'),
             faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.face-api.net/models'),
             faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.face-api.net/models')
-        ]).then(startVideo);
+        ]).then(() => {
+            status.textContent = 'Modèles chargés ! Clique pour autoriser la caméra.';
+        }).catch(err => {
+            status.textContent = `Erreur chargement modèles : ${err.message}`;
+        });
 
-        function startVideo() {
-            status.textContent = 'Modèles chargés ! Accès caméra...';
+        function requestCamera() {
+            startBtn.disabled = true;
+            startBtn.textContent = 'Autorisation en cours...';
+            status.textContent = 'Demande d\'accès à la caméra...';
+
             navigator.mediaDevices.getUserMedia({ video: {} })
-                .then(stream => {
-                    video.srcObject = stream;
-                    video.addEventListener('play', () => {
-                        const canvas = faceapi.createCanvasFromMedia(video);
-                        document.body.append(canvas);
-                        const displaySize = { width: video.width, height: video.height };
-                        faceapi.matchDimensions(canvas, displaySize);
-                        setInterval(async () => {
-                            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-                                .withFaceLandmarks().withFaceDescriptors();
-                            const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                            faceapi.draw.drawDetections(canvas, resizedDetections);
-                            status.textContent = `Visages détectés : ${detections.length}`;
-                        }, 100);  // Détection toutes les 100ms (ajustable pour perf)
-                    });
-                })
-                .catch(err => {
-                    status.textContent = `Erreur caméra : ${err.message}`;
-                });
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function handleSuccess(s) {
+            stream = s;
+            video.srcObject = stream;
+            video.style.display = 'block';
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
+            status.textContent = 'Caméra activée ! Détection en cours...';
+
+            video.addEventListener('loadedmetadata', () => {
+                const canvas = faceapi.createCanvasFromMedia(video);
+                document.body.append(canvas);
+                const displaySize = { width: video.width, height: video.height };
+                faceapi.matchDimensions(canvas, displaySize);
+
+                detectionInterval = setInterval(async () => {
+                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks().withFaceDescriptors();
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                    faceapi.draw.drawDetections(canvas, resizedDetections);
+                    status.textContent = `Visages détectés : ${detections.length}`;
+                }, 100);  // Toutes les 100ms
+            });
+        }
+
+        function handleError(err) {
+            startBtn.disabled = false;
+            startBtn.textContent = 'Autoriser la Caméra';
+            let errorMsg = 'Erreur accès caméra : ';
+            if (err.name === 'NotAllowedError') {
+                errorMsg += 'Accès refusé. Clique encore pour réessayer, ou vérifie les paramètres de ton navigateur (HTTPS requis).';
+            } else if (err.name === 'NotFoundError') {
+                errorMsg += 'Aucune caméra trouvée. Vérifie ton hardware.';
+            } else {
+                errorMsg += err.message;
+            }
+            status.textContent = errorMsg;
         }
 
         function stopDetection() {
-            video.srcObject.getTracks().forEach(track => track.stop());
-            status.textContent = 'Détection arrêtée.';
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+            }
+            video.style.display = 'none';
+            stopBtn.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+            startBtn.disabled = false;
+            startBtn.textContent = 'Autoriser la Caméra';
+            status.textContent = 'Détection arrêtée. Clique pour recommencer.';
         }
     </script>
 </body>
