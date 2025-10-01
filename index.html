@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détection Visages - Webcam Live</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
         body { margin: 0; font-family: Arial; text-align: center; background: #f0f0f0; }
         #video { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
@@ -17,7 +17,7 @@
 </head>
 <body>
     <h1>Détection de Visages en Live</h1>
-    <p id="status">Clique sur "Autoriser la Caméra" pour commencer. Les modèles se chargent en fond...</p>
+    <p id="status">Chargement des libs... Clique sur "Autoriser la Caméra" pour commencer.</p>
     <br>
     <button id="startBtn" onclick="requestCamera()">Autoriser la Caméra</button>
     <video id="video" autoplay muted></video>
@@ -32,16 +32,29 @@
         let stream = null;
         let detectionInterval = null;
 
-        // Charger les modèles en fond
-        Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.face-api.net/models'),
-            faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.face-api.net/models'),
-            faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.face-api.net/models')
-        ]).then(() => {
-            status.textContent = 'Modèles chargés ! Clique pour autoriser la caméra.';
-        }).catch(err => {
-            status.textContent = `Erreur chargement modèles : ${err.message}`;
-        });
+        // Attendre que faceapi soit chargé avant les modèles
+        function loadModels() {
+            if (typeof faceapi === 'undefined') {
+                status.textContent = 'Erreur : face-api.js non chargé. Recharge la page.';
+                return;
+            }
+            Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.face-api.net/models'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.face-api.net/models'),
+                faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.face-api.net/models')
+            ]).then(() => {
+                status.textContent = 'Modèles chargés ! Clique pour autoriser la caméra.';
+            }).catch(err => {
+                status.textContent = `Erreur modèles : ${err.message}`;
+            });
+        }
+
+        // Lancer loadModels une fois les scripts prêts (hack pour defer)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadModels);
+        } else {
+            loadModels();
+        }
 
         function requestCamera() {
             startBtn.disabled = true;
@@ -68,7 +81,7 @@
                 faceapi.matchDimensions(canvas, displaySize);
 
                 detectionInterval = setInterval(async () => {
-                    // Options pour détection plus précise (seuil de confiance)
+                    // Options pour détection plus précise
                     const options = new faceapi.TinyFaceDetectorOptions({ minDetectionConfidence: 0.5 });
                     const detections = await faceapi.detectAllFaces(video, options)
                         .withFaceLandmarks().withFaceDescriptors();
@@ -77,17 +90,17 @@
                     // Effacer et redessiner
                     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
                     
-                    // Dessiner les carrés avec style custom (épais, vert)
+                    // Dessiner les carrés avec style custom
                     const drawOptions = {
                         withLabels: true,
-                        lineWidth: 3,  // Épaisseur pour visibilité
-                        boxColor: '#00FF00',  // Vert fluo
+                        lineWidth: 3,
+                        boxColor: '#00FF00',
                         labelColor: '#00FF00'
                     };
                     faceapi.draw.drawDetections(canvas, resizedDetections, drawOptions);
                     
                     status.textContent = `Visages détectés : ${detections.length} (carré suit en live)`;
-                }, 50);  // Plus réactif : 50ms pour tracking fluide
+                }, 50);  // 50ms pour tracking fluide
             });
         }
 
@@ -96,9 +109,9 @@
             startBtn.textContent = 'Autoriser la Caméra';
             let errorMsg = 'Erreur accès caméra : ';
             if (err.name === 'NotAllowedError') {
-                errorMsg += 'Accès refusé. Clique encore pour réessayer, ou vérifie les paramètres de ton navigateur (HTTPS requis).';
+                errorMsg += 'Accès refusé. Réessaie ou vérifie les params navigateur (HTTPS requis).';
             } else if (err.name === 'NotFoundError') {
-                errorMsg += 'Aucune caméra trouvée. Vérifie ton hardware.';
+                errorMsg += 'Aucune caméra. Vérifie ton hardware.';
             } else {
                 errorMsg += err.message;
             }
