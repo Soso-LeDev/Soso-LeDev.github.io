@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détection Visages - Webcam Live</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <title>Détection Visages - Webcam Live (OpenCV.js)</title>
+    <script async src="https://docs.opencv.org/4.10.0/opencv.js" onload="onOpenCvReady();"></script>
     <style>
         body { margin: 0; font-family: Arial; text-align: center; background: #f0f0f0; }
-        #video { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
+        #videoInput { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
+        #canvasOutput { width: 640px; height: 480px; border: 2px solid #ccc; display: none; }
         #status { margin: 10px; font-size: 18px; color: #333; }
         button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
         button:hover { background: #45a049; }
@@ -17,43 +17,44 @@
 </head>
 <body>
     <h1>Détection de Visages en Live</h1>
-    <p id="status">Chargement des libs... Clique sur "Autoriser la Caméra" pour commencer.</p>
+    <p id="status">Chargement OpenCV.js... Clique pour autoriser la caméra.</p>
     <br>
     <button id="startBtn" onclick="requestCamera()">Autoriser la Caméra</button>
-    <video id="video" autoplay muted></video>
+    <video id="videoInput" autoplay muted></video>
+    <canvas id="canvasOutput"></canvas>
     <br>
     <button id="stopBtn" onclick="stopDetection()" style="display: none;">Arrêter</button>
 
     <script>
-        const video = document.getElementById('video');
-        const status = document.getElementById('status');
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
+        let videoInput = document.getElementById('videoInput');
+        let canvasOutput = document.getElementById('canvasOutput');
+        let status = document.getElementById('status');
+        let startBtn = document.getElementById('startBtn');
+        let stopBtn = document.getElementById('stopBtn');
         let stream = null;
+        let faceCascade = new cv.CascadeClassifier();
         let detectionInterval = null;
 
-        // Attendre que faceapi soit chargé avant les modèles
-        function loadModels() {
-            if (typeof faceapi === 'undefined') {
-                status.textContent = 'Erreur : face-api.js non chargé. Recharge la page.';
-                return;
-            }
-            Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.face-api.net/models'),
-                faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.face-api.net/models'),
-                faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.face-api.net/models')
-            ]).then(() => {
-                status.textContent = 'Modèles chargés ! Clique pour autoriser la caméra.';
-            }).catch(err => {
-                status.textContent = `Erreur modèles : ${err.message}`;
-            });
+        function onOpenCvReady() {
+            console.log('OpenCV.js prêt !');
+            loadCascade();
         }
 
-        // Lancer loadModels une fois les scripts prêts (hack pour defer)
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadModels);
-        } else {
-            loadModels();
+        function loadCascade() {
+            let cascadeUrl = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml';
+            let xhr = new XMLHttpRequest();
+            xhr.open('get', cascadeUrl, true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onload = function() {
+                let data = new Uint8Array(xhr.response);
+                cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', data, true, false, false);
+                faceCascade.load('haarcascade_frontalface_default.xml');
+                status.textContent = 'Cascade chargée ! Clique pour autoriser la caméra.';
+            };
+            xhr.onerror = function() {
+                status.textContent = 'Erreur chargement cascade. Vérifie ta connexion.';
+            };
+            xhr.send();
         }
 
         function requestCamera() {
@@ -61,57 +62,55 @@
             startBtn.textContent = 'Autorisation en cours...';
             status.textContent = 'Demande d\'accès à la caméra...';
 
-            navigator.mediaDevices.getUserMedia({ video: {} })
+            navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function handleSuccess(s) {
             stream = s;
-            video.srcObject = stream;
-            video.style.display = 'block';
+            videoInput.srcObject = stream;
+            videoInput.style.display = 'block';
+            canvasOutput.style.display = 'block';
             startBtn.style.display = 'none';
             stopBtn.style.display = 'inline-block';
             status.textContent = 'Caméra activée ! Détection en cours...';
 
-            video.addEventListener('loadedmetadata', () => {
-                const canvas = faceapi.createCanvasFromMedia(video);
-                document.body.append(canvas);
-                const displaySize = { width: video.width, height: video.height };
-                faceapi.matchDimensions(canvas, displaySize);
+            videoInput.onloadedmetadata = function() {
+                canvasOutput.width = videoInput.videoWidth;
+                canvasOutput.height = videoInput.videoHeight;
+                detectionInterval = setInterval(processVideo, 30);  // 30ms pour tracking fluide
+            };
+        }
 
-                detectionInterval = setInterval(async () => {
-                    // Options pour détection plus précise
-                    const options = new faceapi.TinyFaceDetectorOptions({ minDetectionConfidence: 0.5 });
-                    const detections = await faceapi.detectAllFaces(video, options)
-                        .withFaceLandmarks().withFaceDescriptors();
-                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                    
-                    // Effacer et redessiner
-                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Dessiner les carrés avec style custom
-                    const drawOptions = {
-                        withLabels: true,
-                        lineWidth: 3,
-                        boxColor: '#00FF00',
-                        labelColor: '#00FF00'
-                    };
-                    faceapi.draw.drawDetections(canvas, resizedDetections, drawOptions);
-                    
-                    status.textContent = `Visages détectés : ${detections.length} (carré suit en live)`;
-                }, 50);  // 50ms pour tracking fluide
-            });
+        function processVideo() {
+            let src = cv.imread(videoInput);
+            let gray = new cv.Mat();
+            cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+            let faces = new cv.RectVector();
+            let msize = new cv.Size(0, 0);
+            faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, msize, msize);
+
+            for (let i = 0; i < faces.size(); ++i) {
+                let face = faces.get(i);
+                let point1 = new cv.Point(face.x, face.y);
+                let point2 = new cv.Point(face.x + face.width, face.y + face.height);
+                cv.rectangle(src, point1, point2, [0, 255, 0, 255], 3);  // Vert épais
+            }
+
+            cv.imshow('canvasOutput', src);
+            src.delete(); gray.delete(); faces.delete();
+            status.textContent = `Visages détectés : ${faces.size()} (carré suit en live)`;
         }
 
         function handleError(err) {
             startBtn.disabled = false;
             startBtn.textContent = 'Autoriser la Caméra';
-            let errorMsg = 'Erreur accès caméra : ';
+            let errorMsg = 'Erreur caméra : ';
             if (err.name === 'NotAllowedError') {
-                errorMsg += 'Accès refusé. Réessaie ou vérifie les params navigateur (HTTPS requis).';
+                errorMsg += 'Refusé. Réessaie ou check params (HTTPS requis).';
             } else if (err.name === 'NotFoundError') {
-                errorMsg += 'Aucune caméra. Vérifie ton hardware.';
+                errorMsg += 'Pas de caméra. Vérifie hardware.';
             } else {
                 errorMsg += err.message;
             }
@@ -125,12 +124,13 @@
             if (detectionInterval) {
                 clearInterval(detectionInterval);
             }
-            video.style.display = 'none';
+            videoInput.style.display = 'none';
+            canvasOutput.style.display = 'none';
             stopBtn.style.display = 'none';
             startBtn.style.display = 'inline-block';
             startBtn.disabled = false;
             startBtn.textContent = 'Autoriser la Caméra';
-            status.textContent = 'Détection arrêtée. Clique pour recommencer.';
+            status.textContent = 'Arrêté. Clique pour recommencer.';
         }
     </script>
 </body>
