@@ -93,4 +93,81 @@
       try {
         statusEl.textContent = "Attente du chargement de BlazeFace…";
         // attend que la lib blazeface soit définie globalement par le CDN
-        await waitForGlobal('blazeface',
+        await waitForGlobal('blazeface', 7000).catch(err => {
+          // échec du polling : on laisse l'erreur remonter
+          throw err;
+        });
+        // maintenant charger le modèle
+        statusEl.textContent = "Chargement du modèle BlazeFace…";
+        model = await blazeface.load();
+        statusEl.textContent = "Modèle chargé ✅";
+      } catch (err) {
+        statusEl.textContent = "Impossible de charger BlazeFace : " + (err.message || err);
+        console.error(err);
+        throw err;
+      }
+    }
+
+    async function detectLoop() {
+      if (!model || video.readyState < 2) {
+        requestAnimationFrame(detectLoop);
+        return;
+      }
+      resizeCanvas();
+
+      try {
+        // false -> on veut des coordonnées JS (pas des tensors)
+        const preds = await model.estimateFaces(video, false);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (preds && preds.length > 0) {
+          statusEl.textContent = `Visage détecté ✅ (${preds.length})`;
+          for (let p of preds) {
+            const [x1,y1] = p.topLeft;
+            const [x2,y2] = p.bottomRight;
+            const w = x2 - x1;
+            const h = y2 - y1;
+            ctx.lineWidth = Math.max(2, Math.round(canvas.width / 300));
+            ctx.strokeStyle = "#00FF00";
+            ctx.strokeRect(x1, y1, w, h);
+
+            // landmarks
+            if (p.landmarks && p.landmarks.length) {
+              ctx.fillStyle = "#00FF00";
+              for (const lm of p.landmarks) {
+                ctx.beginPath();
+                ctx.arc(lm[0], lm[1], Math.max(1, canvas.width/500), 0, Math.PI*2);
+                ctx.fill();
+              }
+            }
+          }
+        } else {
+          statusEl.textContent = "Aucun visage détecté ❌";
+        }
+      } catch (err) {
+        // erreurs possibles si modèle déchargé ou input invalide
+        console.error("Erreur détection :", err);
+        statusEl.textContent = "Erreur détection : " + (err.message || err);
+      }
+
+      requestAnimationFrame(detectLoop);
+    }
+
+    (async function main() {
+      try {
+        await setupCamera();
+
+        // Important : si tu as encore l'erreur "blazeface is not defined", c'est que
+        // le CDN n'a pas chargé ou le fichier renvoie 404. On essaie ici de charger proprement.
+        await loadModelWithGuard();
+
+        // Lancer la boucle de détection
+        detectLoop();
+      } catch (err) {
+        console.error("Erreur initialisation :", err);
+        // message déjà mis par les catch internes
+      }
+    })();
+  </script>
+</body>
+</html>
