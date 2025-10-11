@@ -1,76 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reconnaissance Faciale avec Champ Nom</title>
-<style>
-  html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#000; color:#fff; font-family:Arial, sans-serif; }
-  video, canvas { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
-  #ui { position:fixed; top:10px; left:10px; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; }
-  input[type="text"]{padding:5px; border-radius:5px; border:none;}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FaceID local — Enrol & Reconnaissance</title>
+  <style>
+    :root{--accent:#00ff99;--bg:#07121b;}
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;}
+    #app{height:100%;display:flex;flex-direction:column;}
+    /* vidéo pleine page */
+    #stage{position:relative;flex:1;overflow:hidden;}
+    video#videoEl, canvas#overlay{
+      position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+      /* miroir désactivé pour que direction soit naturelle */
+      transform:none;
+    }
+    /* panneau contrôles */
+    #ui{
+      position:fixed; right:12px; top:12px; width:320px; background:rgba(0,0,0,0.45);
+      padding:12px; border-radius:10px; backdrop-filter: blur(6px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
+    label{display:block;margin-top:8px;font-size:13px;color:#cfeee0}
+    input[type="text"]{width:100%; padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:inherit}
+    button{margin-top:8px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:#002; font-weight:600}
+    .small{font-size:12px;opacity:0.85;margin-top:6px}
+    #peopleList{max-height:140px; overflow:auto;margin-top:8px;border-radius:6px;padding:6px;background:rgba(255,255,255,0.02)}
+    .personRow{display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .personRow:last-child{border-bottom:0}
+    .tag{font-size:13px;color:#001;padding:4px 8px;border-radius:999px;background:#d6ffe0}
+    #status{font-family:monospace;font-size:13px;margin-top:6px;color:#bfeecf;}
+  </style>
 </head>
 <body>
-<div id="ui">
-  Nom / note: <input id="noteInput" type="text" placeholder="Ex: Max ou Ami...">
-</div>
+  <div id="app">
+    <div id="stage">
+      <video id="videoEl" autoplay muted playsinline></video>
+      <canvas id="overlay"></canvas>
+    </div>
 
-<video id="video" autoplay muted playsinline></video>
-<canvas id="canvas"></canvas>
+    <div id="ui">
+      <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+        <div>
+          <strong>FaceID local</strong><br><span class="small">Enrol / Recognize — Local only</span>
+        </div>
+        <div id="status">Initialisation...</div>
+      </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
-<script>
-(async()=>{
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  const noteInput = document.getElementById('noteInput');
+      <label>Nom (pour enregistrer)</label>
+      <input id="nameInput" type="text" placeholder="Ex: Soan_001"/>
 
-  // charger modèles
-  await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-  await faceapi.nets.ageGenderNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+      <div style="display:flex;gap:8px;">
+        <button id="enrollBtn">Enregistrer visage</button>
+        <button id="recognizeToggle">Activer recon</button>
+      </div>
 
-  // démarrer la caméra
-  const stream = await navigator.mediaDevices.getUserMedia({ video: { width:1280, height:720 } });
-  video.srcObject = stream;
-  await video.play();
+      <div style="display:flex;gap:8px;">
+        <button id="exportBtn">Exporter JSON</button>
+        <input id="importFile" type="file" accept=".json" style="display:none"/>
+        <button id="importBtn">Importer JSON</button>
+      </div>
 
-  function resizeCanvas(){
-    canvas.width = video.videoWidth || window.innerWidth;
-    canvas.height = video.videoHeight || window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+      <label>Profiles enregistrés</label>
+      <div id="peopleList"></div>
 
-  async function loop(){
-    resizeCanvas();
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+      <div class="small" style="margin-top:6px;">
+        <strong>Seuil reconnaissance :</strong> <span id="thresholdLabel">0.50</span>
+      </div>
+      <input id="threshold" type="range" min="0.25" max="0.8" step="0.01" value="0.5"/>
 
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withAgeAndGender();
+      <div class="small">Notes : on stocke des <em>descriptors</em> (vecteurs numériques). Pas d'image brute. Tout reste local.</div>
+    </div>
+  </div>
 
-    detections.forEach(det=>{
-      const box = det.detection.box;
-      ctx.lineWidth=3;
-      ctx.strokeStyle='#00ff99';
-      ctx.strokeRect(box.x, box.y, box.width, box.height);
+  <!-- face-api (vladmandic build) -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
 
-      // texte avec âge/genre + note
-      const age = det.age ? Math.round(det.age*10)/10 : '?';
-      const gender = det.gender ? (det.gender==='male'?'Homme':'Femme') : '?';
-      const note = noteInput.value || '';
-      const text = `${gender}, ~${age} ans ${note ? '- ' + note : ''}`;
-      ctx.fillStyle='rgba(0,0,0,0.6)';
-      ctx.fillRect(box.x, box.y - 25, ctx.measureText(text).width + 10, 20);
-      ctx.fillStyle='white';
-      ctx.font='16px Arial';
-      ctx.fillText(text, box.x + 5, box.y - 8);
-    });
+  <script>
+  (async()=>{
 
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
-</script>
-</body>
-</html>
+    // ---- Configuration / UI références ----
+    const videoEl = document.getElementById('videoEl');
+    const canvas = document.getElementById('overlay');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const nameInput = document.getElementById('nameInput');
+    const enrollBtn = document.getElementById('enrollBtn');
+    const recognizeToggle = document.getElementById('recognizeToggle');
+    const peopleList = document.getElementById('peopleList');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const thresholdRange = document.getElementById('threshold');
+    const thresholdLabel = document.getElementById('thresholdLabel');
+
+    let runningRecognition = false;
+    let knownFaces = {}; // { name: descriptorArray }
+    const STORAGE_KEY = 'faceid_local_db_v1';
+    let threshold = parseFloat(thresholdRange.value);
+
+    // ---- Helpers ----
+    function saveDB(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(knownFaces));
+      renderPeopleList();
+    }
+    function loadDB(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        try {
+          knownFaces = JSON.parse(raw);
+        } catch(e){ knownFaces = {}; }
+      } else knownFaces = {};
+      renderPeopleList();
+    }
+    function renderPeopleList(){
+      peopleList.innerHTML = '';
+      const entries = Object.entries(knownFaces);
+      if(entries.length === 0){
+        peopleList.innerHTML = '<div class="small">Aucun profil enregistré</div>';
+        return;
+      }
+      for(const [name, desc] of entries){
+        const row = document.createElement('div'); row.className='personRow';
+        const left = document.createElement('div'); left.innerText = name;
+        const right = document.createElement('div');
+        const tag = document.createElement('span'); tag.className='tag'; tag.innerText = 'Stored';
+        const del = document.createElement('button'); del.innerText='Suppr'; del.style.marginLeft='8px';
+        del.onclick = ()=>{ if(confirm('Supprimer '+name+' ?')){ delete knownFaces[name]; saveDB(); } };
+        right.appendChild(tag); right.appendChild(del);
+       
