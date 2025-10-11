@@ -2,34 +2,33 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Reconnaissance Faciale Plein Écran</title>
+  <title>Reconnaissance Faciale — Âge & Sexe</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: #000;
       overflow: hidden;
       height: 100%;
-      width: 100%;
+      background: #000;
+      font-family: 'Inter', sans-serif;
+      color: white;
     }
     video, canvas {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      transform: scaleX(-1); /* effet miroir */
     }
     #status {
       position: fixed;
       bottom: 10px;
       left: 10px;
       color: #00ff99;
-      font-family: monospace;
-      background: rgba(0,0,0,0.5);
-      padding: 6px 10px;
-      border-radius: 6px;
+      background: rgba(0,0,0,0.4);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -42,13 +41,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
+  <!-- TensorFlow.js + modèle âge/genre -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const statusText = document.getElementById('status');
+    const statusEl = document.getElementById('status');
+
     let camera = null;
-    let running = false;
+    let modelReady = false;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -57,12 +61,22 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // --- Charger le modèle d'âge/sexe ---
+    async function loadModels() {
+      await faceapi.nets.ageGenderNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+      modelReady = true;
+      statusEl.textContent = 'Modèle âge/genre prêt.';
+    }
+
+    loadModels();
+
+    // --- MediaPipe configuration ---
     const faceDetection = new FaceDetection({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
     });
 
     faceDetection.setOptions({
-      model: 'short',           // modèle rapide (mobile)
+      model: 'short',
       minDetectionConfidence: 0.5
     });
 
@@ -77,72 +91,70 @@
 
       for (const detection of results.detections) {
         const box = detection.boundingBox;
-        const x = (1 - box.xCenter - box.width / 2) * width;
+        const x = box.xCenter * width - (box.width * width) / 2;
         const y = box.yCenter * height - (box.height * height) / 2;
         const w = box.width * width;
         const h = box.height * height;
 
-        // --- Rectangle principal ---
+        // Dessine un cadre lumineux
         ctx.lineWidth = 3;
         ctx.strokeStyle = '#00ff99';
         ctx.shadowColor = '#00ffaa';
         ctx.shadowBlur = 15;
         ctx.strokeRect(x, y, w, h);
 
-        // --- Traits décoratifs (coins) ---
-        const len = Math.min(w, h) * 0.25;
-        ctx.shadowBlur = 0;
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = '#00ffcc';
-        ctx.beginPath();
-        // coin haut gauche
-        ctx.moveTo(x, y + len);
-        ctx.lineTo(x, y);
-        ctx.lineTo(x + len, y);
-        // coin haut droit
-        ctx.moveTo(x + w - len, y);
-        ctx.lineTo(x + w, y);
-        ctx.lineTo(x + w, y + len);
-        // coin bas gauche
-        ctx.moveTo(x, y + h - len);
-        ctx.lineTo(x, y + h);
-        ctx.lineTo(x + len, y + h);
-        // coin bas droit
-        ctx.moveTo(x + w - len, y + h);
-        ctx.lineTo(x + w, y + h);
-        ctx.lineTo(x + w, y + h - len);
-        ctx.stroke();
+        // --- Estimation âge/genre ---
+        let label = '';
+        if (modelReady) {
+          const faceTensor = tf.tidy(() => {
+            const frame = tf.browser.fromPixels(video);
+            const faceCrop = tf.image.cropAndResize(
+              frame.expandDims(0),
+              [[y / video.videoHeight, x / video.videoWidth, (y + h) / video.videoHeight, (x + w) / video.videoWidth]],
+              [0],
+              [128, 128]
+            );
+            return faceCrop;
+          });
 
-        // --- Point central ---
-        const cx = x + w / 2;
-        const cy = y + h / 2;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#00ff99';
-        ctx.fill();
+          const prediction = await faceapi.predictAgeAndGender(faceTensor);
+          tf.dispose(faceTensor);
+
+          if (prediction) {
+            const age = Math.round(prediction.age);
+            const gender = prediction.gender === 'male' ? 'Homme' : 'Femme';
+            label = `${gender}, ~${age} ans`;
+          }
+        }
+
+        // Affiche label au-dessus du visage
+        if (label) {
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(x, y - 30, ctx.measureText(label).width + 20, 25);
+          ctx.fillStyle = 'white';
+          ctx.font = '16px Inter';
+          ctx.fillText(label, x + 10, y - 12);
+        }
       }
     }
 
     async function start() {
-      if (running) return;
-      running = true;
-      statusText.textContent = 'Activation caméra...';
-
+      statusEl.textContent = 'Activation de la caméra...';
       camera = new Camera(video, {
         onFrame: async () => {
-          await faceDetection.send({image: video});
+          await faceDetection.send({ image: video });
         },
         width: 1280,
         height: 720
       });
-
       try {
         await camera.start();
-        statusText.textContent = 'Caméra active — détection en cours';
-      } catch (e) {
-        console.error(e);
-        statusText.textContent = 'Erreur caméra : ' + e.message;
-        alert('Active ta caméra (HTTPS ou localhost requis).');
+        statusEl.textContent = 'Caméra active — détection en cours';
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Erreur caméra : ' + err.message;
+        alert('Active la caméra (HTTPS ou localhost requis)');
       }
     }
 
