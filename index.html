@@ -3,47 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Détection visage — fichier unique</title>
+  <title>Détection visage — mesure entre les yeux</title>
   <style>
-    html,body { height:100%; margin:0; background:#000; color:#fff; font-family:Inter,Arial,sans-serif; }
-    video, canvas {
-      position: absolute;
-      top:0; left:0;
-      width:100vw; height:100vh;
-      object-fit:cover;
-    }
-    #status {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      z-index: 20;
-    }
+    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Inter,Arial,sans-serif}
+    video,canvas{position:absolute;top:0;left:0;width:100vw;height:100vh;object-fit:cover}
+    #status{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:8px;font-size:14px;z-index:30}
+    #controls{position:fixed;top:12px;left:12px;background:rgba(0,0,0,0.6);padding:8px 10px;border-radius:8px;font-size:13px;z-index:30}
+    #controls input{width:72px;margin-left:6px}
+    .label{color:#ddd}
   </style>
 
-  <!-- 1) Charger TFJS et BlazeFace via CDN (ordre important) -->
+  <!-- TFJS + BlazeFace (ordre important) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 </head>
 <body>
   <video id="video" autoplay muted playsinline></video>
   <canvas id="overlay"></canvas>
+
+  <div id="controls">
+    <div><span class="label">IPD (mm) — entrer si tu veux convertir px→mm :</span>
+      <input id="ipd" type="number" value="63" min="30" max="80" step="0.1"> 
+      <button id="toggleLand">Landmarks ON</button>
+    </div>
+  </div>
+
   <div id="status">Initialisation…</div>
 
-  <!-- Script principal (tout dans le même fichier) -->
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
+    const ipdInput = document.getElementById('ipd');
+    const toggleLandBtn = document.getElementById('toggleLand');
+    let showLandmarks = true;
+    toggleLandBtn.addEventListener('click', () => {
+      showLandmarks = !showLandmarks;
+      toggleLandBtn.textContent = showLandmarks ? 'Landmarks ON' : 'Landmarks OFF';
+    });
+
     let model = null;
 
-    // Utilitaire : attend qu'une variable globale existe (polling) avec timeout
-    function waitForGlobal(name, ms = 5000, interval = 100) {
+    function waitForGlobal(name, ms = 7000, interval = 100) {
       return new Promise((resolve, reject) => {
         if (window[name]) return resolve(window[name]);
         const t = setInterval(() => {
@@ -61,7 +63,7 @@
 
     async function setupCamera() {
       try {
-        statusEl.textContent = "Demande d'accès à la caméra…";
+        statusEl.textContent = "Demande d'accès caméra…";
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
         video.srcObject = stream;
         return new Promise(resolve => {
@@ -78,34 +80,40 @@
     }
 
     function resizeCanvas() {
-      // On met le canvas en taille réelle vidéo (pixels)
       const w = video.videoWidth || window.innerWidth;
       const h = video.videoHeight || window.innerHeight;
       canvas.width = w;
       canvas.height = h;
-      // CSS pour couvrir
       canvas.style.width = "100vw";
       canvas.style.height = "100vh";
     }
     window.addEventListener('resize', resizeCanvas);
 
-    async function loadModelWithGuard() {
+    async function loadModel() {
       try {
-        statusEl.textContent = "Attente du chargement de BlazeFace…";
-        // attend que la lib blazeface soit définie globalement par le CDN
-        await waitForGlobal('blazeface', 7000).catch(err => {
-          // échec du polling : on laisse l'erreur remonter
-          throw err;
-        });
-        // maintenant charger le modèle
-        statusEl.textContent = "Chargement du modèle BlazeFace…";
+        statusEl.textContent = "Chargement BlazeFace…";
+        await waitForGlobal('blazeface', 7000);
         model = await blazeface.load();
         statusEl.textContent = "Modèle chargé ✅";
       } catch (err) {
-        statusEl.textContent = "Impossible de charger BlazeFace : " + (err.message || err);
-        console.error(err);
+        statusEl.textContent = "Erreur chargement modèle : " + (err.message || err);
         throw err;
       }
+    }
+
+    function drawText(text, x, y, size = 14) {
+      ctx.font = `${size}px sans-serif`;
+      ctx.fillStyle = "#00FF00";
+      ctx.fillText(text, x, y);
+    }
+
+    function chooseTwoEyes(landmarks) {
+      // heuristique simple : on prend les 2 points avec la plus petite coordonnée y (les plus hauts)
+      if (!landmarks || landmarks.length < 2) return null;
+      const copy = landmarks.map(l => [l[0], l[1]]);
+      copy.sort((a,b) => a[1] - b[1]); // tri par y ascendant
+      // retourner les deux premiers
+      return [copy[0], copy[1]];
     }
 
     async function detectLoop() {
@@ -114,58 +122,96 @@
         return;
       }
       resizeCanvas();
-
       try {
-        // false -> on veut des coordonnées JS (pas des tensors)
         const preds = await model.estimateFaces(video, false);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (preds && preds.length > 0) {
-          statusEl.textContent = `Visage détecté ✅ (${preds.length})`;
-          for (let p of preds) {
-            const [x1,y1] = p.topLeft;
-            const [x2,y2] = p.bottomRight;
-            const w = x2 - x1;
-            const h = y2 - y1;
-            ctx.lineWidth = Math.max(2, Math.round(canvas.width / 300));
-            ctx.strokeStyle = "#00FF00";
-            ctx.strokeRect(x1, y1, w, h);
+          const p = preds[0]; // 1er visage
+          const [x1,y1] = p.topLeft;
+          const [x2,y2] = p.bottomRight;
+          const w = x2 - x1;
+          const h = y2 - y1;
 
-            // landmarks
-            if (p.landmarks && p.landmarks.length) {
-              ctx.fillStyle = "#00FF00";
-              for (const lm of p.landmarks) {
-                ctx.beginPath();
-                ctx.arc(lm[0], lm[1], Math.max(1, canvas.width/500), 0, Math.PI*2);
-                ctx.fill();
-              }
+          // rectangle autour du visage
+          ctx.lineWidth = Math.max(2, Math.round(canvas.width / 300));
+          ctx.strokeStyle = "#00FF00";
+          ctx.strokeRect(x1, y1, w, h);
+
+          // landmarks (optionnel)
+          if (showLandmarks && p.landmarks) {
+            ctx.fillStyle = "#00FF00";
+            for (const lm of p.landmarks) {
+              ctx.beginPath();
+              ctx.arc(lm[0], lm[1], Math.max(1, canvas.width / 500), 0, Math.PI*2);
+              ctx.fill();
             }
+          }
+
+          // déterminer deux yeux et mesurer entre eux
+          let eyes = null;
+          if (p.landmarks && p.landmarks.length >= 2) {
+            eyes = chooseTwoEyes(p.landmarks);
+          } else if (p.landmarks && p.landmarks.length >= 2) {
+            // fallback indices 0/1 (souvent rightEye/leftEye)
+            eyes = [p.landmarks[0], p.landmarks[1]];
+          }
+
+          if (eyes) {
+            const [e1,e2] = eyes;
+            const dx = e2[0] - e1[0];
+            const dy = e2[1] - e1[1];
+            const distPx = Math.hypot(dx, dy);
+
+            // dessiner ligne entre les yeux
+            ctx.lineWidth = Math.max(1, Math.round(canvas.width / 600));
+            ctx.strokeStyle = "#00FFFF";
+            ctx.beginPath();
+            ctx.moveTo(e1[0], e1[1]);
+            ctx.lineTo(e2[0], e2[1]);
+            ctx.stroke();
+
+            // milieu entre les yeux
+            const midX = (e1[0] + e2[0]) / 2;
+            const midY = (e1[1] + e2[1]) / 2;
+            const boxSize = Math.max(6, canvas.width / 120);
+
+            // carré centré entre les yeux
+            ctx.fillStyle = "#FF0077";
+            ctx.fillRect(midX - boxSize/2, midY - boxSize/2, boxSize, boxSize);
+
+            // texte de mesure près du milieu
+            const pxText = `${Math.round(distPx)} px`;
+            let mmText = '';
+            const ipd = parseFloat(ipdInput.value);
+            if (!isNaN(ipd) && ipd > 0) {
+              const mmPerPx = ipd / distPx; // approximation : ipd (mm) correspond à distPx pixels
+              const distMm = distPx * mmPerPx;
+              mmText = ` — ${distMm.toFixed(1)} mm (est.)`;
+            }
+            drawText(pxText + mmText, midX + boxSize, midY - boxSize);
+
+            statusEl.textContent = `Visage détecté ✅ — confiance: ${Math.round((p.probability?.[0] ?? 1)*100)}% — dist yeux: ${Math.round(distPx)} px${mmText ? ', ~' + (parseFloat(mmText.match(/[\d\.]+/)?.[0]) || '') + ' mm' : ''}`;
+          } else {
+            statusEl.textContent = `Visage détecté ✅ — pas assez de landmarks pour mesurer`;
           }
         } else {
           statusEl.textContent = "Aucun visage détecté ❌";
         }
       } catch (err) {
-        // erreurs possibles si modèle déchargé ou input invalide
         console.error("Erreur détection :", err);
         statusEl.textContent = "Erreur détection : " + (err.message || err);
       }
-
       requestAnimationFrame(detectLoop);
     }
 
-    (async function main() {
+    (async function main(){
       try {
         await setupCamera();
-
-        // Important : si tu as encore l'erreur "blazeface is not defined", c'est que
-        // le CDN n'a pas chargé ou le fichier renvoie 404. On essaie ici de charger proprement.
-        await loadModelWithGuard();
-
-        // Lancer la boucle de détection
+        await loadModel();
         detectLoop();
       } catch (err) {
-        console.error("Erreur initialisation :", err);
-        // message déjà mis par les catch internes
+        console.error(err);
       }
     })();
   </script>
