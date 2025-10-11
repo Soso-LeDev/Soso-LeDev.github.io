@@ -3,217 +3,181 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Détection visage — mesure entre les yeux</title>
+  <title>Visage — ligne & carré en temps réel</title>
   <style>
-    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Inter,Arial,sans-serif}
-    video,canvas{position:absolute;top:0;left:0;width:100vw;height:100vh;object-fit:cover}
-    #status{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:8px;font-size:14px;z-index:30}
-    #controls{position:fixed;top:12px;left:12px;background:rgba(0,0,0,0.6);padding:8px 10px;border-radius:8px;font-size:13px;z-index:30}
-    #controls input{width:72px;margin-left:6px}
-    .label{color:#ddd}
+    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
+    #container{position:relative;width:100vw;height:100vh;overflow:hidden}
+    video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+    canvas{position:absolute;top:0;left:0;/* taille mise dynamiquement */ pointer-events:none}
+    #hud{position:fixed;left:12px;top:12px;background:rgba(0,0,0,0.6);padding:8px;border-radius:8px;font-size:13px;z-index:40}
   </style>
 
-  <!-- TFJS + BlazeFace (ordre important) -->
+  <!-- TFJS + BlazeFace -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline></video>
-  <canvas id="overlay"></canvas>
-
-  <div id="controls">
-    <div><span class="label">IPD (mm) — entrer si tu veux convertir px→mm :</span>
-      <input id="ipd" type="number" value="63" min="30" max="80" step="0.1"> 
-      <button id="toggleLand">Landmarks ON</button>
-    </div>
+  <div id="container">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="overlay"></canvas>
   </div>
+  <div id="hud">Initialisation… (Ouvre la console pour debug)</div>
 
-  <div id="status">Initialisation…</div>
+<script>
+(async () => {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('overlay');
+  const ctx = canvas.getContext('2d');
+  const hud = document.getElementById('hud');
+  let model = null;
 
-  <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('overlay');
-    const ctx = canvas.getContext('2d');
-    const statusEl = document.getElementById('status');
-    const ipdInput = document.getElementById('ipd');
-    const toggleLandBtn = document.getElementById('toggleLand');
-    let showLandmarks = true;
-    toggleLandBtn.addEventListener('click', () => {
-      showLandmarks = !showLandmarks;
-      toggleLandBtn.textContent = showLandmarks ? 'Landmarks ON' : 'Landmarks OFF';
+  // --- Setup camera ---
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+    video.srcObject = stream;
+    await new Promise(resolve => video.onloadedmetadata = resolve);
+    video.play();
+  } catch (e) {
+    hud.textContent = "Erreur accès caméra: " + (e.message || e);
+    console.error(e);
+    return;
+  }
+
+  // --- Align canvas pixel coords to displayed video ---
+  function syncCanvasToVideo() {
+    // taille réelle (pixels) de la vidéo source
+    const vw = video.videoWidth || video.clientWidth;
+    const vh = video.videoHeight || video.clientHeight;
+    canvas.width = vw;
+    canvas.height = vh;
+    // taille CSS du canvas pour couvrir l'élément vidéo affiché (client size)
+    canvas.style.width = video.clientWidth + 'px';
+    canvas.style.height = video.clientHeight + 'px';
+    // position du canvas (au cas où video est centré/croppé)
+    const rect = video.getBoundingClientRect();
+    canvas.style.left = rect.left + 'px';
+    canvas.style.top = rect.top + 'px';
+  }
+  window.addEventListener('resize', syncCanvasToVideo);
+  syncCanvasToVideo();
+
+  // --- wait for blazeface global + load model ---
+  function waitForGlobal(name, ms = 7000, interval = 100) {
+    return new Promise((resolve, reject) => {
+      if (window[name]) return resolve(window[name]);
+      const t = setInterval(() => { if (window[name]) { clearInterval(t); resolve(window[name]); } }, interval);
+      setTimeout(() => { clearInterval(t); reject(new Error(name + " introuvable")); }, ms);
     });
+  }
 
-    let model = null;
+  try {
+    await waitForGlobal('blazeface', 7000);
+    model = await blazeface.load();
+    hud.textContent = "Modèle chargé ✅";
+    console.log("BlazeFace chargé");
+  } catch (err) {
+    hud.textContent = "Erreur chargement modèle: " + (err.message || err);
+    console.error(err);
+    return;
+  }
 
-    function waitForGlobal(name, ms = 7000, interval = 100) {
-      return new Promise((resolve, reject) => {
-        if (window[name]) return resolve(window[name]);
-        const t = setInterval(() => {
-          if (window[name]) {
-            clearInterval(t);
-            resolve(window[name]);
-          }
-        }, interval);
-        setTimeout(() => {
-          clearInterval(t);
-          reject(new Error(name + ' introuvable après ' + ms + 'ms'));
-        }, ms);
-      });
-    }
+  // --- util heuristique : estimer yeux depuis bbox si pas de landmarks ---
+  function estimateEyesFromBox(box) {
+    const [x1,y1] = box.topLeft;
+    const [x2,y2] = box.bottomRight;
+    const w = x2 - x1;
+    const h = y2 - y1;
+    // heuristique : yeux à ~35% de la hauteur depuis le top, à 30% et 70% du width
+    const left = [ x1 + w*0.3, y1 + h*0.35 ];
+    const right = [ x1 + w*0.7, y1 + h*0.35 ];
+    return [left, right];
+  }
 
-    async function setupCamera() {
-      try {
-        statusEl.textContent = "Demande d'accès caméra…";
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-        video.srcObject = stream;
-        return new Promise(resolve => {
-          video.onloadedmetadata = () => {
-            video.play();
-            resizeCanvas();
-            resolve();
-          };
-        });
-      } catch (err) {
-        statusEl.textContent = "Erreur accès caméra : " + (err.message || err);
-        throw err;
-      }
-    }
+  // --- Draw loop ---
+  async function loop() {
+    syncCanvasToVideo(); // garde aligné
+    if (!model || video.readyState < 2) { requestAnimationFrame(loop); return; }
 
-    function resizeCanvas() {
-      const w = video.videoWidth || window.innerWidth;
-      const h = video.videoHeight || window.innerHeight;
-      canvas.width = w;
-      canvas.height = h;
-      canvas.style.width = "100vw";
-      canvas.style.height = "100vh";
-    }
-    window.addEventListener('resize', resizeCanvas);
+    try {
+      // estimateFaces retourne coords en pixels relatifs à l'input (video)
+      const preds = await model.estimateFaces(video, false);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    async function loadModel() {
-      try {
-        statusEl.textContent = "Chargement BlazeFace…";
-        await waitForGlobal('blazeface', 7000);
-        model = await blazeface.load();
-        statusEl.textContent = "Modèle chargé ✅";
-      } catch (err) {
-        statusEl.textContent = "Erreur chargement modèle : " + (err.message || err);
-        throw err;
-      }
-    }
-
-    function drawText(text, x, y, size = 14) {
-      ctx.font = `${size}px sans-serif`;
-      ctx.fillStyle = "#00FF00";
-      ctx.fillText(text, x, y);
-    }
-
-    function chooseTwoEyes(landmarks) {
-      // heuristique simple : on prend les 2 points avec la plus petite coordonnée y (les plus hauts)
-      if (!landmarks || landmarks.length < 2) return null;
-      const copy = landmarks.map(l => [l[0], l[1]]);
-      copy.sort((a,b) => a[1] - b[1]); // tri par y ascendant
-      // retourner les deux premiers
-      return [copy[0], copy[1]];
-    }
-
-    async function detectLoop() {
-      if (!model || video.readyState < 2) {
-        requestAnimationFrame(detectLoop);
+      if (!preds || preds.length === 0) {
+        hud.textContent = "Aucun visage détecté ❌";
+        requestAnimationFrame(loop);
         return;
       }
-      resizeCanvas();
-      try {
-        const preds = await model.estimateFaces(video, false);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (preds && preds.length > 0) {
-          const p = preds[0]; // 1er visage
-          const [x1,y1] = p.topLeft;
-          const [x2,y2] = p.bottomRight;
-          const w = x2 - x1;
-          const h = y2 - y1;
+      // on prend le premier visage
+      const p = preds[0];
+      const [x1,y1] = p.topLeft;
+      const [x2,y2] = p.bottomRight;
+      const w = x2 - x1, h = y2 - y1;
 
-          // rectangle autour du visage
-          ctx.lineWidth = Math.max(2, Math.round(canvas.width / 300));
-          ctx.strokeStyle = "#00FF00";
-          ctx.strokeRect(x1, y1, w, h);
+      // rectangle face
+      ctx.lineWidth = Math.max(2, canvas.width/300);
+      ctx.strokeStyle = "#00FF00";
+      ctx.strokeRect(x1, y1, w, h);
 
-          // landmarks (optionnel)
-          if (showLandmarks && p.landmarks) {
-            ctx.fillStyle = "#00FF00";
-            for (const lm of p.landmarks) {
-              ctx.beginPath();
-              ctx.arc(lm[0], lm[1], Math.max(1, canvas.width / 500), 0, Math.PI*2);
-              ctx.fill();
-            }
-          }
+      // debug: draw center
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fillRect((x1+x2)/2 - 2, (y1+y2)/2 -2, 4, 4);
 
-          // déterminer deux yeux et mesurer entre eux
-          let eyes = null;
-          if (p.landmarks && p.landmarks.length >= 2) {
-            eyes = chooseTwoEyes(p.landmarks);
-          } else if (p.landmarks && p.landmarks.length >= 2) {
-            // fallback indices 0/1 (souvent rightEye/leftEye)
-            eyes = [p.landmarks[0], p.landmarks[1]];
-          }
-
-          if (eyes) {
-            const [e1,e2] = eyes;
-            const dx = e2[0] - e1[0];
-            const dy = e2[1] - e1[1];
-            const distPx = Math.hypot(dx, dy);
-
-            // dessiner ligne entre les yeux
-            ctx.lineWidth = Math.max(1, Math.round(canvas.width / 600));
-            ctx.strokeStyle = "#00FFFF";
-            ctx.beginPath();
-            ctx.moveTo(e1[0], e1[1]);
-            ctx.lineTo(e2[0], e2[1]);
-            ctx.stroke();
-
-            // milieu entre les yeux
-            const midX = (e1[0] + e2[0]) / 2;
-            const midY = (e1[1] + e2[1]) / 2;
-            const boxSize = Math.max(6, canvas.width / 120);
-
-            // carré centré entre les yeux
-            ctx.fillStyle = "#FF0077";
-            ctx.fillRect(midX - boxSize/2, midY - boxSize/2, boxSize, boxSize);
-
-            // texte de mesure près du milieu
-            const pxText = `${Math.round(distPx)} px`;
-            let mmText = '';
-            const ipd = parseFloat(ipdInput.value);
-            if (!isNaN(ipd) && ipd > 0) {
-              const mmPerPx = ipd / distPx; // approximation : ipd (mm) correspond à distPx pixels
-              const distMm = distPx * mmPerPx;
-              mmText = ` — ${distMm.toFixed(1)} mm (est.)`;
-            }
-            drawText(pxText + mmText, midX + boxSize, midY - boxSize);
-
-            statusEl.textContent = `Visage détecté ✅ — confiance: ${Math.round((p.probability?.[0] ?? 1)*100)}% — dist yeux: ${Math.round(distPx)} px${mmText ? ', ~' + (parseFloat(mmText.match(/[\d\.]+/)?.[0]) || '') + ' mm' : ''}`;
-          } else {
-            statusEl.textContent = `Visage détecté ✅ — pas assez de landmarks pour mesurer`;
-          }
-        } else {
-          statusEl.textContent = "Aucun visage détecté ❌";
-        }
-      } catch (err) {
-        console.error("Erreur détection :", err);
-        statusEl.textContent = "Erreur détection : " + (err.message || err);
+      // get eyes: prefer landmarks
+      let eyeA = null, eyeB = null;
+      if (p.landmarks && p.landmarks.length >= 2) {
+        // heuristique: prendre les 2 points les plus hauts (plus petit y)
+        const lands = p.landmarks.slice();
+        lands.sort((a,b) => a[1] - b[1]); // ascend y
+        eyeA = lands[0];
+        eyeB = lands[1];
+        // ordonner left/right par x
+        if (eyeA[0] > eyeB[0]) { const t=eyeA; eyeA=eyeB; eyeB=t; }
+        console.log("Landmarks utilisés pour yeux:", eyeA, eyeB);
+      } else {
+        [eyeA, eyeB] = estimateEyesFromBox(p);
+        console.log("Eyes estimés depuis bbox:", eyeA, eyeB);
       }
-      requestAnimationFrame(detectLoop);
+
+      // Draw eye markers
+      ctx.fillStyle = "#FFD700";
+      const r = Math.max(3, canvas.width/220);
+      ctx.beginPath(); ctx.arc(eyeA[0], eyeA[1], r, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(eyeB[0], eyeB[1], r, 0, Math.PI*2); ctx.fill();
+
+      // Draw line between eyes
+      ctx.strokeStyle = "#00FFFF";
+      ctx.lineWidth = Math.max(2, canvas.width/600);
+      ctx.beginPath(); ctx.moveTo(eyeA[0], eyeA[1]); ctx.lineTo(eyeB[0], eyeB[1]); ctx.stroke();
+
+      // Draw centered square between eyes
+      const midX = (eyeA[0]+eyeB[0])/2;
+      const midY = (eyeA[1]+eyeB[1])/2;
+      const boxSize = Math.max(6, canvas.width/160);
+      ctx.fillStyle = "#FF0077";
+      ctx.fillRect(midX - boxSize/2, midY - boxSize/2, boxSize, boxSize);
+
+      // distance px
+      const dx = eyeB[0] - eyeA[0];
+      const dy = eyeB[1] - eyeA[1];
+      const distPx = Math.hypot(dx, dy);
+
+      // affichage HUD
+      const conf = (p.probability && p.probability.length) ? Math.round(p.probability[0]*100) : "";
+      hud.textContent = `Visage détecté ✅ ${conf?('| conf: '+conf+'%'):''} — dist yeux: ${Math.round(distPx)} px`;
+
+    } catch (err) {
+      console.error("Erreur boucle détection:", err);
+      hud.textContent = "Erreur détection: " + (err.message || err);
     }
 
-    (async function main(){
-      try {
-        await setupCamera();
-        await loadModel();
-        detectLoop();
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  </script>
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+
+})();
+</script>
 </body>
 </html>
