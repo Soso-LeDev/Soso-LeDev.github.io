@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Détection du visage (caméra)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Détection visage — fichier unique</title>
   <style>
-    body { margin:0; overflow:hidden; background:#000; color:#fff; font-family:sans-serif; }
+    html,body { height:100%; margin:0; background:#000; color:#fff; font-family:Inter,Arial,sans-serif; }
     video, canvas {
       position: absolute;
       top:0; left:0;
@@ -14,18 +14,18 @@
     }
     #status {
       position: fixed;
-      bottom: 10px;
+      bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0,0,0,0.6);
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 8px;
       font-size: 14px;
-      z-index: 10;
+      z-index: 20;
     }
   </style>
 
-  <!-- Utiliser versions compatibles TFJS + BlazeFace -->
+  <!-- 1) Charger TFJS et BlazeFace via CDN (ordre important) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 </head>
@@ -34,23 +34,39 @@
   <canvas id="overlay"></canvas>
   <div id="status">Initialisation…</div>
 
+  <!-- Script principal (tout dans le même fichier) -->
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
     let model = null;
-    let running = false;
 
-    // Setup caméra
+    // Utilitaire : attend qu'une variable globale existe (polling) avec timeout
+    function waitForGlobal(name, ms = 5000, interval = 100) {
+      return new Promise((resolve, reject) => {
+        if (window[name]) return resolve(window[name]);
+        const t = setInterval(() => {
+          if (window[name]) {
+            clearInterval(t);
+            resolve(window[name]);
+          }
+        }, interval);
+        setTimeout(() => {
+          clearInterval(t);
+          reject(new Error(name + ' introuvable après ' + ms + 'ms'));
+        }, ms);
+      });
+    }
+
     async function setupCamera() {
       try {
+        statusEl.textContent = "Demande d'accès à la caméra…";
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
         video.srcObject = stream;
         return new Promise(resolve => {
           video.onloadedmetadata = () => {
             video.play();
-            // ajuster canvas à la taille vidéo effective
             resizeCanvas();
             resolve();
           };
@@ -61,92 +77,20 @@
       }
     }
 
-    // Redimensionne canvas pour correspondre à la vidéo en pixels (pas seulement CSS)
     function resizeCanvas() {
-      // video.videoWidth/videoHeight peuvent être 0 si pas encore prêts; vérifier
+      // On met le canvas en taille réelle vidéo (pixels)
       const w = video.videoWidth || window.innerWidth;
       const h = video.videoHeight || window.innerHeight;
       canvas.width = w;
       canvas.height = h;
-      // garder canvas CSS pour couvrir l'écran
+      // CSS pour couvrir
       canvas.style.width = "100vw";
       canvas.style.height = "100vh";
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Charger le modèle BlazeFace (versions compatibles)
-    async function loadModel() {
+    async function loadModelWithGuard() {
       try {
-        statusEl.textContent = "Chargement du modèle…";
-        model = await blazeface.load();
-        statusEl.textContent = "Modèle chargé ✅";
-      } catch (err) {
-        statusEl.textContent = "Erreur chargement modèle : " + (err.message || err);
-        throw err;
-      }
-    }
-
-    async function detectLoop() {
-      if (!model || video.readyState < 2) {
-        // attendre que tout soit prêt
-        requestAnimationFrame(detectLoop);
-        return;
-      }
-      // garder la taille du canvas à jour avant chaque frame au cas où
-      resizeCanvas();
-
-      // estimation des visages
-      const returnTensors = false; // on veut les coordonnées JS
-      const predictions = await model.estimateFaces(video, returnTensors);
-
-      // nettoie le canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (predictions && predictions.length > 0) {
-        // dessiner le premier visage (ou parcourir predictions pour plusieurs)
-        for (let i = 0; i < predictions.length; i++) {
-          const p = predictions[i];
-          // p.topLeft, p.bottomRight sont [x,y] en pixels relatifs à l'input (ici la vidéo)
-          const [x1, y1] = p.topLeft;
-          const [x2, y2] = p.bottomRight;
-          const w = x2 - x1;
-          const h = y2 - y1;
-
-          ctx.lineWidth = Math.max(2, Math.round(canvas.width / 300));
-          ctx.strokeStyle = "#00FF00";
-          ctx.strokeRect(x1, y1, w, h);
-
-          // dessiner landmarks si disponibles
-          if (p.landmarks) {
-            ctx.fillStyle = "#00FF00";
-            for (const lm of p.landmarks) {
-              ctx.beginPath();
-              ctx.arc(lm[0], lm[1], Math.max(1, canvas.width/500), 0, Math.PI*2);
-              ctx.fill();
-            }
-          }
-        }
-        statusEl.textContent = "Visage détecté ✅ (" + predictions.length + ")";
-      } else {
-        statusEl.textContent = "Aucun visage détecté ❌";
-      }
-
-      // prochaine frame
-      requestAnimationFrame(detectLoop);
-    }
-
-    // point d'entrée principal
-    (async function main() {
-      try {
-        statusEl.textContent = "Demande d'accès caméra…";
-        await setupCamera();
-        await loadModel();
-        // lancer la boucle de détection
-        detectLoop();
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  </script>
-</body>
-</html>
+        statusEl.textContent = "Attente du chargement de BlazeFace…";
+        // attend que la lib blazeface soit définie globalement par le CDN
+        await waitForGlobal('blazeface',
