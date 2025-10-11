@@ -1,216 +1,136 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Reconnaissance faciale — Démo</title>
+  <meta charset="UTF-8">
+  <title>Reconnaissance Faciale Plein Écran</title>
   <style>
-    :root{ --bg:#0f1724; --card:#0b1220; --accent:#4ade80; }
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;}
-    body{background:linear-gradient(180deg,#071529, #07121b); display:flex; align-items:center; justify-content:center; color:#e6eef8;}
-    .container{width:960px; max-width:95vw; background:rgba(255,255,255,0.02); border-radius:12px; padding:12px; box-shadow:0 8px 30px rgba(0,0,0,0.6);}
-    .topbar{display:flex; gap:12px; align-items:center; margin-bottom:8px;}
-    .topbar h1{font-size:16px;margin:0;}
-    .video-wrap{position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:8px; overflow:hidden;}
-    video#input_video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1);} /* miroir */
-    canvas#overlay{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
-    .controls{display:flex; gap:8px; margin-top:10px; align-items:center;}
-    button, select{background:var(--card); color:inherit; border:1px solid rgba(255,255,255,0.06); padding:8px 12px; border-radius:8px; cursor:pointer;}
-    .status{margin-left:auto; font-size:13px; opacity:0.85;}
-    .note{font-size:13px; margin-top:8px; opacity:0.9;}
-    .small{font-size:12px; opacity:0.8;}
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+    video, canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      transform: scaleX(-1); /* effet miroir */
+    }
+    #status {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      color: #00ff99;
+      font-family: monospace;
+      background: rgba(0,0,0,0.5);
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <h1>Reconnaissance faciale — visage encadré + traits</h1>
-      <div class="status" id="status">Statut : prêt</div>
-    </div>
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="canvas"></canvas>
+  <div id="status">Initialisation...</div>
 
-    <div class="video-wrap" id="videoWrap">
-      <video id="input_video" autoplay muted playsinline></video>
-      <canvas id="overlay"></canvas>
-    </div>
-
-    <div class="controls">
-      <button id="startBtn">Démarrer la caméra</button>
-      <button id="stopBtn">Arrêter</button>
-      <label class="small">Visages max:
-        <select id="maxFaces">
-          <option value="1">1</option>
-          <option value="2" selected>2</option>
-          <option value="4">4</option>
-          <option value="6">6</option>
-        </select>
-      </label>
-      <label class="small">Détection conf.:
-        <select id="minConfidence">
-          <option value="0.35">0.35</option>
-          <option value="0.45" selected>0.45</option>
-          <option value="0.6">0.6</option>
-        </select>
-      </label>
-
-      <div class="note small">Conseil : ouvrir via <code>http://localhost</code> si la caméra ne fonctionne pas.</div>
-    </div>
-
-    <p class="note">Cette démo utilise <strong>MediaPipe FaceMesh</strong>. Les rectangles entourent chaque visage et des triangles relient des points-clés (yeux, nez, menton) pour "délimiter" visuellement.</p>
-  </div>
-
-  <!-- MediaPipe scripts (CDN jsdelivr) -->
+  <!-- MediaPipe Face Detection -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
 
   <script>
-    const videoElement = document.getElementById('input_video');
-    const canvasElement = document.getElementById('overlay');
-    const ctx = canvasElement.getContext('2d');
-    const statusEl = document.getElementById('status');
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const maxFacesSel = document.getElementById('maxFaces');
-    const minConfSel = document.getElementById('minConfidence');
-
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusText = document.getElementById('status');
     let camera = null;
-    let faceMesh = null;
     let running = false;
 
-    function setStatus(t){ statusEl.textContent = 'Statut : ' + t; }
-
-    // redimension canvas pour correspondre à la vidéo (en pixels)
-    function resizeCanvasToVideo(){
-      const rect = videoElement.getBoundingClientRect();
-      canvasElement.width = rect.width;
-      canvasElement.height = rect.height;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    // convertit landmark (x,y en ratio 0..1) en coordonnées canvas
-    function landmarkToPoint(lm, width, height){
-      return { x: lm.x * width, y: lm.y * height };
-    }
+    const faceDetection = new FaceDetection({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
+    });
 
-    // Dessine rectangle englobant et triangles de "délimitation"
-    function drawFaceAnnotations(canvasCtx, faceLandmarks, canvasWidth, canvasHeight, faceIndex){
-      // calcul du bounding box à partir des landmarks
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      for(const lm of faceLandmarks){
-        minX = Math.min(minX, lm.x);
-        minY = Math.min(minY, lm.y);
-        maxX = Math.max(maxX, lm.x);
-        maxY = Math.max(maxY, lm.y);
-      }
-      // conversion en pixels
-      const x = minX * canvasWidth;
-      const y = minY * canvasHeight;
-      const w = (maxX - minX) * canvasWidth;
-      const h = (maxY - minY) * canvasHeight;
+    faceDetection.setOptions({
+      model: 'short',           // modèle rapide (mobile)
+      minDetectionConfidence: 0.5
+    });
 
-      // style rectangle
-      canvasCtx.lineWidth = Math.max(2, Math.round(canvasWidth/240));
-      canvasCtx.strokeStyle = "rgba(74, 222, 128, 0.95)"; // vert pastel
-      canvasCtx.setLineDash([6,4]);
-      canvasCtx.strokeRect(x, y, w, h);
+    faceDetection.onResults(onResults);
 
-      // petit label
-      canvasCtx.setLineDash([]);
-      canvasCtx.fillStyle = "rgba(10,12,14,0.8)";
-      canvasCtx.fillRect(x, y - 22, 72, 20);
-      canvasCtx.fillStyle = "white";
-      canvasCtx.font = "13px Inter, Arial";
-      canvasCtx.fillText("Visage " + (faceIndex+1), x + 6, y - 8);
+    async function onResults(results) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!results.detections || results.detections.length === 0) return;
 
-      // Dessiner quelques triangles / traits entre points-clés
-      // Indices populaires dans le FaceMesh (Google): 33 (right eye outer), 263 (left eye outer), 1 (nose tip), 152 (chin)
-      // Utilise-les pour dessiner des triangles esthétiques.
-      const idx = {
-        rightEyeOuter: 33,
-        leftEyeOuter: 263,
-        noseTip: 1,
-        chin: 152,
-        leftMouth: 61,
-        rightMouth: 291
-      };
+      const width = canvas.width;
+      const height = canvas.height;
 
-      function p(i){ return landmarkToPoint(faceLandmarks[i], canvasWidth, canvasHeight); }
+      for (const detection of results.detections) {
+        const box = detection.boundingBox;
+        const x = (1 - box.xCenter - box.width / 2) * width;
+        const y = box.yCenter * height - (box.height * height) / 2;
+        const w = box.width * width;
+        const h = box.height * height;
 
-      // triangle yeux + nez
-      try {
-        const A = p(idx.rightEyeOuter), B = p(idx.leftEyeOuter), C = p(idx.noseTip);
-        canvasCtx.beginPath();
-        canvasCtx.moveTo(A.x, A.y);
-        canvasCtx.lineTo(B.x, B.y);
-        canvasCtx.lineTo(C.x, C.y);
-        canvasCtx.closePath();
-        canvasCtx.lineWidth = Math.max(1.5, Math.round(canvasWidth/420));
-        canvasCtx.strokeStyle = "rgba(255,255,255,0.9)";
-        canvasCtx.setLineDash([3,2]);
-        canvasCtx.stroke();
-      } catch(e){ /* ignore si pas de point */ }
+        // --- Rectangle principal ---
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#00ff99';
+        ctx.shadowColor = '#00ffaa';
+        ctx.shadowBlur = 15;
+        ctx.strokeRect(x, y, w, h);
 
-      // triangle bouche + menton
-      try {
-        const A = p(idx.leftMouth), B = p(idx.rightMouth), C = p(idx.chin);
-        canvasCtx.beginPath();
-        canvasCtx.moveTo(A.x, A.y);
-        canvasCtx.lineTo(B.x, B.y);
-        canvasCtx.lineTo(C.x, C.y);
-        canvasCtx.closePath();
-        canvasCtx.lineWidth = Math.max(1.5, Math.round(canvasWidth/420));
-        canvasCtx.strokeStyle = "rgba(255,200,60,0.95)";
-        canvasCtx.setLineDash([4,3]);
-        canvasCtx.stroke();
-      } catch(e){}
+        // --- Traits décoratifs (coins) ---
+        const len = Math.min(w, h) * 0.25;
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#00ffcc';
+        ctx.beginPath();
+        // coin haut gauche
+        ctx.moveTo(x, y + len);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x + len, y);
+        // coin haut droit
+        ctx.moveTo(x + w - len, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + len);
+        // coin bas gauche
+        ctx.moveTo(x, y + h - len);
+        ctx.lineTo(x, y + h);
+        ctx.lineTo(x + len, y + h);
+        // coin bas droit
+        ctx.moveTo(x + w - len, y + h);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x + w, y + h - len);
+        ctx.stroke();
 
-      // dessiner quelques points clés (petits cercles)
-      [idx.rightEyeOuter, idx.leftEyeOuter, idx.noseTip, idx.chin].forEach(i => {
-        try {
-          const q = p(i);
-          canvasCtx.beginPath();
-          canvasCtx.fillStyle = "rgba(74,222,128,0.95)";
-          canvasCtx.arc(q.x, q.y, Math.max(2, Math.round(canvasWidth/220)), 0, Math.PI*2);
-          canvasCtx.fill();
-        } catch(e){}
-      });
-    }
-
-    // callback MediaPipe
-    function onResults(results){
-      if(!running) return;
-      resizeCanvasToVideo();
-      ctx.clearRect(0,0,canvasElement.width, canvasElement.height);
-
-      if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-        for(let i=0;i<results.multiFaceLandmarks.length;i++){
-          const landmarks = results.multiFaceLandmarks[i];
-          drawFaceAnnotations(ctx, landmarks, canvasElement.width, canvasElement.height, i);
-        }
+        // --- Point central ---
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#00ff99';
+        ctx.fill();
       }
     }
 
-    // démarrer face mesh + caméra
-    async function start(){
-      if(running) return;
-      setStatus('Initialisation...');
-      // créer faceMesh
-      faceMesh = new FaceMesh({locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      }});
+    async function start() {
+      if (running) return;
+      running = true;
+      statusText.textContent = 'Activation caméra...';
 
-      faceMesh.setOptions({
-        maxNumFaces: parseInt(maxFacesSel.value, 10),
-        refineLandmarks: true,
-        minDetectionConfidence: parseFloat(minConfSel.value),
-        minTrackingConfidence: 0.5
-      });
-
-      faceMesh.onResults(onResults);
-
-      // initialiser caméra via camera_utils
-      camera = new Camera(videoElement, {
+      camera = new Camera(video, {
         onFrame: async () => {
-          await faceMesh.send({image: videoElement});
+          await faceDetection.send({image: video});
         },
         width: 1280,
         height: 720
@@ -218,54 +138,15 @@
 
       try {
         await camera.start();
-        running = true;
-        setStatus('Caméra active — détection en cours');
-      } catch(err){
-        console.error(err);
-        setStatus('Erreur caméra : ' + (err.message || err));
-        alert('Impossible d\'accéder à la caméra. Assure-toi d\'être en HTTPS ou localhost et d\'avoir autorisé la caméra.');
+        statusText.textContent = 'Caméra active — détection en cours';
+      } catch (e) {
+        console.error(e);
+        statusText.textContent = 'Erreur caméra : ' + e.message;
+        alert('Active ta caméra (HTTPS ou localhost requis).');
       }
     }
 
-    function stop(){
-      if(camera){
-        camera.stop();
-        camera = null;
-      }
-      if(faceMesh){
-        faceMesh.close();
-        faceMesh = null;
-      }
-      running = false;
-      ctx.clearRect(0,0,canvasElement.width, canvasElement.height);
-      setStatus('Arrêté');
-    }
-
-    // éléments UI
-    startBtn.addEventListener('click', start);
-    stopBtn.addEventListener('click', stop);
-
-    // si l'utilisateur change options pendant l'exécution, on redémarre le modèle
-    maxFacesSel.addEventListener('change', () => {
-      if(running){
-        stop();
-        setTimeout(start, 150);
-      }
-    });
-    minConfSel.addEventListener('change', () => {
-      if(running){
-        stop();
-        setTimeout(start, 150);
-      }
-    });
-
-    // redimension responsive
-    window.addEventListener('resize', () => {
-      if(videoElement.videoWidth) resizeCanvasToVideo();
-    });
-
-    // auto start si autorisation donnée (optionnel)
-    //start(); // décommenter si tu veux démarrer automatiquement
+    start();
   </script>
 </body>
 </html>
