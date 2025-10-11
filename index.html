@@ -1,226 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Reconnaissance faciale simple (client)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détection du visage (caméra)</title>
   <style>
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; display:flex; gap:20px; padding:18px; }
-    #left { max-width:420px; }
-    video, canvas { width: 420px; height: auto; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,0.12); }
-    .controls { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
-    label { display:block; font-size:0.9rem; margin-bottom:6px; }
-    input[type="text"] { padding:6px; width:170px; }
-    button { padding:8px 12px; cursor:pointer; border-radius:6px; border:1px solid #ccc; background:#fff; }
-    #log { margin-top:12px; font-size:0.9rem; color:#222; }
-    #ref-list { margin-top:12px; }
-    .ref-item { font-size:0.9rem; margin:6px 0; }
-    small { color:#666; }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+    #status {
+      position: fixed;
+      bottom: 10px;
+      background: rgba(0,0,0,0.6);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-  <div id="left">
-    <h2>Reconnaissance faciale (client)</h2>
-    <p><small>Charger une image de référence (nom) → calculer face descriptor → démarrer la webcam pour comparer en temps réel.</small></p>
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="overlay"></canvas>
+  <div id="status">Chargement du modèle...</div>
 
-    <label>Nom de la référence
-      <input id="refName" type="text" placeholder="Ex: Alice">
-    </label>
-    <label>Image de référence
-      <input id="refImage" type="file" accept="image/*">
-    </label>
-    <div class="controls">
-      <button id="addRef">Ajouter référence</button>
-      <button id="startCam">Démarrer caméra</button>
-      <button id="stopCam">Arrêter caméra</button>
-    </div>
-
-    <div id="ref-list"><strong>Références :</strong><div id="refs"></div></div>
-    <div id="log">Chargement des modèles…</div>
-  </div>
-
-  <div id="right">
-    <video id="video" autoplay muted playsinline></video>
-    <canvas id="overlay"></canvas>
-  </div>
-
-  <!-- face-api.js depuis CDN -->
+  <!-- face-api.js -->
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-
   <script>
-  // --- Variables globales ---
-  const video = document.getElementById('video');
-  const overlay = document.getElementById('overlay');
-  const ctx = overlay.getContext('2d');
-  const logEl = document.getElementById('log');
-  const refsContainer = document.getElementById('refs');
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('overlay');
+    const ctx = overlay.getContext('2d');
+    const statusEl = document.getElementById('status');
 
-  // Stockage des labeled descriptors en mémoire
-  const labeledDescriptors = []; // { label: string, descriptors: Float32Array[] }
-
-  // Chargement des modèles (utilise tinyFaceDetector + faceLandmark + faceRecognition)
-  async function loadModels() {
-    log('Téléchargement des modèles (peut prendre quelques secondes)…');
-    // charge depuis le même CDN ; si ça bloque, vérifier la connexion
-    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/';
-    // tiny_face_detector, landmarks et recognition
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-    log('Modèles chargés. Ajoute une référence puis démarre la caméra.');
-  }
-
-  function log(s){ logEl.innerText = s; }
-
-  // --- Ajouter référence depuis fichier upload ---
-  document.getElementById('addRef').addEventListener('click', async () => {
-    const name = document.getElementById('refName').value.trim();
-    const fileInput = document.getElementById('refImage');
-    if (!name) return alert('Donne un nom à la référence.');
-    if (!fileInput.files || fileInput.files.length === 0) return alert('Choisis une image de référence.');
-
-    const file = fileInput.files[0];
-    const img = await fileToImage(file);
-    log('Traitement de l\'image de référence…');
-
-    // détecte la face et calcule descriptor
-    const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-    if (!detection) return alert('Aucune face détectée dans l\'image. Essaye une autre photo claire.');
-
-    // ajoute au tableau
-    const desc = detection.descriptor;
-    labeledDescriptors.push({ label: name, descriptors: [desc] });
-    renderRefs();
-    log(`Référence "${name}" ajoutée.`);
-    // nettoyage input
-    fileInput.value = '';
-    document.getElementById('refName').value = '';
-  });
-
-  function renderRefs() {
-    refsContainer.innerHTML = '';
-    labeledDescriptors.forEach((r, i) => {
-      const div = document.createElement('div');
-      div.className = 'ref-item';
-      div.innerHTML = `${i+1}. <strong>${escapeHtml(r.label)}</strong> — ${r.descriptors.length} descriptor(s)
-        <button data-i="${i}" style="margin-left:8px">Suppr</button>`;
-      refsContainer.appendChild(div);
-      div.querySelector('button').addEventListener('click', () => {
-        labeledDescriptors.splice(i,1);
-        renderRefs();
-      });
-    });
-    if(labeledDescriptors.length===0) refsContainer.innerHTML = '<em>Aucune référence</em>';
-  }
-
-  // --- Caméra ---
-  let stream = null;
-  let detectInterval = null;
-
-  document.getElementById('startCam').addEventListener('click', startCamera);
-  document.getElementById('stopCam').addEventListener('click', stopCamera);
-
-  async function startCamera() {
-    if (!labeledDescriptors.length) {
-      if (!confirm('Aucune référence ajoutée ; veux-tu continuer quand même ?')) return;
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("Erreur d'accès caméra : " + err.message);
+      }
     }
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
-      video.srcObject = stream;
-      await video.play();
+
+    async function loadModels() {
+      const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/';
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+      statusEl.textContent = "Modèle chargé ✔️";
+      startDetection();
+    }
+
+    async function startDetection() {
       overlay.width = video.videoWidth;
       overlay.height = video.videoHeight;
-      log('Caméra démarrée — reconnaissance en cours...');
-      // commence détection périodique
-      if (detectInterval) clearInterval(detectInterval);
-      detectInterval = setInterval(detectAndMatch, 400); // toutes les 400ms
-    } catch (err) {
-      console.error(err);
-      alert('Erreur accès caméra : ' + (err.message || err));
-    }
-  }
 
-  function stopCamera() {
-    if (detectInterval) { clearInterval(detectInterval); detectInterval = null; }
-    if (stream) {
-      stream.getTracks().forEach(t => t.stop());
-      stream = null;
-    }
-    video.pause();
-    ctx.clearRect(0,0,overlay.width, overlay.height);
-    log('Caméra arrêtée.');
-  }
+      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224 });
 
-  // --- Détection + comparaison ---
-  async function detectAndMatch() {
-    if (video.readyState < 2) return;
-    const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
-    const result = await faceapi.detectSingleFace(video, options).withFaceLandmarks().withFaceDescriptor();
-    ctx.clearRect(0,0,overlay.width, overlay.height);
+      setInterval(async () => {
+        const result = await faceapi.detectSingleFace(video, options);
+        ctx.clearRect(0, 0, overlay.width, overlay.height);
 
-    if (!result) {
-      log('Aucune face détectée.');
-      return;
+        if (result) {
+          const box = result.box;
+          ctx.strokeStyle = "#00FF00";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(box.x, box.y, box.width, box.height);
+          statusEl.textContent = "Visage détecté ✅";
+        } else {
+          statusEl.textContent = "Aucun visage détecté ❌";
+        }
+      }, 100);
     }
 
-    // dessine box + landmarks
-    const resized = faceapi.resizeResults(result, { width: overlay.width, height: overlay.height });
-    const box = resized.detection.box;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#0b84ff';
-    ctx.strokeRect(box.x, box.y, box.width, box.height);
-
-    // prépare face matcher si on a des références
-    if (labeledDescriptors.length === 0) {
-      log('Face détectée — mais aucune référence pour comparer.');
-      return;
-    }
-
-    // crée des LabeledFaceDescriptors pour face-api
-    const labeledForMatcher = labeledDescriptors.map(ld => new faceapi.LabeledFaceDescriptors(ld.label, ld.descriptors));
-    const maxDescriptorDistance = 0.6; // seuil : plus petit = plus strict
-    const faceMatcher = new faceapi.FaceMatcher(labeledForMatcher, maxDescriptorDistance);
-
-    const best = faceMatcher.findBestMatch(result.descriptor); // retourne Label + distance
-    // convert distance -> similarité approximative
-    const similarity = Math.max(0, 1 - best.distance); // simple inversion
-    const percent = Math.round(similarity * 100);
-
-    // affiche texte
-    const text = `${best.label} — score: ${percent}% (distance:${best.distance.toFixed(3)})`;
-    ctx.font = '16px system-ui';
-    ctx.fillStyle = '#0b84ff';
-    ctx.fillText(text, box.x, box.y > 20 ? box.y - 8 : box.y + box.height + 18);
-
-    log('Match: ' + text);
-  }
-
-  // --- utilitaires ---
-  function fileToImage(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = e => reject(e);
-      const reader = new FileReader();
-      reader.onload = () => img.src = reader.result;
-      reader.onerror = e => reject(e);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  // --- initialisation ---
-  (async () => {
-    await loadModels();
-    // ajuster canvas taille (sera mis à jour au play)
-    overlay.width = 420;
-    overlay.height = 315;
-    renderRefs();
-  })();
-
-  // arrête caméra si on quitte la page
-  window.addEventListener('beforeunload', stopCamera);
+    video.addEventListener('playing', loadModels);
+    startCamera();
   </script>
 </body>
 </html>
