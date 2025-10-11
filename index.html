@@ -6,13 +6,11 @@
   <title>Détection du visage (caméra)</title>
   <style>
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #111;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
       color: white;
       font-family: sans-serif;
-      overflow: hidden;
     }
     video, canvas {
       position: absolute;
@@ -25,6 +23,8 @@
     #status {
       position: fixed;
       bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       background: rgba(0,0,0,0.6);
       padding: 8px 14px;
       border-radius: 8px;
@@ -37,54 +37,63 @@
   <canvas id="overlay"></canvas>
   <div id="status">Chargement du modèle...</div>
 
-  <!-- face-api.js -->
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <!-- TensorFlow.js + BlazeFace -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.1.1/dist/blazeface.min.js"></script>
+
   <script>
     const video = document.getElementById('video');
-    const overlay = document.getElementById('overlay');
-    const ctx = overlay.getContext('2d');
+    const canvas = document.getElementById('overlay');
+    const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
+    let model;
 
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-      } catch (err) {
-        alert("Erreur d'accès caméra : " + err.message);
+    async function setupCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      return new Promise(resolve => {
+        video.onloadedmetadata = () => {
+          video.play();
+          resolve(video);
+        };
+      });
+    }
+
+    async function loadModel() {
+      model = await blazeface.load();
+      statusEl.textContent = "Modèle chargé ✅";
+    }
+
+    async function detectFace() {
+      const predictions = await model.estimateFaces(video, false);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (predictions.length > 0) {
+        const face = predictions[0];
+        const [x, y] = face.topLeft;
+        const [x2, y2] = face.bottomRight;
+        const width = x2 - x;
+        const height = y2 - y;
+        ctx.strokeStyle = "#00FF00";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, width, height);
+        statusEl.textContent = "Visage détecté ✅";
+      } else {
+        statusEl.textContent = "Aucun visage détecté ❌";
       }
+
+      requestAnimationFrame(detectFace);
     }
 
-    async function loadModels() {
-      const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/';
-      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-      statusEl.textContent = "Modèle chargé ✔️";
-      startDetection();
+    async function main() {
+      await setupCamera();
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      await loadModel();
+      detectFace();
     }
 
-    async function startDetection() {
-      overlay.width = video.videoWidth;
-      overlay.height = video.videoHeight;
-
-      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224 });
-
-      setInterval(async () => {
-        const result = await faceapi.detectSingleFace(video, options);
-        ctx.clearRect(0, 0, overlay.width, overlay.height);
-
-        if (result) {
-          const box = result.box;
-          ctx.strokeStyle = "#00FF00";
-          ctx.lineWidth = 3;
-          ctx.strokeRect(box.x, box.y, box.width, box.height);
-          statusEl.textContent = "Visage détecté ✅";
-        } else {
-          statusEl.textContent = "Aucun visage détecté ❌";
-        }
-      }, 100);
-    }
-
-    video.addEventListener('playing', loadModels);
-    startCamera();
+    main();
   </script>
 </body>
 </html>
