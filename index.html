@@ -224,7 +224,7 @@
           },
           body: JSON.stringify({
             messages: [{ role: 'user', content: question }],
-            model: 'llama3-8b-8192'
+            model: 'llama-3.1-8b-instant' // Modèle mis à jour, compatible et rapide
           })
         });
         console.log('Réponse HTTP status:', response.status);
