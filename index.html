@@ -22,7 +22,7 @@
     }
     #status {
       position: fixed;
-      bottom: 40px; /* Décalé pour laisser place au transcript */
+      bottom: 40px;
       left: 10px;
       color: #00ff99;
       background: rgba(0,0,0,0.4);
@@ -40,7 +40,7 @@
     }
     #speech-bubble {
       position: fixed;
-      bottom: 70px; /* Décalé pour ne pas chevaucher le status/transcript */
+      bottom: 70px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 255, 153, 0.2);
@@ -155,188 +155,4 @@
           });
 
           const prediction = await faceapi.predictAgeAndGender(faceTensor);
-          tf.dispose(faceTensor);
-
-          if (prediction) {
-            const age = Math.round(prediction.age);
-            const gender = prediction.gender === 'male' ? 'Homme' : 'Femme';
-            label = `${gender}, ~${age} ans`;
-          }
-        }
-
-        // Affiche label au-dessus du visage
-        if (label) {
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(0,0,0,0.6)';
-          ctx.fillRect(x, y - 30, ctx.measureText(label).width + 20, 25);
-          ctx.fillStyle = 'white';
-          ctx.font = '16px Inter';
-          ctx.fillText(label, x + 10, y - 12);
-        }
-      }
-    }
-
-    async function startCamera() {
-      statusEl.textContent = 'Activation de la caméra...';
-      camera = new Camera(video, {
-        onFrame: async () => {
-          if (isRecognitionActive) {
-            await faceDetection.send({ image: video });
-          }
-        },
-        width: 1280,
-        height: 720,
-        facingMode: 'environment' // Utilise la caméra arrière sur mobile
-      });
-      try {
-        await camera.start();
-        statusEl.textContent = 'Caméra active — détection en cours';
-      } catch (err) {
-        console.error('Erreur caméra:', err);
-        statusEl.textContent = 'Erreur caméra : ' + err.message;
-        alert('Activez la caméra (HTTPS ou localhost requis)');
-      }
-    }
-
-    function stopCamera() {
-      if (camera) {
-        camera.stop();
-      }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      video.srcObject = null;
-      statusEl.textContent = 'Reconnaissance faciale arrêtée. Écoute en cours...';
-    }
-
-    async function askGroq(question) {
-      if (!apiKey) {
-        statusEl.textContent = 'Clé API Groq manquante';
-        console.log('Clé API manquante');
-        return;
-      }
-      statusEl.textContent = 'Interrogation de l\'IA...';
-      try {
-        console.log('Envoi de la question à Groq:', question);
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            messages: [{ role: 'user', content: question }],
-            model: 'llama-3.1-8b-instant' // Modèle mis à jour, compatible et rapide
-          })
-        });
-        console.log('Réponse HTTP status:', response.status);
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error ${response.status}: ${errorText}`);
-        }
-        const data = await response.json();
-        console.log('Réponse data de Groq:', data);
-        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-          const answer = data.choices[0].message.content;
-          speechBubble.textContent = answer;
-          speechBubble.style.display = 'block';
-          setTimeout(() => {
-            speechBubble.style.display = 'none';
-          }, 10000);
-        } else if (data.error) {
-          throw new Error(data.error.message || 'Erreur inconnue de Groq');
-        } else {
-          console.log('Aucune réponse valide de Groq');
-          speechBubble.textContent = 'Aucune réponse reçue.';
-          speechBubble.style.display = 'block';
-          setTimeout(() => {
-            speechBubble.style.display = 'none';
-          }, 5000);
-        }
-        statusEl.textContent = 'Caméra active — détection en cours';
-      } catch (err) {
-        console.error('Erreur avec l\'IA:', err);
-        statusEl.textContent = 'Erreur avec l\'IA: ' + err.message;
-        speechBubble.textContent = 'Erreur: ' + err.message;
-        speechBubble.style.display = 'block';
-        setTimeout(() => {
-          speechBubble.style.display = 'none';
-        }, 5000);
-      }
-    }
-
-    // --- Reconnaissance vocale ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = true;
-      recognition.interimResults = true; // Activé pour résultats intermédiaires
-
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
-        transcript = transcript.trim().toLowerCase();
-        transcriptEl.textContent = `Dit : ${transcript}`;
-        console.log('Transcript détecté:', transcript);
-
-        const activationPhrases = [
-          'krozen ouvre la reconnaissance faciale',
-          'frozen ouvre la reconnaissance faciale',
-          'crozen ouvre la reconnaissance faciale'
-        ];
-
-        const stopPhrases = [
-          'krozen arrête la reconnaissance faciale',
-          'frozen arrête la reconnaissance faciale',
-          'crozen arrête la reconnaissance faciale'
-        ];
-
-        if (stopPhrases.some(phrase => transcript.includes(phrase)) && event.results[event.results.length - 1].isFinal) {
-          isRecognitionActive = false;
-          stopCamera();
-          return;
-        }
-
-        if (!isRecognitionActive) {
-          if (activationPhrases.some(phrase => transcript.includes(phrase)) && event.results[event.results.length - 1].isFinal) {
-            isRecognitionActive = true;
-            startCamera();
-          }
-        } else {
-          const prefixes = ['krozen', 'frozen', 'crozen'];
-          const prefixMatch = prefixes.find(prefix => transcript.startsWith(prefix));
-          if (prefixMatch && event.results[event.results.length - 1].isFinal) {
-            const question = transcript.replace(new RegExp(`^${prefixMatch}\\s*,?\\s*`, 'i'), '').trim();
-            if (question) {
-              console.log('Question extraite:', question);
-              askGroq(question);
-            }
-          }
-        }
-      };
-
-      recognition.onerror = (event) => {
-        if (event.error === 'no-speech') {
-          console.log('Pas de parole détectée - ignorance');
-          return; // Ignorer cette erreur courante
-        }
-        console.error('Erreur reconnaissance vocale:', event.error);
-        statusEl.textContent = 'Erreur vocale: ' + event.error;
-      };
-
-      recognition.onend = () => {
-        console.log('Reconnaissance vocale terminée - redémarrage');
-        recognition.start(); // Redémarre pour écoute continue
-      };
-
-      recognition.start();
-    } else {
-      statusEl.textContent = 'Reconnaissance vocale non supportée par ce navigateur.';
-    }
-
-    // Démarre la caméra immédiatement au chargement
-    startCamera();
-  </script>
-</body>
-</html>
+          tf.dispose(face
