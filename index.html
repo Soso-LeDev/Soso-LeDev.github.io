@@ -22,7 +22,7 @@
     }
     #status {
       position: fixed;
-      bottom: 10px;
+      bottom: 40px; /* Décalé pour laisser place au transcript */
       left: 10px;
       color: #00ff99;
       background: rgba(0,0,0,0.4);
@@ -32,20 +32,15 @@
     }
     #transcript {
       position: fixed;
-      bottom: 40px;
+      bottom: 10px;
       left: 10px;
       color: #00ff99;
       font-size: 12px;
-      background: rgba(0,0,0,0.4);
-      padding: 4px 8px;
-      border-radius: 4px;
-      max-width: 80%;
-      word-wrap: break-word;
-      display: none;
+      opacity: 0.8;
     }
     #speech-bubble {
       position: fixed;
-      bottom: 50px;
+      bottom: 70px; /* Décalé pour ne pas chevaucher le status/transcript */
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 255, 153, 0.2);
@@ -67,9 +62,9 @@
   </style>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline style="display: none;"></video>
-  <canvas id="canvas" style="display: none;"></canvas>
-  <div id="status">Écoute en cours... Dites "Krozen, ouvre la reconnaissance faciale"</div>
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="canvas"></canvas>
+  <div id="status">Écoute en cours... Caméra active — détection en cours</div>
   <div id="transcript"></div>
   <div id="speech-bubble"></div>
 
@@ -93,7 +88,7 @@
 
     let camera = null;
     let modelReady = false;
-    let isRecognitionActive = false;
+    let isRecognitionActive = true; // Active par défaut
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -106,7 +101,7 @@
     async function loadModels() {
       await faceapi.nets.ageGenderNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
       modelReady = true;
-      statusEl.textContent = 'Modèle âge/genre prêt.';
+      statusEl.textContent = 'Modèle âge/genre prêt. Caméra active — détection en cours';
     }
 
     loadModels();
@@ -182,8 +177,6 @@
 
     async function startCamera() {
       statusEl.textContent = 'Activation de la caméra...';
-      video.style.display = 'block';
-      canvas.style.display = 'block';
       camera = new Camera(video, {
         onFrame: async () => {
           await faceDetection.send({ image: video });
@@ -244,21 +237,22 @@
 
       recognition.onresult = (event) => {
         const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-        // Affiche le transcript en petit et vert en bas
-        transcriptEl.textContent = transcript;
-        transcriptEl.style.display = 'block';
-        setTimeout(() => {
-          transcriptEl.style.display = 'none';
-        }, 5000); // Masquer après 5 secondes
+        transcriptEl.textContent = `Dit : ${transcript}`; // Affiche ce qui a été dit
+
+        const activationPhrases = [
+          'krozen ouvre la reconnaissance faciale',
+          'frozen ouvre la reconnaissance faciale',
+          'crozen ouvre la reconnaissance faciale'
+        ];
 
         if (!isRecognitionActive) {
-          if (transcript.includes('krozen ouvre la reconnaissance faciale')) {
+          if (activationPhrases.some(phrase => transcript.includes(phrase))) {
             isRecognitionActive = true;
             startCamera();
           }
         } else {
-          if (transcript.startsWith('krozen')) {
-            const question = transcript.replace(/^krozen\s*,?\s*/i, '').trim();
+          if (transcript.startsWith('krozen') || transcript.startsWith('frozen') || transcript.startsWith('crozen')) {
+            const question = transcript.replace(/^(krozen|frozen|crozen)\s*,?\s*/i, '').trim();
             if (question) {
               askGroq(question);
             }
@@ -270,15 +264,17 @@
         console.error('Erreur reconnaissance vocale:', event.error);
       };
 
-      recognition.start();
-
-      // Redémarre la reconnaissance si elle s'arrête
       recognition.onend = () => {
-        recognition.start();
+        recognition.start(); // Redémarre pour écoute continue
       };
+
+      recognition.start();
     } else {
       statusEl.textContent = 'Reconnaissance vocale non supportée par ce navigateur.';
     }
+
+    // Démarre la caméra immédiatement au chargement
+    startCamera();
   </script>
 </body>
 </html>
