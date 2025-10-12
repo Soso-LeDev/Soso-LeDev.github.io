@@ -64,16 +64,11 @@
 <body>
   <video id="video" autoplay muted playsinline></video>
   <canvas id="canvas"></canvas>
-  <div id="status">Écoute en cours... Caméra active — détection en cours</div>
+  <div id="status">Chargement du modèle...</div>
   <div id="transcript"></div>
   <div id="speech-bubble"></div>
 
-  <!-- MediaPipe Face Detection -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
-  <!-- TensorFlow.js + modèle âge/genre -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0"></script>
+  <!-- face-api.js -->
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
 
   <script>
@@ -84,11 +79,9 @@
     const transcriptEl = document.getElementById('transcript');
     const speechBubble = document.getElementById('speech-bubble');
 
-    const apiKey = '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'; // Clé API Groq
+    const apiKey = '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';
 
-    let camera = null;
-    let modelReady = false;
-    let isRecognitionActive = true; // Active par défaut
+    let isRecognitionActive = true;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -97,133 +90,71 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // --- Charger le modèle d'âge/sexe ---
+    // --- Charger les modèles face-api ---
     async function loadModels() {
-      await faceapi.nets.ageGenderNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-      modelReady = true;
-      statusEl.textContent = 'Modèle âge/genre prêt. Caméra active — détection en cours';
+      statusEl.textContent = 'Chargement des modèles...';
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'),
+        faceapi.nets.ageGenderNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/')
+      ]);
+      statusEl.textContent = 'Modèles prêts — activation de la caméra...';
+      startCamera();
     }
 
-    loadModels();
-
-    // --- MediaPipe configuration ---
-    const faceDetection = new FaceDetection({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
-    });
-
-    faceDetection.setOptions({
-      model: 'short',
-      minDetectionConfidence: 0.5
-    });
-
-    faceDetection.onResults(onResults);
-
-    async function onResults(results) {
-      if (!isRecognitionActive) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!results.detections || results.detections.length === 0) return;
-
-      const width = canvas.width;
-      const height = canvas.height;
-
-      for (const detection of results.detections) {
-        const box = detection.boundingBox;
-        const x = box.xCenter * width - (box.width * width) / 2;
-        const y = box.yCenter * height - (box.height * height) / 2;
-        const w = box.width * width;
-        const h = box.height * height;
-
-        // Dessine un cadre lumineux
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#00ff99';
-        ctx.shadowColor = '#00ffaa';
-        ctx.shadowBlur = 15;
-        ctx.strokeRect(x, y, w, h);
-
-        // --- Estimation âge/genre ---
-        let label = '';
-        if (modelReady) {
-          const faceTensor = tf.tidy(() => {
-            const frame = tf.browser.fromPixels(video);
-            const faceCrop = tf.image.cropAndResize(
-              frame.expandDims(0),
-              [[y / video.videoHeight, x / video.videoWidth, (y + h) / video.videoHeight, (x + w) / video.videoWidth]],
-              [0],
-              [128, 128]
-            );
-            return faceCrop;
-          });
-
-          const prediction = await faceapi.predictAgeAndGender(faceTensor);
-          tf.dispose(faceTensor);
-
-          if (prediction) {
-            const age = Math.round(prediction.age);
-            const gender = prediction.gender === 'male' ? 'Homme' : 'Femme';
-            label = `${gender}, ~${age} ans`;
-          }
-        }
-
-        // Affiche label au-dessus du visage
-        if (label) {
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(0,0,0,0.6)';
-          ctx.fillRect(x, y - 30, ctx.measureText(label).width + 20, 25);
-          ctx.fillStyle = 'white';
-          ctx.font = '16px Inter';
-          ctx.fillText(label, x + 10, y - 12);
-        }
-      }
-    }
-
+    // --- Démarrer la caméra ---
     async function startCamera() {
-      statusEl.textContent = 'Activation de la caméra...';
-      camera = new Camera(video, {
-        onFrame: async () => {
-          if (isRecognitionActive) {
-            await faceDetection.send({ image: video });
-          }
-        },
-        width: 1280,
-        height: 720,
-        facingMode: 'environment' // Utilise la caméra arrière sur mobile
-      });
       try {
-        await camera.start();
-        statusEl.textContent = 'Caméra active — détection en cours';
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+          statusEl.textContent = 'Caméra active — détection en cours';
+          detectLoop();
+        };
       } catch (err) {
-        console.error('Erreur caméra:', err);
         statusEl.textContent = 'Erreur caméra : ' + err.message;
         alert('Activez la caméra (HTTPS ou localhost requis)');
       }
     }
 
-    function stopCamera() {
-      if (camera) {
-        camera.stop();
-      }
+    // --- Boucle de détection ---
+    async function detectLoop() {
+      if (!isRecognitionActive || video.paused || video.ended) return setTimeout(detectLoop, 500);
+      
+      const detections = await faceapi
+        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withAgeAndGender();
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      video.srcObject = null;
-      statusEl.textContent = 'Reconnaissance faciale arrêtée. Écoute en cours...';
+      const displaySize = { width: canvas.width, height: canvas.height };
+      const resized = faceapi.resizeResults(detections, displaySize);
+
+      resized.forEach(result => {
+        const { age, gender, detection } = result;
+        const box = detection.box;
+        const label = `${gender === 'male' ? 'Homme' : 'Femme'}, ~${Math.round(age)} ans`;
+
+        ctx.strokeStyle = '#00ff99';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#00ffaa';
+        ctx.shadowBlur = 10;
+        ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(box.x, box.y - 25, ctx.measureText(label).width + 15, 20);
+        ctx.fillStyle = 'white';
+        ctx.font = '16px Inter';
+        ctx.fillText(label, box.x + 5, box.y - 10);
+      });
+
+      requestAnimationFrame(detectLoop);
     }
 
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'fr-FR';
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    }
-
+    // --- Requête IA Groq ---
     async function askGroq(question) {
-      if (!apiKey) {
-        statusEl.textContent = 'Clé API Groq manquante';
-        console.log('Clé API manquante');
-        return;
-      }
       statusEl.textContent = 'Interrogation de l\'IA...';
       try {
-        console.log('Envoi de la question à Groq:', question);
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -232,45 +163,18 @@
           },
           body: JSON.stringify({
             messages: [{ role: 'user', content: question }],
-            model: 'llama3.1-8b-instant' // Modèle à jour
+            model: 'llama-3.1-8b-instant'
           })
         });
-        console.log('Réponse HTTP status:', response.status);
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error ${response.status}: ${errorText}`);
-        }
+
         const data = await response.json();
-        console.log('Réponse data de Groq:', data);
-        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-          const answer = data.choices[0].message.content;
-          speechBubble.textContent = answer;
-          speechBubble.style.display = 'block';
-          speak(answer); // Réponse vocale
-          setTimeout(() => {
-            speechBubble.style.display = 'none';
-          }, 10000);
-        } else if (data.error) {
-          throw new Error(data.error.message || 'Erreur inconnue de Groq');
-        } else {
-          console.log('Aucune réponse valide de Groq');
-          speechBubble.textContent = 'Aucune réponse reçue.';
-          speechBubble.style.display = 'block';
-          speak('Aucune réponse reçue.');
-          setTimeout(() => {
-            speechBubble.style.display = 'none';
-          }, 5000);
-        }
-        statusEl.textContent = isRecognitionActive ? 'Caméra active — détection en cours' : 'Reconnaissance faciale arrêtée. Écoute en cours...';
-      } catch (err) {
-        console.error('Erreur avec l\'IA:', err);
-        statusEl.textContent = 'Erreur avec l\'IA: ' + err.message;
-        speechBubble.textContent = 'Erreur: ' + err.message;
+        const answer = data.choices?.[0]?.message?.content || "Aucune réponse reçue.";
+        speechBubble.textContent = answer;
         speechBubble.style.display = 'block';
-        speak('Erreur: ' + err.message);
-        setTimeout(() => {
-          speechBubble.style.display = 'none';
-        }, 5000);
+        setTimeout(() => { speechBubble.style.display = 'none'; }, 10000);
+        statusEl.textContent = 'Caméra active — détection en cours';
+      } catch (err) {
+        statusEl.textContent = 'Erreur IA : ' + err.message;
       }
     }
 
@@ -284,70 +188,46 @@
 
       recognition.onresult = (event) => {
         let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+        for (let i = event.resultIndex; i < event.results.length; ++i)
           transcript += event.results[i][0].transcript;
-        }
         transcript = transcript.trim().toLowerCase();
         transcriptEl.textContent = `Dit : ${transcript}`;
-        console.log('Transcript détecté:', transcript);
 
-        const activationPhrases = [
-          'krozen ouvre la reconnaissance faciale',
-          'frozen ouvre la reconnaissance faciale',
-          'crozen ouvre la reconnaissance faciale'
-        ];
+        const activationPhrases = ['krozen ouvre la reconnaissance faciale', 'frozen ouvre la reconnaissance faciale', 'crozen ouvre la reconnaissance faciale'];
+        const stopPhrases = ['krozen arrête la reconnaissance faciale', 'frozen arrête la reconnaissance faciale', 'crozen arrête la reconnaissance faciale'];
 
-        const stopPhrases = [
-          'krozen arrête la reconnaissance faciale',
-          'frozen arrête la reconnaissance faciale',
-          'crozen arrête la reconnaissance faciale'
-        ];
-
-        if (stopPhrases.some(phrase => transcript.includes(phrase)) && event.results[event.results.length - 1].isFinal) {
+        if (stopPhrases.some(p => transcript.includes(p)) && event.results[event.results.length - 1].isFinal) {
           isRecognitionActive = false;
-          stopCamera();
+          statusEl.textContent = 'Reconnaissance faciale arrêtée.';
+          return;
+        }
+        if (!isRecognitionActive && activationPhrases.some(p => transcript.includes(p)) && event.results[event.results.length - 1].isFinal) {
+          isRecognitionActive = true;
+          statusEl.textContent = 'Caméra active — détection en cours';
+          detectLoop();
           return;
         }
 
-        if (!isRecognitionActive) {
-          if (activationPhrases.some(phrase => transcript.includes(phrase)) && event.results[event.results.length - 1].isFinal) {
-            isRecognitionActive = true;
-            startCamera();
-          }
-        } else {
-          const prefixes = ['krozen', 'frozen', 'crozen'];
-          const prefixMatch = prefixes.find(prefix => transcript.startsWith(prefix));
-          if (prefixMatch && event.results[event.results.length - 1].isFinal) {
-            const question = transcript.replace(new RegExp(`^${prefixMatch}\\s*,?\\s*`, 'i'), '').trim();
-            if (question) {
-              console.log('Question extraite:', question);
-              askGroq(question);
-            }
-          }
+        const prefixes = ['krozen', 'frozen', 'crozen'];
+        const prefix = prefixes.find(p => transcript.startsWith(p));
+        if (prefix && event.results[event.results.length - 1].isFinal) {
+          const question = transcript.replace(new RegExp(`^${prefix}\\s*,?\\s*`, 'i'), '').trim();
+          if (question) askGroq(question);
         }
       };
 
       recognition.onerror = (event) => {
-        if (event.error === 'no-speech') {
-          console.log('Pas de parole détectée - ignorance');
-          return;
-        }
-        console.error('Erreur reconnaissance vocale:', event.error);
-        statusEl.textContent = 'Erreur vocale: ' + event.error;
+        if (event.error !== 'no-speech')
+          statusEl.textContent = 'Erreur vocale : ' + event.error;
       };
 
-      recognition.onend = () => {
-        console.log('Reconnaissance vocale terminée - redémarrage');
-        recognition.start();
-      };
-
+      recognition.onend = () => recognition.start();
       recognition.start();
     } else {
-      statusEl.textContent = 'Reconnaissance vocale non supportée par ce navigateur.';
+      statusEl.textContent = 'Reconnaissance vocale non supportée.';
     }
 
-    // Démarre la caméra immédiatement au chargement
-    startCamera();
+    loadModels();
   </script>
 </body>
 </html>
