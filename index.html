@@ -30,6 +30,19 @@
       border-radius: 8px;
       font-size: 14px;
     }
+    #transcript {
+      position: fixed;
+      bottom: 40px;
+      left: 10px;
+      color: #00ff99;
+      font-size: 12px;
+      background: rgba(0,0,0,0.4);
+      padding: 4px 8px;
+      border-radius: 4px;
+      max-width: 80%;
+      word-wrap: break-word;
+      display: none;
+    }
     #speech-bubble {
       position: fixed;
       bottom: 50px;
@@ -57,6 +70,7 @@
   <video id="video" autoplay muted playsinline style="display: none;"></video>
   <canvas id="canvas" style="display: none;"></canvas>
   <div id="status">Écoute en cours... Dites "Krozen, ouvre la reconnaissance faciale"</div>
+  <div id="transcript"></div>
   <div id="speech-bubble"></div>
 
   <!-- MediaPipe Face Detection -->
@@ -72,6 +86,7 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
+    const transcriptEl = document.getElementById('transcript');
     const speechBubble = document.getElementById('speech-bubble');
 
     const apiKey = ''; // Mettez votre clé API Groq ici, par exemple depuis un fichier .env (GROQ_API_KEY). Note: Pour une utilisation en navigateur, la clé sera exposée. Utilisez un serveur pour la sécurité.
@@ -229,6 +244,13 @@
 
       recognition.onresult = (event) => {
         const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        // Affiche le transcript en petit et vert en bas
+        transcriptEl.textContent = transcript;
+        transcriptEl.style.display = 'block';
+        setTimeout(() => {
+          transcriptEl.style.display = 'none';
+        }, 5000); // Masquer après 5 secondes
+
         if (!isRecognitionActive) {
           if (transcript.includes('krozen ouvre la reconnaissance faciale')) {
             isRecognitionActive = true;
@@ -249,6 +271,11 @@
       };
 
       recognition.start();
+
+      // Redémarre la reconnaissance si elle s'arrête
+      recognition.onend = () => {
+        recognition.start();
+      };
     } else {
       statusEl.textContent = 'Reconnaissance vocale non supportée par ce navigateur.';
     }
