@@ -84,7 +84,7 @@
     const transcriptEl = document.getElementById('transcript');
     const speechBubble = document.getElementById('speech-bubble');
 
-    const apiKey = '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'; // Clé API Groq intégrée directement (attention : exposée dans le navigateur pour ce test. Pour la prod, utilisez un serveur backend).
+    const apiKey = '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'; // Clé API Groq
 
     let camera = null;
     let modelReady = false;
@@ -189,7 +189,7 @@
         await camera.start();
         statusEl.textContent = 'Caméra active — détection en cours';
       } catch (err) {
-        console.error(err);
+        console.error('Erreur caméra:', err);
         statusEl.textContent = 'Erreur caméra : ' + err.message;
         alert('Activez la caméra (HTTPS ou localhost requis)');
       }
@@ -198,10 +198,12 @@
     async function askGroq(question) {
       if (!apiKey) {
         statusEl.textContent = 'Clé API Groq manquante';
+        console.log('Clé API manquante');
         return;
       }
       statusEl.textContent = 'Interrogation de l\'IA...';
       try {
+        console.log('Envoi de la question à Groq:', question);
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -210,20 +212,36 @@
           },
           body: JSON.stringify({
             messages: [{ role: 'user', content: question }],
-            model: 'llama3-8b-8192' // Modèle rapide, ajustez si nécessaire
+            model: 'llama3-8b-8192'
           })
         });
+        console.log('Réponse HTTP status:', response.status);
         const data = await response.json();
-        const answer = data.choices[0].message.content;
-        speechBubble.textContent = answer;
+        console.log('Réponse data de Groq:', data);
+        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+          const answer = data.choices[0].message.content;
+          speechBubble.textContent = answer;
+          speechBubble.style.display = 'block';
+          setTimeout(() => {
+            speechBubble.style.display = 'none';
+          }, 10000);
+        } else {
+          console.log('Aucune réponse valide de Groq');
+          speechBubble.textContent = 'Aucune réponse reçue.';
+          speechBubble.style.display = 'block';
+          setTimeout(() => {
+            speechBubble.style.display = 'none';
+          }, 5000);
+        }
+        statusEl.textContent = 'Caméra active — détection en cours';
+      } catch (err) {
+        console.error('Erreur avec l\'IA:', err);
+        statusEl.textContent = 'Erreur avec l\'IA: ' + err.message;
+        speechBubble.textContent = 'Erreur: ' + err.message;
         speechBubble.style.display = 'block';
         setTimeout(() => {
           speechBubble.style.display = 'none';
-        }, 10000); // Masquer après 10 secondes
-        statusEl.textContent = 'Caméra active — détection en cours';
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent = 'Erreur avec l\'IA';
+        }, 5000);
       }
     }
 
@@ -233,11 +251,15 @@
       const recognition = new SpeechRecognition();
       recognition.lang = 'fr-FR';
       recognition.continuous = true;
-      recognition.interimResults = false;
+      recognition.interimResults = true; // Activé pour résultats intermédiaires
 
       recognition.onresult = (event) => {
-        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-        transcriptEl.textContent = `Dit : ${transcript}`; // Affiche ce qui a été dit
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        transcript = transcript.trim().toLowerCase();
+        transcriptEl.textContent = `Dit : ${transcript}`;
 
         const activationPhrases = [
           'krozen ouvre la reconnaissance faciale',
@@ -253,7 +275,7 @@
         } else {
           if (transcript.startsWith('krozen') || transcript.startsWith('frozen') || transcript.startsWith('crozen')) {
             const question = transcript.replace(/^(krozen|frozen|crozen)\s*,?\s*/i, '').trim();
-            if (question) {
+            if (question && event.results[event.results.length - 1].isFinal) { // Attendre résultat final
               askGroq(question);
             }
           }
@@ -261,10 +283,16 @@
       };
 
       recognition.onerror = (event) => {
+        if (event.error === 'no-speech') {
+          console.log('Pas de parole détectée - ignorance');
+          return; // Ignorer cette erreur courante
+        }
         console.error('Erreur reconnaissance vocale:', event.error);
+        statusEl.textContent = 'Erreur vocale: ' + event.error;
       };
 
       recognition.onend = () => {
+        console.log('Reconnaissance vocale terminée - redémarrage');
         recognition.start(); // Redémarre pour écoute continue
       };
 
