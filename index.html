@@ -1,162 +1,651 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Reconnaissance Faciale — Âge & Sexe</title>
+  <meta charset="utf-8" />
+  <title>Reconnaissance Faciale — Avancé (Âge / Sexe / Expressions / Reconnaissance)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      background: #000;
-      font-family: 'Inter', sans-serif;
-      color: white;
+    :root{
+      --accent: #00ff99;
+      --bg: #000;
+      --panel-bg: rgba(0,0,0,0.6);
+      --muted: rgba(255,255,255,0.75);
+      --card-radius: 12px;
     }
-    video, canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
+    html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,Arial}
+    #app {height:100%;position:relative;overflow:hidden}
+    video, canvas {position:fixed; inset:0; width:100vw; height:100vh; object-fit:cover}
+    #hud {
+      position:fixed; right:12px; top:12px; width:360px; max-width:40vw;
+      background:var(--panel-bg); border-radius:var(--card-radius); padding:12px; backdrop-filter: blur(6px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      border:1px solid rgba(0,255,153,0.08);
     }
-    #status {
-      position: fixed;
-      bottom: 40px;
-      left: 10px;
-      color: #00ff99;
-      background: rgba(0,0,0,0.4);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 14px;
+    .row{display:flex;gap:8px;align-items:center}
+    button{
+      background:transparent;color:var(--accent);border:1px solid rgba(0,255,153,0.12);padding:8px 10px;border-radius:8px;
+      cursor:pointer;font-weight:600;
     }
-    #transcript {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      color: #00ff99;
-      font-size: 12px;
-      opacity: 0.8;
-    }
+    button.primary{background:linear-gradient(90deg,#002b1a,rgba(0,255,153,0.08));border:1px solid rgba(0,255,153,0.25)}
+    .small{font-size:12px;padding:6px 8px}
+    #status{position:fixed;left:12px;bottom:12px;background:var(--panel-bg);padding:8px 10px;border-radius:10px;border:1px solid rgba(0,255,153,0.08);color:var(--accent)}
+    #transcript{position:fixed;left:12px;bottom:60px;color:var(--accent);opacity:0.9;font-size:13px}
+    .section {margin-top:10px}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    select,input[type=checkbox]{margin-right:8px}
+    #thumbs {display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;max-height:160px;overflow:auto}
+    .thumb{width:70px;height:70px;border-radius:8px;overflow:hidden;border:2px solid rgba(255,255,255,0.06)}
     #speech-bubble {
-      position: fixed;
-      bottom: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 255, 153, 0.2);
-      color: #00ff99;
-      padding: 15px 20px;
-      border-radius: 15px;
-      max-width: 80%;
-      font-size: 16px;
-      text-align: center;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(0, 255, 153, 0.5);
-      display: none;
-      animation: fadeIn 0.5s ease-in-out;
+      position:fixed; left:50%; transform:translateX(-50%); bottom:120px;
+      background:rgba(0,255,153,0.08); color:var(--accent); padding:12px 16px;border-radius:14px;
+      border:1px solid rgba(0,255,153,0.18); display:none; backdrop-filter: blur(6px);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
+    .stats{font-size:13px;color:var(--muted);margin-top:6px}
+    .small-muted{font-size:12px;color:rgba(255,255,255,0.6)}
+    #galleryPanel{position:fixed;left:12px;top:12px;background:var(--panel-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);max-width:240px}
+    .model-tag{font-size:12px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);display:inline-block;margin-right:6px;color:var(--muted)}
+    input[type=file]{display:none}
   </style>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline></video>
-  <canvas id="canvas"></canvas>
-  <div id="status">Chargement du modèle...</div>
-  <div id="transcript"></div>
-  <div id="speech-bubble"></div>
+  <div id="app">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="overlay"></canvas>
 
-  <!-- face-api.js -->
+    <div id="hud">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <strong style="font-size:16px">Reconnaissance Faciale — Avancé</strong>
+          <div class="small-muted">Âge / Sexe / Expressions / Reconnaissance</div>
+        </div>
+        <div>
+          <button id="startBtn" class="primary small">Démarrer</button>
+          <button id="stopBtn" class="small">Arrêter</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Mode détection</label>
+        <select id="detectorMode">
+          <option value="tiny">TinyFaceDetector (rapide)</option>
+          <option value="ssd">SSD Mobilenet (plus précis)</option>
+        </select>
+        <label style="margin-top:8px"><input type="checkbox" id="showBox" checked> Afficher boîtes & labels</label>
+        <label><input type="checkbox" id="autoMemo" checked> Sauvegarder les observations dans Memoir</label>
+      </div>
+
+      <div class="section row" style="justify-content:space-between">
+        <div>
+          <button id="snapBtn" class="small">Prendre photo</button>
+          <button id="recordBtn" class="small">Enregistrer vidéo</button>
+          <button id="stopRecordBtn" class="small" disabled>Stop</button>
+        </div>
+        <div style="text-align:right">
+          <div class="small-muted">FPS: <span id="fps">--</span></div>
+          <div class="small-muted">Visages: <span id="facesCount">0</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Reconnaissance / Gestion visages</label>
+        <div class="row">
+          <input id="nameInput" placeholder="Nom pour enregistrement" style="flex:1;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff">
+          <button id="registerBtn" class="small">Enregistrer visage</button>
+        </div>
+        <div style="margin-top:8px" class="row">
+          <button id="exportBtn" class="small">Exporter</button>
+          <button id="importBtn" class="small">Importer</button>
+          <input type="file" id="fileInput" accept=".json">
+          <button id="clearFacesBtn" class="small">Supprimer tout</button>
+        </div>
+        <div id="thumbs" class="section"></div>
+      </div>
+
+      <div class="section">
+        <label>IA Groq (question vocale ou texte)</label>
+        <div class="row">
+          <input id="questionInput" placeholder="Pose ta question (ex: quelle est la météo?)" style="flex:1;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff">
+          <button id="askBtn" class="small">Interroger</button>
+        </div>
+      </div>
+
+      <div class="section stats">
+        <div>Âge moyen (lissé): <strong id="avgAge">--</strong></div>
+        <div>Dernière émotion dominante: <strong id="lastExpr">--</strong></div>
+        <div><button id="downloadMemoBtn" class="small">Télécharger Memoir.txt</button> <button id="clearMemoBtn" class="small">Vider Memoir</button></div>
+      </div>
+    </div>
+
+    <div id="galleryPanel">
+      <div style="font-weight:700;margin-bottom:6px">Galerie / Visages connus</div>
+      <div id="knownList" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto"></div>
+    </div>
+
+    <div id="status">Chargement modèles…</div>
+    <div id="transcript"></div>
+    <div id="speech-bubble"></div>
+  </div>
+
+  <!-- face-api.js (vladmandic) -->
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
 
   <script>
+  (async ()=>{
+
+    // ---------------------------
+    // Configuration & état
+    // ---------------------------
     const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
+    const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
     const statusEl = document.getElementById('status');
     const transcriptEl = document.getElementById('transcript');
     const speechBubble = document.getElementById('speech-bubble');
 
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const snapBtn = document.getElementById('snapBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const stopRecordBtn = document.getElementById('stopRecordBtn');
+    const detectorModeSel = document.getElementById('detectorMode');
+    const showBoxChk = document.getElementById('showBox');
+    const autoMemoChk = document.getElementById('autoMemo');
+    const nameInput = document.getElementById('nameInput');
+    const registerBtn = document.getElementById('registerBtn');
+    const thumbsEl = document.getElementById('thumbs');
+    const knownListEl = document.getElementById('knownList');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const fileInput = document.getElementById('fileInput');
+    const clearFacesBtn = document.getElementById('clearFacesBtn');
+    const askBtn = document.getElementById('askBtn');
+    const questionInput = document.getElementById('questionInput');
+    const fpsEl = document.getElementById('fps');
+    const facesCountEl = document.getElementById('facesCount');
+    const avgAgeEl = document.getElementById('avgAge');
+    const lastExprEl = document.getElementById('lastExpr');
+    const downloadMemoBtn = document.getElementById('downloadMemoBtn');
+    const clearMemoBtn = document.getElementById('clearMemoBtn');
+
+    // Keep the API key visible as requested (warning)
     const apiKey = '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';
 
-    let isRecognitionActive = true;
+    let isRunning = false;
+    let mediaRecorder = null;
+    let recordedBlobs = [];
+    let fpsCounter = { lastTime: performance.now(), frames:0, fps:0 };
+    let detectionInterval = 100; // ms for fallback loops
+    let faceMatcher = null;
+    let labeledDescriptors = []; // in-memory
+    let memoRecords = JSON.parse(localStorage.getItem('memoir_v1') || '[]');
+    let lastExpressions = [];
+    let ageSmootherWindow = 5; // smoothing window
+    let ageBuffer = [];
 
-    function resizeCanvas() {
+    // ensure canvas sized
+    function resizeCanvas(){
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-    // --- Charger les modèles face-api ---
+    // ---------------------------
+    // Load models
+    // ---------------------------
     async function loadModels() {
-      statusEl.textContent = 'Chargement des modèles...';
+      statusEl.textContent = 'Chargement modèles face-api...';
+      // Charger plusieurs modèles utiles
+      const base = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
       await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'),
-        faceapi.nets.ageGenderNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/')
+        faceapi.nets.tinyFaceDetector.loadFromUri(base),
+        faceapi.nets.ssdMobilenetv1.loadFromUri(base),
+        faceapi.nets.ageGenderNet.loadFromUri(base),
+        faceapi.nets.faceExpressionNet.loadFromUri(base),
+        faceapi.nets.faceLandmark68Net.loadFromUri(base),
+        faceapi.nets.faceRecognitionNet.loadFromUri(base)
       ]);
-      statusEl.textContent = 'Modèles prêts — activation de la caméra...';
-      startCamera();
+      statusEl.textContent = 'Modèles prêts';
+      loadSavedFaces();
     }
 
-    // --- Démarrer la caméra ---
-    async function startCamera() {
+    await loadModels();
+
+    // ---------------------------
+    // Camera
+    // ---------------------------
+    async function startCamera(){
+      if(isRunning) return;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        statusEl.textContent = 'Activation caméra...';
+        const stream = await navigator.mediaDevices.getUserMedia({video:{width:1280,height:720}, audio:true});
         video.srcObject = stream;
-        video.onloadedmetadata = () => {
-          video.play();
-          statusEl.textContent = 'Caméra active — détection en cours';
-          detectLoop();
-        };
-      } catch (err) {
-        statusEl.textContent = 'Erreur caméra : ' + err.message;
-        alert('Activez la caméra (HTTPS ou localhost requis)');
+        await video.play();
+        isRunning = true;
+        statusEl.textContent = 'Caméra active — démarrage détection';
+        runDetectionLoop();
+      } catch(err){
+        statusEl.textContent = 'Erreur caméra: ' + err.message;
+        alert('Activez la caméra (HTTPS ou localhost requis) : ' + err.message);
       }
     }
+    function stopCamera(){
+      if(!isRunning) return;
+      const s = video.srcObject;
+      if(s && s.getTracks) s.getTracks().forEach(t=>t.stop());
+      video.srcObject = null;
+      isRunning = false;
+      statusEl.textContent = 'Caméra arrêtée';
+      clearOverlay();
+    }
+    startBtn.onclick = startCamera;
+    stopBtn.onclick = stopCamera;
 
-    // --- Boucle de détection ---
-    async function detectLoop() {
-      if (!isRecognitionActive || video.paused || video.ended) return setTimeout(detectLoop, 500);
-      
-      const detections = await faceapi
-        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-        .withAgeAndGender();
+    // ---------------------------
+    // Detection loop
+    // ---------------------------
+    async function runDetectionLoop(){
+      resizeCanvas();
+      const mode = detectorModeSel.value;
+      let options = mode === 'ssd' ? new faceapi.SsdMobilenetv1Options({minConfidence:0.5}) : new faceapi.TinyFaceDetectorOptions({inputSize:320, scoreThreshold:0.5});
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const displaySize = { width: canvas.width, height: canvas.height };
-      const resized = faceapi.resizeResults(detections, displaySize);
+      async function loop(){
+        if(!isRunning){ return; }
+        const t0 = performance.now();
+        let detections;
+        try {
+          if(mode === 'ssd') {
+            detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withAgeAndGender().withFaceExpressions().withFaceDescriptors();
+          } else {
+            detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withAgeAndGender().withFaceExpressions().withFaceDescriptors();
+          }
+        } catch(err){
+          console.error('Erreur détection', err);
+          detections = [];
+        }
 
-      resized.forEach(result => {
-        const { age, gender, detection } = result;
-        const box = detection.box;
-        const label = `${gender === 'male' ? 'Homme' : 'Femme'}, ~${Math.round(age)} ans`;
+        // FPS calc
+        fpsCounter.frames++;
+        const now = performance.now();
+        if(now - fpsCounter.lastTime >= 1000){
+          fpsCounter.fps = Math.round((fpsCounter.frames*1000)/(now - fpsCounter.lastTime));
+          fpsCounter.lastTime = now;
+          fpsCounter.frames = 0;
+          fpsEl.textContent = fpsCounter.fps;
+        }
 
-        ctx.strokeStyle = '#00ff99';
-        ctx.lineWidth = 3;
-        ctx.shadowColor = '#00ffaa';
-        ctx.shadowBlur = 10;
-        ctx.strokeRect(box.x, box.y, box.width, box.height);
-
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(box.x, box.y - 25, ctx.measureText(label).width + 15, 20);
-        ctx.fillStyle = 'white';
-        ctx.font = '16px Inter';
-        ctx.fillText(label, box.x + 5, box.y - 10);
-      });
-
-      requestAnimationFrame(detectLoop);
+        drawDetections(detections);
+        if(autoMemoChk.checked && detections.length>0){
+          saveMemo(detections);
+        }
+        // schedule next frame
+        requestAnimationFrame(loop);
+      }
+      loop();
     }
 
-    // --- Requête IA Groq ---
-    async function askGroq(question) {
-      statusEl.textContent = 'Interrogation de l\'IA...';
+    function clearOverlay(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+
+    // ---------------------------
+    // Drawing / visualisation
+    // ---------------------------
+    function drawDetections(detections){
+      clearOverlay();
+      const displaySize = { width: canvas.width, height: canvas.height };
+      // Need to map detection box from video coords -> canvas
+      // Use ratios
+      const scaleX = canvas.width / video.videoWidth;
+      const scaleY = canvas.height / video.videoHeight;
+
+      facesCountEl.textContent = detections.length;
+
+      let ages = [];
+      let dominantExpression = null;
+      let exprCounts = {};
+
+      detections.forEach((res, idx) => {
+        const box = res.detection.box;
+        const x = box.x * scaleX;
+        const y = box.y * scaleY;
+        const w = box.width * scaleX;
+        const h = box.height * scaleY;
+
+        // age smoothing: store buffer across faces by index (approx)
+        const age = res.age || 0;
+        ages.push(age);
+
+        // expressions
+        const expressions = res.expressions || {};
+        let topExpr = Object.keys(expressions).reduce((a,b)=> expressions[a] > expressions[b] ? a : b, Object.keys(expressions)[0] || null);
+        lastExpressions.push(topExpr);
+        exprCounts[topExpr] = (exprCounts[topExpr] || 0) + 1;
+
+        // recognition: find best match if we have matcher
+        let nameLabel = 'Inconnu';
+        if(faceMatcher && res.descriptor){
+          const best = faceMatcher.findBestMatch(res.descriptor);
+          if(best && best.label && best.label !== 'unknown') nameLabel = best.toString(); // includes distance
+        }
+
+        // final label
+        const gender = (res.gender === 'male' ? 'Homme' : 'Femme');
+        const label = `${nameLabel} — ${gender}, ~${Math.round(age)} ans`;
+
+        if(showBoxChk.checked){
+          // box
+          ctx.save();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#00ff99';
+          ctx.shadowColor = '#00ffaa';
+          ctx.shadowBlur = 8;
+          ctx.strokeRect(x, y, w, h);
+          ctx.shadowBlur = 0;
+          // label background
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          const measure = ctx.measureText(label).width;
+          ctx.fillRect(x, y - 24, measure + 14, 22);
+          ctx.fillStyle = '#fff';
+          ctx.font = '14px Inter';
+          ctx.fillText(label, x + 6, y - 8);
+          ctx.restore();
+        }
+
+        // create thumbnail (small) in thumbs area (only once per detection)
+        if(idx < 8){ // limit number of thumbs drawn
+          try {
+            const faceCanvas = document.createElement('canvas');
+            const s = 128;
+            faceCanvas.width = s; faceCanvas.height = s;
+            const fctx = faceCanvas.getContext('2d');
+            // draw from video scaled and cropped
+            fctx.drawImage(video, box.x, box.y, box.width, box.height, 0, 0, s, s);
+            // place/update thumb element
+            if(idx >= thumbsEl.children.length){
+              const div = document.createElement('div'); div.className='thumb';
+              div.appendChild(faceCanvas);
+              thumbsEl.appendChild(div);
+            } else {
+              const existingCanvas = thumbsEl.children[idx].querySelector('canvas');
+              if(existingCanvas){
+                existingCanvas.getContext('2d').clearRect(0,0,s,s);
+                existingCanvas.getContext('2d').drawImage(faceCanvas,0,0);
+              } else {
+                thumbsEl.children[idx].innerHTML=''; thumbsEl.children[idx].appendChild(faceCanvas);
+              }
+            }
+          } catch(e){/* ignore thumbnail draw errors */ }
+        }
+      });
+
+      // stats: average age (smoothed)
+      if(ages.length>0){
+        const meanAge = ages.reduce((a,b)=>a+b,0)/ages.length;
+        ageBuffer.push(meanAge);
+        if(ageBuffer.length > ageSmootherWindow) ageBuffer.shift();
+        const smoothed = Math.round(ageBuffer.reduce((a,b)=>a+b,0)/ageBuffer.length);
+        avgAgeEl.textContent = smoothed + ' ans';
+      } else {
+        avgAgeEl.textContent = '--';
+      }
+
+      // expression
+      const exprKeys = Object.keys(exprCounts);
+      if(exprKeys.length>0){
+        const dom = exprKeys.reduce((a,b)=> exprCounts[a] > exprCounts[b] ? a : b);
+        lastExprEl.textContent = dom;
+      }
+
+    }
+
+    // ---------------------------
+    // Face registration / persistence
+    // ---------------------------
+    function serializeDescriptors(ld){
+      // ld: [{ label, descriptors: [Float32Array,...] }]
+      return JSON.stringify(ld.map(item => ({
+        label: item.label,
+        descriptors: item.descriptors.map(d => Array.from(d))
+      })));
+    }
+    function deserializeDescriptors(json){
+      const arr = JSON.parse(json);
+      return arr.map(item => ({
+        label: item.label,
+        descriptors: item.descriptors.map(a => new Float32Array(a))
+      }));
+    }
+
+    function saveFacesToStorage(){
+      const payload = serializeDescriptors(labeledDescriptors);
+      localStorage.setItem('known_faces_v1', payload);
+    }
+
+    function loadSavedFaces(){
+      const raw = localStorage.getItem('known_faces_v1');
+      if(!raw) return;
       try {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
+        labeledDescriptors = deserializeDescriptors(raw);
+        rebuildFaceMatcher();
+        renderKnownList();
+      } catch(e){ console.error('Erreur lecture known faces', e); }
+    }
+
+    function rebuildFaceMatcher(){
+      if(labeledDescriptors.length===0){ faceMatcher = null; return; }
+      const labeled = labeledDescriptors.map(ld => new faceapi.LabeledFaceDescriptors(ld.label, ld.descriptors));
+      faceMatcher = new faceapi.FaceMatcher(labeled, 0.6);
+    }
+
+    function renderKnownList(){
+      knownListEl.innerHTML='';
+      labeledDescriptors.forEach((ld, i)=>{
+        const div = document.createElement('div');
+        div.style.display='flex'; div.style.alignItems='center'; div.style.gap='8px';
+        const img = document.createElement('canvas'); img.width=64; img.height=64; img.style.borderRadius='8px';
+        // draw first descriptor as placeholder (no image stored) - put label box with initials
+        const g = img.getContext('2d');
+        g.fillStyle = '#111'; g.fillRect(0,0,64,64);
+        g.fillStyle = '#00ff99'; g.font='12px Inter'; g.fillText(ld.label.slice(0,12),6,34);
+        div.appendChild(img);
+        const txt = document.createElement('div'); txt.style.flex='1';
+        txt.innerHTML = `<strong style="font-size:13px">${ld.label}</strong><div style="font-size:12px;color:rgba(255,255,255,0.6)">Descriptors: ${ld.descriptors.length}</div>`;
+        const del = document.createElement('button'); del.className='small'; del.textContent='Supprimer';
+        del.onclick = ()=>{ labeledDescriptors.splice(i,1); saveFacesToStorage(); rebuildFaceMatcher(); renderKnownList(); };
+        div.appendChild(txt); div.appendChild(del);
+        knownListEl.appendChild(div);
+      });
+    }
+
+    registerBtn.onclick = async ()=>{
+      if(!isRunning){ alert('Démarre la caméra avant d\'enregistrer.'); return; }
+      const name = (nameInput.value||'Personne').trim();
+      if(!name) { alert('Donne un nom'); return; }
+      statusEl.textContent = `Capture visage pour "${name}"...`;
+      const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+      if(!detection){
+        alert('Aucun visage détecté — place-toi devant la caméra.');
+        statusEl.textContent = 'Aucun visage détecté';
+        return;
+      }
+      const descriptor = detection.descriptor;
+      // find if label exists
+      let found = labeledDescriptors.find(ld => ld.label === name);
+      if(found) {
+        found.descriptors.push(descriptor);
+      } else {
+        labeledDescriptors.push({ label: name, descriptors: [descriptor] });
+      }
+      saveFacesToStorage();
+      rebuildFaceMatcher();
+      renderKnownList();
+      statusEl.textContent = `Visage enregistré : ${name}`;
+    };
+
+    exportBtn.onclick = ()=>{
+      const data = serializeDescriptors(labeledDescriptors);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'known_faces.json'; a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    importBtn.onclick = ()=> fileInput.click();
+    fileInput.onchange = (e)=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        try{
+          const json = ev.target.result;
+          const imported = deserializeDescriptors(json);
+          // merge
+          imported.forEach(item=>{
+            const exist = labeledDescriptors.find(ld=>ld.label===item.label);
+            if(exist) exist.descriptors.push(...item.descriptors);
+            else labeledDescriptors.push(item);
+          });
+          saveFacesToStorage(); rebuildFaceMatcher(); renderKnownList();
+          statusEl.textContent = 'Import OK';
+        }catch(err){ alert('Erreur import: '+err.message); }
+      };
+      reader.readAsText(f);
+    };
+
+    clearFacesBtn.onclick = ()=>{
+      if(!confirm('Supprimer tous les visages enregistrés ?')) return;
+      labeledDescriptors = []; saveFacesToStorage(); rebuildFaceMatcher(); renderKnownList();
+    };
+
+    // load initial
+    loadSavedFaces();
+
+    // ---------------------------
+    // Memoir (journal) — append & export
+    // ---------------------------
+    function saveMemo(detections){
+      // store timestamp, count, avgAge, names
+      const t = new Date().toISOString();
+      const count = detections.length;
+      const avgAge = Math.round(detections.reduce((a,b)=>a+(b.age||0),0) / (count||1));
+      const names = detections.map(d=>{
+        try{
+          if(faceMatcher && d.descriptor) {
+            const m = faceMatcher.findBestMatch(d.descriptor);
+            return m ? m.toString() : 'inconnu';
+          }
+        }catch(e){}
+        return 'inconnu';
+      });
+      const rec = { time: t, count, avgAge, names };
+      memoRecords.push(rec);
+      localStorage.setItem('memoir_v1', JSON.stringify(memoRecords));
+    }
+
+    downloadMemoBtn.onclick = ()=>{
+      const lines = memoRecords.map(r=>`${r.time} | count:${r.count} | avgAge:${r.avgAge} | names:${r.names.join(',')}`);
+      const txt = lines.join('\n');
+      const blob = new Blob([txt], { type:'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'Memoir.txt'; a.click();
+      URL.revokeObjectURL(url);
+    };
+    clearMemoBtn.onclick = ()=>{
+      if(!confirm('Vider le Memoir ?')) return;
+      memoRecords = []; localStorage.removeItem('memoir_v1');
+    };
+
+    // ---------------------------
+    // Snapshot & Recording
+    // ---------------------------
+    snapBtn.onclick = ()=>{
+      if(!isRunning) return alert('Active la caméra');
+      const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight;
+      c.getContext('2d').drawImage(video,0,0);
+      const url = c.toDataURL('image/png');
+      const a = document.createElement('a'); a.href=url; a.download = `snapshot_${Date.now()}.png`; a.click();
+    };
+
+    recordBtn.onclick = ()=>{
+      if(!isRunning) return alert('Active la caméra');
+      recordedBlobs = [];
+      const stream = video.srcObject;
+      try {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+      } catch (e) {
+        try { mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8' }); } catch (e2){
+          mediaRecorder = new MediaRecorder(stream);
+        }
+      }
+      mediaRecorder.ondataavailable = (ev)=>{ if(ev.data && ev.data.size>0) recordedBlobs.push(ev.data); };
+      mediaRecorder.onstop = ()=>{
+        const blob = new Blob(recordedBlobs, { type:'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `record_${Date.now()}.webm`; a.click();
+        URL.revokeObjectURL(url);
+      };
+      mediaRecorder.start();
+      recordBtn.disabled = true; stopRecordBtn.disabled = false;
+      statusEl.textContent = 'Enregistrement vidéo...';
+    };
+    stopRecordBtn.onclick = ()=>{
+      if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      recordBtn.disabled = false; stopRecordBtn.disabled = true;
+      statusEl.textContent = 'Enregistrement arrêté';
+    };
+
+    // ---------------------------
+    // Voice recognition (commands)
+    // ---------------------------
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(SpeechRecognition){
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'fr-FR';
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.onresult = (e)=>{
+        const transcript = e.results[e.results.length-1][0].transcript.trim().toLowerCase();
+        transcriptEl.textContent = 'Dit: ' + transcript;
+        // commands:
+        if(transcript.includes('prendre une photo') || transcript.includes('prends une photo')){
+          snapBtn.click();
+          showSpeech('Photo prise ✅');
+        } else if(transcript.includes('enregistrer') || transcript.includes('commence enregistrement')){
+          recordBtn.click();
+          showSpeech('Enregistrement démarré ✅');
+        } else if(transcript.includes('arrête l enregistrement') || transcript.includes('stop enregistrement')){
+          stopRecordBtn.click();
+          showSpeech('Enregistrement stoppé ✅');
+        } else if(transcript.includes('lire memoir') || transcript.includes('affiche memoir')){
+          downloadMemoBtn.click();
+        } else if(transcript.startsWith('krozen') || transcript.startsWith('frozen') || transcript.startsWith('crozen')){
+          // treat as question for the IA (strip keyword)
+          const q = transcript.replace(/^(krozen|frozen|crozen)\s*/, '');
+          if(q) askGroq(q);
+        }
+      };
+      recognition.onerror = (e)=> console.warn('Speech error', e);
+      recognition.onend = ()=> recognition.start();
+      recognition.start();
+    } else {
+      transcriptEl.textContent = 'Reconnaissance vocale non supportée';
+    }
+
+    function showSpeech(text, ms=6000){
+      speechBubble.textContent = text; speechBubble.style.display='block';
+      setTimeout(()=>speechBubble.style.display='none', ms);
+    }
+
+    // ---------------------------
+    // Groq ask function (kept client-side as requested)
+    // ---------------------------
+    async function askGroq(question){
+      if(!question) return;
+      statusEl.textContent = 'Interrogation IA...';
+      try {
+        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method:'POST',
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
@@ -166,68 +655,49 @@
             model: 'llama-3.1-8b-instant'
           })
         });
-
-        const data = await response.json();
-        const answer = data.choices?.[0]?.message?.content || "Aucune réponse reçue.";
-        speechBubble.textContent = answer;
-        speechBubble.style.display = 'block';
-        setTimeout(() => { speechBubble.style.display = 'none'; }, 10000);
-        statusEl.textContent = 'Caméra active — détection en cours';
-      } catch (err) {
-        statusEl.textContent = 'Erreur IA : ' + err.message;
+        if(!resp.ok){ const t = await resp.text(); throw new Error(`${resp.status} ${t}`); }
+        const json = await resp.json();
+        const answer = json.choices?.[0]?.message?.content || 'Aucune réponse';
+        showSpeech(answer, 10000);
+        statusEl.textContent = 'Caméra active';
+      } catch(err){
+        console.error('Groq error', err);
+        statusEl.textContent = 'Erreur IA: ' + err.message;
+        showSpeech('Erreur IA: ' + err.message, 5000);
       }
     }
+    askBtn.onclick = ()=> askGroq(questionInput.value.trim());
 
-    // --- Reconnaissance vocale ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'fr-FR';
-      recognition.continuous = true;
-      recognition.interimResults = true;
+    // ---------------------------
+    // Utility: load known faces from storage at start
+    // ---------------------------
+    function loadSavedFaces(){
+      const raw = localStorage.getItem('known_faces_v1');
+      if(!raw) return;
+      try {
+        labeledDescriptors = deserializeDescriptors(raw);
+        rebuildFaceMatcher();
+        renderKnownList();
+      } catch(e){
+        console.error('Import known faces failed', e);
+      }
+    }
+    loadSavedFaces();
 
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i)
-          transcript += event.results[i][0].transcript;
-        transcript = transcript.trim().toLowerCase();
-        transcriptEl.textContent = `Dit : ${transcript}`;
-
-        const activationPhrases = ['krozen ouvre la reconnaissance faciale', 'frozen ouvre la reconnaissance faciale', 'crozen ouvre la reconnaissance faciale'];
-        const stopPhrases = ['krozen arrête la reconnaissance faciale', 'frozen arrête la reconnaissance faciale', 'crozen arrête la reconnaissance faciale'];
-
-        if (stopPhrases.some(p => transcript.includes(p)) && event.results[event.results.length - 1].isFinal) {
-          isRecognitionActive = false;
-          statusEl.textContent = 'Reconnaissance faciale arrêtée.';
-          return;
-        }
-        if (!isRecognitionActive && activationPhrases.some(p => transcript.includes(p)) && event.results[event.results.length - 1].isFinal) {
-          isRecognitionActive = true;
-          statusEl.textContent = 'Caméra active — détection en cours';
-          detectLoop();
-          return;
-        }
-
-        const prefixes = ['krozen', 'frozen', 'crozen'];
-        const prefix = prefixes.find(p => transcript.startsWith(p));
-        if (prefix && event.results[event.results.length - 1].isFinal) {
-          const question = transcript.replace(new RegExp(`^${prefix}\\s*,?\\s*`, 'i'), '').trim();
-          if (question) askGroq(question);
-        }
-      };
-
-      recognition.onerror = (event) => {
-        if (event.error !== 'no-speech')
-          statusEl.textContent = 'Erreur vocale : ' + event.error;
-      };
-
-      recognition.onend = () => recognition.start();
-      recognition.start();
-    } else {
-      statusEl.textContent = 'Reconnaissance vocale non supportée.';
+    // ---------------------------
+    // Helper: deserialize utility (duplicated for scoping)
+    // ---------------------------
+    function deserializeDescriptors(json){
+      const arr = JSON.parse(json);
+      return arr.map(item => ({
+        label: item.label,
+        descriptors: item.descriptors.map(a => new Float32Array(a))
+      }));
     }
 
-    loadModels();
+    // initial UI state
+    statusEl.textContent = 'Prêt. Clique sur "Démarrer"';
+  })();
   </script>
 </body>
 </html>
