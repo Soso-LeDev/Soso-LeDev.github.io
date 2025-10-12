@@ -228,6 +228,10 @@
           })
         });
         console.log('Réponse HTTP status:', response.status);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error ${response.status}: ${errorText}`);
+        }
         const data = await response.json();
         console.log('Réponse data de Groq:', data);
         if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
@@ -237,6 +241,8 @@
           setTimeout(() => {
             speechBubble.style.display = 'none';
           }, 10000);
+        } else if (data.error) {
+          throw new Error(data.error.message || 'Erreur inconnue de Groq');
         } else {
           console.log('Aucune réponse valide de Groq');
           speechBubble.textContent = 'Aucune réponse reçue.';
@@ -272,6 +278,7 @@
         }
         transcript = transcript.trim().toLowerCase();
         transcriptEl.textContent = `Dit : ${transcript}`;
+        console.log('Transcript détecté:', transcript);
 
         const activationPhrases = [
           'krozen ouvre la reconnaissance faciale',
@@ -297,9 +304,12 @@
             startCamera();
           }
         } else {
-          if ((transcript.startsWith('krozen') || transcript.startsWith('frozen') || transcript.startsWith('crozen')) && event.results[event.results.length - 1].isFinal) {
-            const question = transcript.replace(/^(krozen|frozen|crozen)\s*,?\s*/i, '').trim();
+          const prefixes = ['krozen', 'frozen', 'crozen'];
+          const prefixMatch = prefixes.find(prefix => transcript.startsWith(prefix));
+          if (prefixMatch && event.results[event.results.length - 1].isFinal) {
+            const question = transcript.replace(new RegExp(`^${prefixMatch}\\s*,?\\s*`, 'i'), '').trim();
             if (question) {
+              console.log('Question extraite:', question);
               askGroq(question);
             }
           }
