@@ -119,6 +119,7 @@
     faceDetection.onResults(onResults);
 
     async function onResults(results) {
+      if (!isRecognitionActive) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (!results.detections || results.detections.length === 0) return;
 
@@ -179,7 +180,9 @@
       statusEl.textContent = 'Activation de la caméra...';
       camera = new Camera(video, {
         onFrame: async () => {
-          await faceDetection.send({ image: video });
+          if (isRecognitionActive) {
+            await faceDetection.send({ image: video });
+          }
         },
         width: 1280,
         height: 720,
@@ -193,6 +196,15 @@
         statusEl.textContent = 'Erreur caméra : ' + err.message;
         alert('Activez la caméra (HTTPS ou localhost requis)');
       }
+    }
+
+    function stopCamera() {
+      if (camera) {
+        camera.stop();
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      video.srcObject = null;
+      statusEl.textContent = 'Reconnaissance faciale arrêtée. Écoute en cours...';
     }
 
     async function askGroq(question) {
@@ -267,15 +279,27 @@
           'crozen ouvre la reconnaissance faciale'
         ];
 
+        const stopPhrases = [
+          'krozen arrête la reconnaissance faciale',
+          'frozen arrête la reconnaissance faciale',
+          'crozen arrête la reconnaissance faciale'
+        ];
+
+        if (stopPhrases.some(phrase => transcript.includes(phrase)) && event.results[event.results.length - 1].isFinal) {
+          isRecognitionActive = false;
+          stopCamera();
+          return;
+        }
+
         if (!isRecognitionActive) {
-          if (activationPhrases.some(phrase => transcript.includes(phrase))) {
+          if (activationPhrases.some(phrase => transcript.includes(phrase)) && event.results[event.results.length - 1].isFinal) {
             isRecognitionActive = true;
             startCamera();
           }
         } else {
-          if (transcript.startsWith('krozen') || transcript.startsWith('frozen') || transcript.startsWith('crozen')) {
+          if ((transcript.startsWith('krozen') || transcript.startsWith('frozen') || transcript.startsWith('crozen')) && event.results[event.results.length - 1].isFinal) {
             const question = transcript.replace(/^(krozen|frozen|crozen)\s*,?\s*/i, '').trim();
-            if (question && event.results[event.results.length - 1].isFinal) { // Attendre résultat final
+            if (question) {
               askGroq(question);
             }
           }
