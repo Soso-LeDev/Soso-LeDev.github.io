@@ -3,291 +3,264 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Buckingham Palace Roleplay — Guide</title>
-  <meta name="description" content="Buckingham Palace Roleplay — rôles, règles et liens. Design moderne, responsive et optimisé pour présentation." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <title>Buckingham Palace Roleplay — Guide et Informations</title>
+  <meta name="description" content="Guide pour Buckingham Palace Roleplay (Roblox) — rôles, règles, liens et commandes." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f1724;
+      --bg:#f4f7fb;
       --card:#ffffff;
-      --muted:#9aa4b2;
-      --accent:#ffbe2e;
-      --glass: rgba(255,255,255,0.06);
-      --glass-2: rgba(255,255,255,0.04);
-      --nav: rgba(7,20,40,0.85);
-      --glass-border: rgba(255,255,255,0.06);
-      --max-width:1100px;
+      --muted:#6b7280;
+      --accent:#007bff;
+      --nav:#001f3f;
+      --glass: rgba(255,255,255,0.7);
+      --max-width:1120px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071025 0%, #0f1724 100%);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
-    a{color:inherit}
-    .container{max-width:var(--max-width);margin:0 auto;padding:24px}
-    /* NAV */
-    header.site-header{position:sticky;top:0;z-index:60;background:linear-gradient(180deg, rgba(7,20,40,0.55), rgba(7,20,40,0.25));backdrop-filter: blur(6px);border-bottom:1px solid rgba(255,255,255,0.03)}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:var(--max-width);margin:0 auto;padding:14px}
-    .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-    .brand .logo{
-      width:48px;height:48px;border-radius:10px;overflow:hidden;display:inline-block;box-shadow:0 6px 20px rgba(2,6,23,0.6);
-      background:linear-gradient(135deg,#1f3a6b,#0b6cff);
-      display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-family:Playfair Display,serif
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#112; background:var(--bg); -webkit-font-smoothing:antialiased}
+    a{color:var(--accent)}
+    /* Header / hero */
+    .hero {
+      background: linear-gradient(180deg, rgba(0,31,63,0.55), rgba(0,31,63,0.45)), url("https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter") center/cover no-repeat;
+      color: #fff;
+      padding: 56px 20px;
+      text-align: left;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.18);
     }
-    .brand h1{font-size:1rem;margin:0;color:#fff;font-weight:700;letter-spacing:0.2px}
-    nav.menu{display:flex;gap:18px;align-items:center}
-    nav.menu a{color:#dfe9f8;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;transition:all .18s}
-    nav.menu a:hover{background:rgba(255,255,255,0.03);transform:translateY(-3px);color:var(--accent)}
-    .cta-btn{background:var(--accent);color:#072036;padding:8px 12px;border-radius:8px;font-weight:700;box-shadow:0 6px 18px rgba(255,190,46,0.12);border:none}
-    /* HERO + SLIDER */
-    .hero{position:relative;display:grid;align-items:center;min-height:56vh;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.02)}
-    .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(3,8,20,0.35) 10%, rgba(3,8,20,0.6) 60%);pointer-events:none}
-    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 460px;gap:28px;padding:60px 24px;align-items:center}
-    .hero-visual{border-radius:18px;overflow:hidden;box-shadow:0 18px 60px rgba(2,6,23,0.6);min-height:360px;background:#0b2238;position:relative}
-    .slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease,transform .9s ease;transform:scale(1.02)}
-    .slide img{width:100%;height:100%;object-fit:cover;display:block}
-    .slide.active{opacity:1;transform:scale(1);z-index:2}
-    .slider-controls{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;pointer-events:auto;z-index:5}
-    .control-btn{background:rgba(0,0,0,0.45);border:none;color:#fff;padding:8px 12px;border-radius:10px;backdrop-filter: blur(6px);cursor:pointer}
-    .thumbs{display:flex;gap:8px;position:absolute;left:12px;bottom:62px;z-index:5}
-    .thumb{width:64px;height:36px;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(2,6,23,0.5);opacity:0.85;cursor:pointer;border:2px solid rgba(255,255,255,0.03)}
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .thumb.active{outline:3px solid var(--accent);opacity:1}
-    .hero-copy{align-self:center;color:#f6fbff;padding:8px 12px}
-    .eyebrow{display:inline-block;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));padding:6px 10px;border-radius:999px;font-weight:700;color:var(--accent);font-size:12px;margin-bottom:12px}
-    .hero-copy h2{font-family:Playfair Display, serif;font-size:clamp(28px,4.2vw,40px);margin:6px 0 12px;line-height:1.02}
-    .hero-copy p.lead{color:var(--muted);margin:0 0 18px;font-size:15px;max-width:56ch}
+    .container{max-width:var(--max-width);margin:0 auto;padding:0 20px}
+    .hero-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+    .hero-text{flex:1;min-width:280px}
+    .brand{
+      font-family:'Playfair Display', serif;
+      font-size:28px;
+      margin:0 0 8px 0;
+      letter-spacing:0.2px;
+    }
+    .hero-sub{color:rgba(255,255,255,0.9);font-size:18px;margin:8px 0 18px;max-width:60ch}
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
-    .btn-primary{background:var(--accent);color:#072036;padding:12px 18px;border:none;border-radius:10px;font-weight:800;cursor:pointer;box-shadow:0 10px 36px rgba(255,190,46,0.12)}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 16px;border-radius:10px;color:#e6eef6}
-    /* ROLE GRID */
-    .roles{padding:40px 24px 64px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-    .role-card{background:linear-gradient(180deg,var(--glass),var(--glass-2));border-radius:14px;padding:18px;border:1px solid var(--glass-border);backdrop-filter: blur(8px);box-shadow:0 8px 30px rgba(2,6,23,0.5);transition:transform .28s, box-shadow .28s}
-    .role-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(2,6,23,0.65)}
-    .role-top{display:flex;align-items:center;gap:14px}
-    .role-icon{width:56px;height:56px;border-radius:10px;flex:0 0 56px;background:linear-gradient(135deg,#0b6cff,#1f3a6b);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-family:Playfair Display,serif}
-    .role-info h3{margin:0;font-size:18px}
-    .role-info p{margin:6px 0 0;color:var(--muted);font-size:13px}
-    .role-meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
-    .pill{padding:8px 10px;border-radius:999px;font-weight:700;font-size:13px;background:rgba(255,255,255,0.03);color:#dfe9f8}
-    .role-cta{padding:10px 14px;border-radius:10px;background:var(--accent);color:#072036;font-weight:800;border:none;cursor:pointer}
-    /* FOOTER */
-    footer{padding:28px 24px;border-top:1px solid rgba(255,255,255,0.02);color:var(--muted)}
-    .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-    /* Responsive */
+    .btn{background:var(--accent);color:#fff;padding:12px 16px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.18);color:#fff}
+    .hero-media{width:420px;min-width:260px;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(2,6,23,0.35)}
+    .hero-media img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
+    /* nav */
+    nav.mainnav{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid rgba(16,24,40,0.04)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;max-width:var(--max-width);margin:0 auto}
+    .nav-left{display:flex;align-items:center;gap:12px}
+    .logo{background:var(--nav);color:#fff;width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Playfair Display}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{font-weight:600;color:#0f1724;text-decoration:none;padding:8px 10px;border-radius:8px}
+    .nav-links a:hover{color:var(--accent);transform:translateY(-2px)}
+    /* sections */
+    section.card{
+      background:var(--card);
+      border-radius:12px;
+      padding:26px;
+      margin:28px auto;
+      max-width:var(--max-width);
+      box-shadow:0 12px 30px rgba(16,24,40,0.06);
+      opacity:0; transform:translateY(20px); transition:opacity .7s ease, transform .7s ease;
+    }
+    section.card.visible{opacity:1; transform:translateY(0)}
+    h2{font-family:'Playfair Display',serif;color:var(--nav);margin:0 0 12px;font-size:1.6rem;border-bottom:3px solid var(--accent);padding-bottom:10px}
+    h3{color:var(--nav);margin:8px 0}
+    p.lead{color:var(--muted);margin:0 0 12px}
+    .featured{width:100%;border-radius:10px;margin:14px 0;display:block;box-shadow:0 8px 22px rgba(2,6,23,0.06)}
+    .links-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .link-btn{padding:10px 14px;border-radius:8px;background:linear-gradient(180deg,#fff,#f3f6fb);border:1px solid rgba(16,24,40,0.04);font-weight:700}
+    /* table */
+    table{width:100%;border-collapse:collapse;margin-top:18px}
+    th,td{padding:12px;border:1px solid #eef2f6;text-align:left}
+    th{background:var(--accent);color:#fff;font-weight:700}
+    tr:hover td{background:#fbfdff}
+    ul.clean{list-style:none;padding:0;margin:0}
+    ul.clean li{padding:10px 0;border-bottom:1px solid #f1f5f9}
+    .divider{height:1px;background:#eef2f6;margin:16px 0;border-radius:2px}
+    footer{background:var(--nav);color:#fff;padding:18px;text-align:center;margin-top:18px}
+    /* responsive */
     @media (max-width:980px){
-      .hero-inner{grid-template-columns:1fr;grid-auto-rows:auto;padding:36px 18px}
-      .hero-visual{order:2;min-height:280px}
-      .hero-copy{order:1}
-      .roles{grid-template-columns:repeat(2,1fr)}
+      .hero-inner{flex-direction:column-reverse}
+      .hero-media{width:100%}
+      .nav-links{display:none}
     }
     @media (max-width:640px){
-      nav.menu{display:none}
-      .roles{grid-template-columns:1fr;padding:24px 12px 56px}
-      .hero{min-height:46vh}
-      .thumbs{display:none}
-      .hero-inner{gap:14px}
+      .brand{font-size:22px}
+      .hero-sub{font-size:15px}
+      .hero{padding:36px 12px}
     }
-    /* entrance animations */
-    .fade-up{opacity:0;transform:translateY(14px);animation:fadeUp .7s ease forwards}
-    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
-  <header class="site-header">
+  <!-- NAV -->
+  <nav class="mainnav" role="navigation" aria-label="navigation principale">
     <div class="nav-inner container">
-      <a class="brand" href="#">
-        <div class="logo">BP</div>
+      <div class="nav-left">
+        <div class="logo" aria-hidden="true">BP</div>
         <div>
-          <h1>Buckingham Palace RP</h1>
-          <div style="font-size:12px;color:#9fb0ca;margin-top:2px">Rôles • Server • Events</div>
+          <div style="font-weight:700">Buckingham Palace RP</div>
+          <div style="font-size:12px;color:var(--muted)">Guide & Informations</div>
         </div>
-      </a>
-
-      <nav class="menu" aria-label="menu principal">
+      </div>
+      <div class="nav-links" role="menubar" aria-label="menu">
         <a href="#home">Accueil</a>
-        <a href="#roles">Rôles</a>
-        <a href="#rules">Règles</a>
-        <a href="#links">Liens</a>
-        <button class="cta-btn" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">Rejoindre</button>
-      </nav>
+        <a href="#police">Police (MPS)</a>
+        <a href="#ambulance">Ambulance (LAS)</a>
+        <a href="#royal-guard">Garde Royale (RG)</a>
+        <a class="link-btn" href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener">Jouer maintenant</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" role="banner" id="home">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <h1 class="brand">Buckingham Palace Roleplay sur Roblox</h1>
+        <p class="hero-sub">Un jeu de rôle immersif basé sur Westminster — protégez la royauté, faites régner la loi ou semez le chaos. Rejoignez la communauté et découvrez les rôles disponibles.</p>
+        <div class="hero-actions">
+          <button class="btn" onclick="document.getElementById('police').scrollIntoView({behavior:'smooth'})">Voir les rôles</button>
+          <a class="btn secondary" href="https://discord.com/invite/buckingham" target="_blank" rel="noopener">Discord officiel</a>
+        </div>
+      </div>
+      <div class="hero-media" aria-hidden="true">
+        <!-- image fournie (fallback si nécessaire vers la seconde) -->
+        <img src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter" alt="Buckingham Palace - visuel" onerror="this.src='https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter'">
+      </div>
     </div>
   </header>
 
-  <main>
-    <section id="home" class="hero" aria-label="Visuel principal">
-      <div class="hero-inner container">
-        <div class="hero-copy fade-up" style="animation-delay:.15s">
-          <span class="eyebrow">Serveur RP • Westminster</span>
-          <h2>Buckingham Palace Roleplay — Entre prestige et chaos</h2>
-          <p class="lead">Protège le palais comme garde royal, maintiens l'ordre comme policier, sauve des vies en ambulance ou choisis la voie du hors-la-loi — immersion forte, règles claires et communauté active.</p>
-          <div class="hero-actions">
-            <button class="btn-primary" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">Voir les rôles</button>
-            <button class="btn-ghost" onclick="openDiscord()">Discord officiel</button>
-          </div>
-        </div>
+  <!-- HOME SECTION (summary + links) -->
+  <section class="card" aria-labelledby="home-title">
+    <h2 id="home-title">Accueil</h2>
+    <img class="featured" src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter" alt="Buckingham Palace - vue">
+    <p class="lead">Buckingham Palace est un jeu Roblox centré sur le roleplay vie/life. Il se déroule à Westminster, London. Rejoignez en tant que garde royal, officier de police, criminel ou paramédic.</p>
 
-        <div class="hero-visual fade-up" style="animation-delay:.25s" aria-hidden="false">
-          <!-- SLIDER : remplace directement les URLs ci-dessous par tes images si tu veux -->
-          <div class="slide active" data-index="0">
-            <img alt="Buckingham Palace - image 1" src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter">
-          </div>
-          <div class="slide" data-index="1">
-            <img alt="Buckingham Palace - image 2" src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter">
-          </div>
+    <div class="links-row" role="navigation" aria-label="liens utiles">
+      <a class="link-btn" href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener">Jouer maintenant</a>
+      <a class="link-btn" href="https://discord.com/invite/buckingham" target="_blank" rel="noopener">Discord officiel</a>
+      <a class="link-btn" href="https://buckingham-palace.fandom.com/wiki/%F0%9F%92%82_Buckingham_Palace_Wiki" target="_blank" rel="noopener">Wiki</a>
+      <button class="link-btn" onclick="alert('Bienvenue dans le rôle-play !')">Commencer l'aventure</button>
+    </div>
+  </section>
 
-          <!-- thumbnails (desktop) -->
-          <div class="thumbs" aria-hidden="true">
-            <div class="thumb active" data-index="0"><img alt="miniature 1" src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter"></div>
-            <div class="thumb" data-index="1"><img alt="miniature 2" src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter"></div>
-          </div>
+  <!-- POLICE -->
+  <section id="police" class="card" aria-labelledby="police-title">
+    <h2 id="police-title">Police — Metropolitan Police Service (MPS)</h2>
+    <h3>Standards professionnels</h3>
+    <p>En tant que constable, adhérez à l'honnêteté, l'intégrité, le respect et la responsabilité. Respectez le roleplay et les règles du serveur.</p>
 
-          <!-- controls -->
-          <div class="slider-controls">
-            <button class="control-btn" id="prevBtn" aria-label="Image précédente">◀</button>
-            <button class="control-btn" id="nextBtn" aria-label="Image suivante">▶</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="divider" aria-hidden="true"></div>
 
-    <section id="roles" class="roles container" aria-label="Rôles disponibles">
-      <article class="role-card fade-up" style="animation-delay:.1s">
-        <div class="role-top">
-          <div class="role-icon">MP</div>
-          <div class="role-info">
-            <h3>Police (MPS)</h3>
-            <p>Patrouilles, arrestations, maintien de l'ordre et investigations.</p>
-          </div>
-        </div>
-        <div class="role-meta">
-          <div class="pill">Qualification: Examen</div>
-          <button class="role-cta" onclick="alert('Demande envoyée — système serveur requis')">Postuler</button>
-        </div>
-      </article>
+    <h3>Réglementation du kit</h3>
+    <ul class="clean" aria-label="équipements">
+      <li><strong>Taser :</strong> Utiliser pour incapaciter suspects fuyant ou menaçants.</li>
+      <li><strong>Bâton :</strong> Pour la défense contre suspects non coopératifs.</li>
+      <li><strong>Radio :</strong> Pour communications essentielles, codes d'état.</li>
+      <li><strong>PAVA :</strong> Spray incapacitant pour défense.</li>
+      <li><strong>Menottes :</strong> Pour retenir suspects résistants.</li>
+      <li><strong>Armes à feu :</strong> Seulement pour menace imminente à la vie.</li>
+    </ul>
 
-      <article class="role-card fade-up" style="animation-delay:.18s">
-        <div class="role-top">
-          <div class="role-icon">LAS</div>
-          <div class="role-info">
-            <h3>Ambulance (LAS)</h3>
-            <p>Soins avancés, réanimation et sauvetage des joueurs downed.</p>
-          </div>
-        </div>
-        <div class="role-meta">
-          <div class="pill">Gamepass: Optionnel</div>
-          <button class="role-cta" onclick="alert('Demande envoyée — système serveur requis')">Postuler</button>
-        </div>
-      </article>
+    <div class="divider"></div>
 
-      <article class="role-card fade-up" style="animation-delay:.26s">
-        <div class="role-top">
-          <div class="role-icon">RG</div>
-          <div class="role-info">
-            <h3>Garde Royale (RG)</h3>
-            <p>Protection du palais, cérémonies & postes VIP.</p>
-          </div>
-        </div>
-        <div class="role-meta">
-          <div class="pill">Permissions: Restreint</div>
-          <button class="role-cta" onclick="alert('Demande envoyée — système serveur requis')">Postuler</button>
-        </div>
-      </article>
+    <h3>Codes d'État</h3>
+    <ul class="clean" aria-label="codes d'état">
+      <li>State 0: Urgence — assistance immédiate requise</li>
+      <li>State 1: En service</li>
+      <li>State 2: En patrouille</li>
+      <li>State 3: Au poste — disponible</li>
+      <li>State 5: En route</li>
+      <li>State 6: Arrivé</li>
+      <li>State 9: Transport de prisonnier</li>
+      <li>State 11: Hors service</li>
+      <li>State 15: Reçu</li>
+      <li>State 16: Répéter le dernier</li>
+    </ul>
 
-      <article class="role-card fade-up" style="animation-delay:.34s">
-        <div class="role-top">
-          <div class="role-icon">CR</div>
-          <div class="role-info">
-            <h3>Criminel</h3>
-            <p>Braquages, fuites, roleplay hors-la-loi — haut risque, haute récompense.</p>
-          </div>
-        </div>
-        <div class="role-meta">
-          <div class="pill">Mode: libre</div>
-          <button class="role-cta" onclick="alert('Vous avez choisi: Criminel — amuse-toi !')">Choisir</button>
-        </div>
-      </article>
-    </section>
+    <div class="divider"></div>
 
-    <section id="rules" class="container" style="padding:22px 24px 64px">
-      <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:stretch">
-        <div style="flex:1;min-width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px)">
-          <h3 style="margin:0 0 8px">Règles essentielles</h3>
-          <ul style="margin:12px 0 0;padding-left:18px;color:var(--muted)">
-            <li>Respect RP & respect des joueurs</li>
-            <li>Pas d'abus d'armes / exploitation de bugs</li>
-            <li>Suivre les consignes des officiers en service</li>
-            <li>Signalement via Discord pour problèmes</li>
-          </ul>
-        </div>
+    <h3>Commandes Quick-Chat</h3>
+    <div style="overflow:auto">
+      <table aria-describedby="quickchat-desc">
+        <caption id="quickchat-desc" style="caption-side:top;text-align:left;font-weight:700;padding-bottom:8px">Commandes vocales rapides</caption>
+        <thead>
+          <tr><th scope="col">Commande</th><th scope="col">Message (EN)</th><th scope="col">Usage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>/e rights</td><td>You do not have to say anything. But it may harm your defence if you do not mention when questioned something which you later rely on in court. Anything you do say may be given in evidence.</td><td>Lecture des droits avant arrestation</td></tr>
+          <tr><td>/e s1</td><td>I will now be searching you under Section 1 of the Police and Criminal Evidence Act 1984.</td><td>Fouille avec cause probable</td></tr>
+          <tr><td>/e s32</td><td>I will now be searching you under Section 32 of the Police and Criminal Evidence Act 1984 due to your arrest.</td><td>Fouille liée à une arrestation</td></tr>
+          <tr><td>/e s47</td><td>I will now be searching you under Section 47 of the Firearms Act 1968.</td><td>Fouille pour suspicion de possession d'arme</td></tr>
+          <tr><td>/e t</td><td>TASER, TASER, TASER!</td><td>Avertir avant utilisation du taser</td></tr>
+          <tr><td>/e tao</td><td>TASER ARMED OFFICER!</td><td>S'annoncer comme officier armé de taser</td></tr>
+          <tr><td>/e ap</td><td>ARMED POLICE!</td><td>S'annoncer comme police armée</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-        <div style="width:320px;min-width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px)">
-          <h3 style="margin:0 0 8px">Liens utiles</h3>
-          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
-            <a href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener noreferrer" style="text-decoration:none"><button class="btn-ghost" style="width:100%;text-align:left">Jouer maintenant</button></a>
-            <a href="https://discord.com/invite/buckingham" target="_blank" rel="noopener noreferrer" style="text-decoration:none"><button class="btn-ghost" style="width:100%;text-align:left">Discord officiel</button></a>
-            <a href="https://buckingham-palace.fandom.com" target="_blank" rel="noopener noreferrer" style="text-decoration:none"><button class="btn-ghost" style="width:100%;text-align:left">Wiki / Infos</button></a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+    <div class="divider"></div>
+
+    <h3>Divisions</h3>
+    <p><strong>Divisions primaires :</strong> Response Policing, Armed Policing, Close Protection, Roads & Transport. Certaines divisions requièrent qualifications/permissions.</p>
+
+    <div class="divider"></div>
+
+    <h3>Rangs et Outils</h3>
+    <ul class="clean" aria-label="rangs">
+      <li>Trainee Constable (0 points): Handcuffs, Baton, Warrant card</li>
+      <li>Special Constable (2 points): Taser</li>
+      <li>Constable (5 points): Speed gun</li>
+      <li>Senior Constable (15 points): PAVA</li>
+      <li>Sergeant (50 points): Medical bag</li>
+      <li>Inspector (100 points): Clamp</li>
+      <li>Chief Inspector (150 points): British Transport Police</li>
+      <li>Superintendent (250 points)</li>
+      <li>Chief Superintendent (350 points)</li>
+    </ul>
+  </section>
+
+  <!-- AMBULANCE -->
+  <section id="ambulance" class="card" aria-labelledby="amb-title">
+    <h2 id="amb-title">Ambulance — London Ambulance Service (LAS)</h2>
+    <p class="lead">La LAS est une équipe qui s'occupe des soins avancés et du sauvetage des joueurs downed. Certains rôles peuvent être liés à un gamepass ou à une formation.</p>
+    <p>Le manuel fournit des guidelines sur les rôles, la structure des rangs, l'entraînement et l'usage de l'équipement. Requiert entraînement via le lien ci-dessous.</p>
+    <p>Lien d'entraînement : <a href="https://docs.google.com/document/d/1soiboQEQQCtL3pA2HjcLGGUmnq-_9gsjQIGc7jrPCYY/edit?tab=t.0" target="_blank" rel="noopener">Voir le document</a></p>
+  </section>
+
+  <!-- ROYAL GUARD -->
+  <section id="royal-guard" class="card" aria-labelledby="rg-title">
+    <h2 id="rg-title">Garde Royale (RG)</h2>
+    <p><strong>Guardsman :</strong> M1911 + L85A2 (avec munitions)</p>
+    <p><strong>Corporal :</strong> Permission d'ouvrir les portes du palais</p>
+    <p>La Garde Royale protège le palais et maintient l'ordre dans les zones royales. Rôles souvent restreints et soumis à qualification.</p>
+  </section>
 
   <footer>
-    <div class="container footer-inner">
-      <div>© 2025 Buckingham Palace Roleplay — Design</div>
-      <div class="muted">Made with ❤️ — Responsive • Accessible • Ready</div>
+    <div class="container">
+      <p style="margin:0">&copy; 2025 Buckingham Palace Roleplay Guide — Design amélioré, animations et images intégrées.</p>
     </div>
   </footer>
 
   <script>
-    // slider logic
-    (function(){
-      const slides = Array.from(document.querySelectorAll('.slide'));
-      const thumbs = Array.from(document.querySelectorAll('.thumb'));
-      const prev = document.getElementById('prevBtn');
-      const next = document.getElementById('nextBtn');
-      let idx = 0;
-      function show(i){
-        idx = (i + slides.length) % slides.length;
-        slides.forEach(s => s.classList.remove('active'));
-        thumbs.forEach(t => t.classList.remove('active'));
-        slides[idx].classList.add('active');
-        if(thumbs[idx]) thumbs[idx].classList.add('active');
-      }
-      prev.addEventListener('click', ()=> show(idx-1));
-      next.addEventListener('click', ()=> show(idx+1));
-      thumbs.forEach(t => t.addEventListener('click', ()=> show(Number(t.dataset.index))));
-      // auto rotate every 6s
-      let auto = setInterval(()=> show(idx+1), 6000);
-      // pause on hover
-      const hero = document.querySelector('.hero-visual');
-      hero.addEventListener('mouseenter', ()=> clearInterval(auto));
-      hero.addEventListener('mouseleave', ()=> { auto = setInterval(()=> show(idx+1), 6000); });
-      // init
-      show(0);
-    })();
-
-    // misc
-    function openDiscord(){ window.open('https://discord.com/invite/buckingham','_blank','noopener'); }
-    document.addEventListener('DOMContentLoaded', () => {
-      const els = document.querySelectorAll('.fade-up');
-      els.forEach((el,i) => {
-        el.style.opacity = 0;
-        el.style.transform = 'translateY(18px)';
-        setTimeout(()=> {
-          el.style.transition = 'opacity .6s ease, transform .6s cubic-bezier(.2,.9,.3,1)';
-          el.style.opacity = 1;
-          el.style.transform = 'translateY(0)';
-        }, 120 + i*80);
-      });
-    });
-
-    // Smooth scroll anchors
+    // Smooth scroll for internal links
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click', function(e){
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+        const t = document.querySelector(this.getAttribute('href'));
+        if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
       });
     });
+
+    // IntersectionObserver reveal
+    const sections = document.querySelectorAll('section.card');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if(en.isIntersecting) en.target.classList.add('visible');
+      });
+    }, {threshold: 0.12});
+    sections.forEach(s => obs.observe(s));
+
+    // small console log
+    console.log('Guide chargé — bonne visite !');
   </script>
 </body>
 </html>
