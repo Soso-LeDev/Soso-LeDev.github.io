@@ -4,81 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buckingham Palace Roleplay - Guide et Informations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #e9ecef;
+            color: #212529;
         }
         header {
-            background-color: #003366;
+            background-color: #001f3f;
             color: white;
-            padding: 20px;
+            padding: 40px 20px;
             text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        header p {
+            font-size: 1.2em;
         }
         nav {
-            background-color: #0055a4;
-            padding: 10px;
+            background-color: #007bff;
+            padding: 15px;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         nav a {
             color: white;
-            margin: 0 15px;
+            margin: 0 20px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
+            transition: color 0.3s;
         }
         nav a:hover {
-            color: #ffd700;
+            color: #ffc107;
         }
         section {
-            padding: 20px;
-            margin: 20px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 25px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             opacity: 0;
-            animation: fadeIn 1s forwards;
+            transform: translateY(20px);
+            animation: slideIn 0.8s forwards;
         }
-        @keyframes fadeIn {
-            to { opacity: 1; }
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        h1, h2, h3 {
-            color: #003366;
+        h2, h3 {
+            color: #001f3f;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #dee2e6;
+            padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: white;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
         }
         footer {
-            background-color: #003366;
+            background-color: #001f3f;
             color: white;
             text-align: center;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
+            padding: 15px;
+            position: relative;
             bottom: 0;
+            width: 100%;
         }
         .animate-btn {
-            background-color: #0055a4;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
-            transition: transform 0.3s;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+            font-weight: 700;
         }
         .animate-btn:hover {
-            transform: scale(1.05);
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .section-divider {
+            border-top: 1px solid #dee2e6;
+            margin: 20px 0;
         }
     </style>
 </head>
@@ -96,28 +127,30 @@
     <section id="home">
         <h2>Accueil</h2>
         <p>Buckingham Palace est un jeu Roblox centré sur le rôle-play dans le genre vie/life. Il se déroule à Westminster, London. Vous pouvez rejoindre en tant que garde royal, officier de police, criminel, ou paramédic.</p>
-        <p>Lien du jeu : <a href="https://www.roblox.com/games/13476966119/Buckingham-Palace">Jouer maintenant</a></p>
-        <p>Discord officiel : <a href="https://discord.com/invite/buckingham">Rejoindre</a></p>
-        <p>Wiki : <a href="https://buckingham-palace.fandom.com/wiki/%F0%9F%92%82_Buckingham_Palace_Wiki">Visiter</a></p>
+        <p>Lien du jeu : <a href="https://www.roblox.com/games/13476966119/Buckingham-Palace" style="color: #007bff;">Jouer maintenant</a></p>
+        <p>Discord officiel : <a href="https://discord.com/invite/buckingham" style="color: #007bff;">Rejoindre</a></p>
+        <p>Wiki : <a href="https://buckingham-palace.fandom.com/wiki/%F0%9F%92%82_Buckingham_Palace_Wiki" style="color: #007bff;">Visiter</a></p>
         <button class="animate-btn" onclick="alert('Bienvenue dans le rôle-play !')">Commencer l'aventure</button>
     </section>
     <section id="police">
         <h2>Police - Metropolitan Police Service (MPS)</h2>
         <h3>Standards Professionnels</h3>
         <p>En tant que constable, adhérez à l'honnêteté, intégrité, respect et responsabilité.</p>
+        <div class="section-divider"></div>
         <h3>Réglementation du Kit</h3>
-        <p>Taser : Utiliser pour incapaciter suspects fuyant ou menaçants.</p>
-        <p>Baton : Pour la défense contre suspects non coopératifs.</p>
-        <p>Radio : Pour communications essentielles, codes d'état.</p>
-        <p>PAVA : Spray incapacitant pour défense.</p>
-        <p>Menottes : Pour retenir suspects résistants.</p>
-        <p>Armes à feu : Seulement pour menace imminente à la vie.</p>
+        <p><strong>Taser :</strong> Utiliser pour incapaciter suspects fuyant ou menaçants.</p>
+        <p><strong>Baton :</strong> Pour la défense contre suspects non coopératifs.</p>
+        <p><strong>Radio :</strong> Pour communications essentielles, codes d'état.</p>
+        <p><strong>PAVA :</strong> Spray incapacitant pour défense.</p>
+        <p><strong>Menottes :</strong> Pour retenir suspects résistants.</p>
+        <p><strong>Armes à feu :</strong> Seulement pour menace imminente à la vie.</p>
+        <div class="section-divider"></div>
         <h3>Codes d'État</h3>
         <ul>
-            <li>Status 0: Urgence</li>
+            <li>Status 0: Urgence ; assistance immédiate requise</li>
             <li>State 1: En service</li>
             <li>State 2: En patrouille</li>
-            <li>State 3: Au poste</li>
+            <li>State 3: Au poste ; disponible</li>
             <li>State 5: En route</li>
             <li>State 6: Arrivé</li>
             <li>State 9: Transport de prisonnier</li>
@@ -125,43 +158,54 @@
             <li>State 15: Reçu</li>
             <li>State 16: Répéter le dernier</li>
         </ul>
+        <div class="section-divider"></div>
         <h3>Commandes Quick-Chat</h3>
         <table>
             <tr><th>Commande</th><th>Message</th><th>Usage</th></tr>
-            <tr><td>/e rights</td><td>You do not have to say anything...</td><td>Lire les droits</td></tr>
-            <tr><td>/e s1</td><td>I will now be searching you under Section 1...</td><td>Recherche probable cause</td></tr>
-            <!-- Ajouter les autres -->
+            <tr><td>/e rights</td><td>You do not have to say anything. But it may harm your defence if you do not mention when questioned something which you later rely on in court. Anything you do say may be given in evidence.</td><td>Utilisé pour lire les droits avant une arrestation</td></tr>
+            <tr><td>/e s1</td><td>I will now be searching you under Section 1 of the Police and Criminal Evidence Act 1984.</td><td>Utilisé pour fouiller quelqu'un avec cause probable</td></tr>
+            <tr><td>/e s32</td><td>I will now be searching you under Section 32 of the Police and Criminal Evidence Act 1984 due to your arrest.</td><td>Utilisé pour fouiller quelqu'un en raison d'une arrestation</td></tr>
+            <tr><td>/e s47</td><td>I will now be searching you under Section 47 of the Firearms Act 1968.</td><td>Utilisé pour fouiller quelqu'un soupçonné de possession d'arme à feu</td></tr>
+            <tr><td>/e t</td><td>TASER, TASER, TASER!</td><td>Utilisé pour avertir le suspect avant taser</td></tr>
+            <tr><td>/e tao</td><td>TASER ARMED OFFICER!</td><td>Utilisé pour s'annoncer comme officier armé de taser</td></tr>
+            <tr><td>/e ap</td><td>ARMED POLICE!</td><td>Utilisé pour s'annoncer comme police armée</td></tr>
         </table>
+        <div class="section-divider"></div>
         <h3>Divisions</h3>
-        <p>Divisions Primaires : Response Policing, Armed Policing, Close Protection, etc.</p>
-        <p>Divisions Spécialistes : MO7 (Taskforce), MO8 (RTPC), MO19 (SFC).</p>
-        <h3>Rangs</h3>
-        <p>Special constable = Taser</p>
-        <p>Constable = Speed gun</p>
-        <p>Senior Constable = PAVA</p>
-        <p>Sergeant = Medical bag</p>
-        <p>Inspector = Clamp</p>
-        <p>Chief Inspector = UK Transport Police</p>
-        <!-- Ajouter plus de détails du handbook -->
+        <p><strong>Divisions Primaires :</strong> Response Policing (quiz), Armed Policing (gamepass), Close Protection (gamepass), Uniformed Protection (via Close Protection), Escort Bikers (via Close Protection), Police Snipers (gamepass).</p>
+        <p><strong>Divisions Spécialistes :</strong> MO7 (Taskforce), MO8 (Roads & Transport Policing Command), MO19 (Specialist Firearms Command). Requiert qualification policière et application.</p>
+        <div class="section-divider"></div>
+        <h3>Rangs et Outils</h3>
+        <ul>
+            <li>Trainee Constable (0 points): Handcuffs, Baton, Warrant card</li>
+            <li>Special Constable (2 points): Taser</li>
+            <li>Constable (5 points): Speed gun</li>
+            <li>Senior Constable (15 points): PAVA</li>
+            <li>Sergeant (50 points): Medical bag</li>
+            <li>Inspector (100 points): Clamp</li>
+            <li>Chief Inspector (150 points): British Transport Police</li>
+            <li>Superintendent (250 points): None</li>
+            <li>Chief Superintendent (350 points): None</li>
+        </ul>
+        <!-- Ajouté plus de détails du handbook pour complétude -->
     </section>
     <section id="ambulance">
         <h2>Ambulance - London Ambulance Service (LAS)</h2>
-        <p>LAS est une équipe payante (gamepass) permettant de soigner les joueurs blessés et de sauver les downed players.</p>
-        <p>Le manuel fournit des guidelines sur les rôles, structure de rangs, entraînement et usage d'équipement.</p>
-        <p>Requiert un gamepass de 350 Robux. Une des équipes les plus complexes.</p>
-        <!-- Ajouter plus si disponible -->
+        <p>LAS est une équipe payante (gamepass de 350 Robux) permettant de soigner les joueurs blessés et de sauver les downed players. C'est l'une des équipes les plus complexes du jeu.</p>
+        <p>Le manuel fournit des guidelines sur les rôles, structure de rangs, entraînement et usage d'équipement. Requiert un entraînement spécifique via le lien fourni.</p>
+        <p>Lien d'entraînement : <a href="https://docs.google.com/document/d/1soiboQEQQCtL3pA2HjcLGGUmnq-_9gsjQIGc7jrPCYY/edit?tab=t.0" style="color: #007bff;">Voir le document</a></p>
     </section>
     <section id="royal-guard">
         <h2>Garde Royale (RG)</h2>
-        <p>Guardsman = M1911 + L85A2 (munitions)</p>
-        <p>Corporal = Permission d'ouvrir portes BP</p>
+        <p><strong>Guardsman :</strong> M1911 + L85A2 (avec munitions)</p>
+        <p><strong>Corporal :</strong> Permission d'ouvrir les portes de BP</p>
+        <p>La Garde Royale protège le palais et maintient l'ordre dans les zones royales.</p>
     </section>
     <footer>
-        <p>&copy; 2025 Buckingham Palace Roleplay Guide. Déposé sur GitHub.</p>
+        <p>&copy; 2025 Buckingham Palace Roleplay Guide. Déposé sur GitHub. Amélioré pour un meilleur design !</p>
     </footer>
     <script>
-        // Simple JS pour animations supplémentaires si needed
-        console.log('Site chargé');
+        console.log('Site chargé avec animations améliorées');
     </script>
 </body>
 </html>
