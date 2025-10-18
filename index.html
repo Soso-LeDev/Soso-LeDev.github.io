@@ -1,287 +1,122 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Buckingham Palace Roleplay — Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#f6f8fb;
-    --card:#ffffff;
-    --muted:#6b7280;
-    --nav:#07102a;
-    --accent:#0a57d3; /* generic accent, changes with role */
-    --accent-2:#0646a8;
-    --glass: rgba(255,255,255,0.7);
-    --maxw:1150px;
-    --radius:14px;
-    --shadow: 0 10px 30px rgba(11,18,34,0.08);
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-i18n="pageTitle">Buckingham Palace RP — Guide</title>
+  <meta name="description" content="Guide Buckingham Palace Roleplay — Police, Médecin, Roi, Garde Royale. Design sombre néon, FR/EN." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#091018;
+      --panel:#0f1720;
+      --muted:#9aa6b2;
+      --glass: rgba(255,255,255,0.03);
+      --radius:14px;
+      --maxw:1100px;
+      --accent-blue: #29a0ff;
+      --accent-cyan: #22ffd6;
+      --accent-gold: #ffd166;
+      --accent-red: #ff4666;
+      --glass-border: rgba(255,255,255,0.04);
+      --glow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#061018 0%, #071226 100%);color:#ecf6ff;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+    a{color:inherit}
+    .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 
-  /* role color themes applied by JS (data-role) */
-  body[data-role="police"]  { --accent:#0a57d3; --accent-2:#063fa7; }
-  body[data-role="medic"]   { --accent:#0bb08b; --accent-2:#058a66; }
-  body[data-role="king"]    { --accent:#b8860b; --accent-2:#7f5c05; }
-  body[data-role="guard"]   { --accent:#a61b2b; --accent-2:#740f18; }
+    /* top nav */
+    header.top{position:sticky;top:0;z-index:120;background:linear-gradient(180deg, rgba(6,12,20,0.55), rgba(6,12,20,0.2));backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,0.03)}
+    .top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;max-width:var(--maxw);margin:0 auto}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Montserrat;color:#061018;background:linear-gradient(135deg,var(--accent-blue),#063a8d);box-shadow:0 8px 30px rgba(41,160,255,0.08)}
+    .title{font-weight:700;letter-spacing:0.4px}
+    .subtitle{font-size:12px;color:var(--muted)}
+    nav.main{display:flex;gap:10px;align-items:center}
+    nav.main a{padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:600;color:#cfe9ff;opacity:0.95}
+    nav.main a:hover{transform:translateY(-3px)}
+    .play{padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,var(--accent-blue),#0060ff);color:#061018;font-weight:800;box-shadow:0 12px 40px rgba(41,160,255,0.08);text-decoration:none}
+    .lang-toggle{display:inline-flex;gap:6px;align-items:center;background:transparent;border-radius:8px;padding:6px;border:1px solid rgba(255,255,255,0.03)}
 
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#0b1220;background:var(--bg);-webkit-font-smoothing:antialiased}
-  a{color:var(--accent)}
-  .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+    /* hero */
+    .hero{display:flex;gap:24px;align-items:center;padding:48px 0}
+    .hero-left{flex:1;min-width:260px}
+    .kicker{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);font-weight:700;font-size:13px}
+    h1{font-family:Montserrat,system-ui;font-size:34px;margin:12px 0 8px;color:#eaf7ff}
+    p.lead{color:var(--muted);max-width:60ch;margin:0 0 18px;line-height:1.5}
+    .hero-ctas{display:flex;gap:10px;align-items:center}
+    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
+    .btn.primary{background:linear-gradient(90deg,var(--accent-blue),#0756d6);color:#061018;box-shadow:0 14px 40px rgba(41,160,255,0.08)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#cfe9ff}
+    .hero-right{width:420px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--glow)}
+    .hero-right img{width:100%;height:100%;object-fit:cover;display:block;min-height:240px;transition:transform .9s ease}
 
-  /* NAV */
-  .topbar{background:#fff;box-shadow:0 6px 20px rgba(11,18,34,0.04);position:sticky;top:0;z-index:90}
-  .top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:var(--maxw);margin:0 auto;padding:14px 20px}
-  .brand{display:flex;align-items:center;gap:12px}
-  .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-family:Playfair Display;font-weight:700;font-size:18px;box-shadow:0 8px 24px rgba(10,12,32,0.08)}
-  .site-title{font-weight:700}
-  .site-sub{font-size:12px;color:var(--muted)}
-  nav.mainnav{display:flex;align-items:center;gap:12px}
-  nav.mainnav a{padding:8px 12px;border-radius:10px;text-decoration:none;color:#0b1220;font-weight:600;transition:all .14s}
-  nav.mainnav a:hover{transform:translateY(-3px);color:var(--accent)}
-  .play-btn{background:var(--accent);color:white;padding:8px 14px;border-radius:10px;font-weight:800;text-decoration:none;box-shadow:0 8px 22px rgba(10,12,32,0.08)}
+    /* layout */
+    main{padding:14px 0 90px}
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:20px;max-width:var(--maxw);margin:0 auto;padding:0 20px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(2,8,20,0.45)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .tab{padding:10px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.03);font-weight:700;cursor:pointer;color:#dff1ff}
+    .tab.active{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 10px 30px rgba(0,0,0,0.6);transform:translateY(-4px);border-color:rgba(255,255,255,0.04)}
+    h2.section{font-family:Montserrat, sans-serif;margin:0 0 8px;color:#f7feff}
+    p.meta{color:var(--muted);margin:0 0 12px}
+    .subgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
 
-  /* HERO */
-  .hero{display:flex;gap:28px;align-items:center;padding:44px 0}
-  .hero-left{flex:1;min-width:260px}
-  .eyebrow{display:inline-block;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(10,12,32,0.04),rgba(10,12,32,0.02));font-weight:800;color:var(--accent);font-size:13px}
-  h1.hero-title{font-family:Playfair Display,serif;font-size:34px;margin:14px 0 8px;color:var(--nav)}
-  p.lead{color:var(--muted);max-width:56ch;margin:0 0 18px}
-  .hero-ctas{display:flex;gap:10px;align-items:center}
-  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
-  .btn.primary{background:var(--accent);color:white}
-  .btn.ghost{background:transparent;border:1px solid rgba(11,18,34,0.06)}
-  .hero-right{width:420px;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:white}
-  .hero-right img{width:100%;height:100%;object-fit:cover;display:block;min-height:240px}
+    /* role accent blocks */
+    .accent {
+      display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    }
+    .accent .dot{width:12px;height:12px;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,0.5)}
+    /* colored variants */
+    .police .dot{background:var(--accent-blue); box-shadow:0 6px 18px rgba(41,160,255,0.18)}
+    .medic .dot{background:var(--accent-cyan); box-shadow:0 6px 18px rgba(34,255,214,0.12)}
+    .king .dot{background:var(--accent-gold); box-shadow:0 6px 18px rgba(255,209,102,0.12)}
+    .guard .dot{background:var(--accent-red); box-shadow:0 6px 18px rgba(255,70,102,0.12)}
 
-  /* MAIN content */
-  main{padding:18px 0 80px}
-  .layout{display:grid;grid-template-columns:1fr 360px;gap:22px;max-width:var(--maxw);margin:0 auto;padding:10px}
-  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
-  .section-title{font-family:Playfair Display,serif;color:var(--accent);margin:0 0 8px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border:1px solid rgba(255,255,255,0.03);text-align:left;color:#eaf7ff}
+    th{background:rgba(255,255,255,0.03)}
+    .small{font-size:13px;color:var(--muted)}
 
-  /* roles list (tabs-like) */
-  .roles-nav{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-  .role-tab{padding:10px 14px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.4));border:1px solid rgba(11,18,34,0.04);cursor:pointer;font-weight:700}
-  .role-tab.active{box-shadow:0 10px 30px rgba(10,12,32,0.06);transform:translateY(-4px);border-color:rgba(0,0,0,0.06)}
+    /* sidebar */
+    aside{position:relative}
+    .card-small{padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .pill{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);color:#dff1ff;font-weight:700;font-size:13px}
 
-  /* page panels */
-  .panel{display:none}
-  .panel.active{display:block}
-  .grid-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:10px;border:1px solid #eef3f8;text-align:left}
-  th{background:var(--accent);color:#fff}
+    .gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .gallery img{width:calc(50% - 4px);height:90px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
 
-  /* gallery small */
-  .gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .gallery img{width:calc(50% - 4px);height:96px;object-fit:cover;border-radius:8px}
+    /* mobile CTA */
+    .cta-mobile {display:none;position:fixed;left:12px;right:12px;bottom:14px;background:linear-gradient(90deg,var(--accent-blue),#0662ff);padding:12px;border-radius:12px;text-align:center;font-weight:800;color:#061018;z-index:200}
+    @media (max-width:960px){
+      .layout{grid-template-columns:1fr}
+      .hero-right{display:none}
+      .cta-mobile{display:block}
+      nav.main a.hide-mobile{display:none}
+    }
 
-  /* right column small helpers */
-  .meta{font-size:14px;color:var(--muted)}
-  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(10,12,32,0.04);font-weight:700}
-
-  /* footer */
-  footer{padding:18px 0;text-align:center;color:var(--muted)}
-
-  /* CTA mobile fixed */
-  .cta-mobile{display:none;position:fixed;left:12px;right:12px;bottom:14px;background:var(--accent);color:white;padding:12px;border-radius:12px;font-weight:800;text-align:center;z-index:200}
-  @media (max-width:880px){ .layout{grid-template-columns:1fr} .hero-right{width:100%} .cta-mobile{display:block} nav.mainnav a.hide-mobile{display:none} }
-
-  /* small responsiveness */
-  @media (max-width:600px){
-    .hero{padding:24px 0}
-    h1.hero-title{font-size:24px}
-    .gallery img{width:calc(50% - 4px)}
-  }
-</style>
+    /* focus & reduced motion */
+    :focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
+    @media (prefers-reduced-motion: reduce) {
+      .hero-right img, .tab, .panel { transition: none; }
+    }
+  </style>
 </head>
-<body data-role="police">
-  <!-- NAV -->
-  <div class="topbar">
+<body data-lang="fr" data-role="police">
+  <!-- TOP -->
+  <header class="top" role="banner">
     <div class="top-inner container">
       <div class="brand">
         <div class="logo">BP</div>
         <div>
-          <div class="site-title">Buckingham Palace RP</div>
-          <div class="site-sub">Guide & Informations</div>
+          <div class="title" data-i18n="siteName">Buckingham Palace RP</div>
+          <div class="subtitle" data-i18n="siteTag">Roleplay • Westminster</div>
         </div>
       </div>
 
-      <nav class="mainnav" aria-label="Navigation principale">
-        <a class="hide-mobile" href="#home" onclick="goHome()">Accueil</a>
-        <a href="#police" onclick="selectRole('police')">Police</a>
-        <a href="#medic" onclick="selectRole('medic')">Médecin</a>
-        <a href="#king" onclick="selectRole('king')">Roi</a>
-        <a href="#guard" onclick="selectRole('guard')">Garde Royale</a>
-        <a class="play-btn" href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener">Jouer maintenant</a>
-      </nav>
-    </div>
-  </div>
-
-  <!-- HERO -->
-  <header class="hero container" id="home">
-    <div class="hero-left">
-      <div class="eyebrow">Serveur RP — Westminster</div>
-      <h1 class="hero-title">Buckingham Palace Roleplay sur Roblox</h1>
-      <p class="lead">Protège la royauté, maintiens l'ordre ou choisis le chaos. Guides, procédures et candidatures pour chaque rôle — conçus pour faciliter la gestion du serveur et l'intégration des nouveaux.</p>
-      <div class="hero-ctas">
-        <button class="btn primary" onclick="scrollToSection('#police')">Voir les rôles</button>
-        <button class="btn ghost" onclick="openDiscord()">Discord officiel</button>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <!-- hero images rotate simply -->
-      <img id="heroImg" src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter" alt="Buckingham Palace">
-    </div>
-  </header>
-
-  <!-- MAIN -->
-  <main>
-    <div class="layout">
-
-      <!-- left / content -->
-      <div>
-        <div class="card">
-          <div class="roles-nav" role="tablist" aria-label="Sélection rôle">
-            <div class="role-tab active" data-role="police" onclick="selectRole('police')">Police</div>
-            <div class="role-tab" data-role="medic" onclick="selectRole('medic')">Médecin</div>
-            <div class="role-tab" data-role="king" onclick="selectRole('king')">Roi</div>
-            <div class="role-tab" data-role="guard" onclick="selectRole('guard')">Garde Royale</div>
-          </div>
-
-          <!-- POLICE PANEL -->
-          <section id="panel-police" class="panel active" aria-labelledby="policeTitle">
-            <h2 class="section-title" id="policeTitle">Police — Metropolitan Police Service (MPS)</h2>
-            <p class="meta">Rôle : maintien de l'ordre, enquêtes, escorte VIP.</p>
-
-            <h3>Contenu recommandé</h3>
-            <ul>
-              <li><strong>Présentation :</strong> mission & responsabilités.</li>
-              <li><strong>Procédures :</strong> arrestation, fouille, codes d'état (State 0,1,2...).</li>
-              <li><strong>Kit :</strong> liste & conditions d'utilisation (taser, PAVA, baton).</li>
-              <li><strong>Rangs :</strong> progression & permissions.</li>
-              <li><strong>Formation :</strong> quiz, vidéos, sessions.</li>
-              <li><strong>Candidature :</strong> formulaire, critères d'acceptation.</li>
-            </ul>
-
-            <div style="margin-top:12px" class="card">
-              <strong>Exemples de codes d'état</strong>
-              <table><thead><tr><th>Code</th><th>Signification</th></tr></thead>
-              <tbody>
-                <tr><td>State 0</td><td>Urgence — assistance immédiate</td></tr>
-                <tr><td>State 5</td><td>En route</td></tr>
-                <tr><td>State 9</td><td>Transport de prisonnier</td></tr>
-              </tbody></table>
-            </div>
-
-            <div style="margin-top:12px" class="card">
-              <strong>Candidature / Postuler</strong>
-              <p class="meta">Formulaire basique — récupère pseudo et discord.</p>
-              <form onsubmit="event.preventDefault(); alert('Candidature Police envoyée (exemple)')">
-                <div style="display:flex;gap:8px;margin-bottom:8px">
-                  <input required placeholder="Pseudo Roblox" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
-                  <input required placeholder="Discord (user#0000)" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
-                </div>
-                <select required style="width:100%;padding:8px;border-radius:8px;border:1px solid #eef3f8;margin-bottom:8px">
-                  <option value="">Position demandée</option>
-                  <option>Patrol</option>
-                  <option>Armed Unit</option>
-                  <option>Close Protection</option>
-                </select>
-                <textarea placeholder="Pourquoi vous ? (1-2 lignes)" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eef3f8;min-height:80px"></textarea>
-                <div style="margin-top:8px;text-align:right"><button class="btn primary" type="submit">Postuler</button></div>
-              </form>
-            </div>
-          </section>
-
-          <!-- MEDIC PANEL -->
-          <section id="panel-medic" class="panel" aria-labelledby="medicTitle">
-            <h2 class="section-title" id="medicTitle">Médecin / Ambulance — LAS</h2>
-            <p class="meta">Soins avancés, triage et évacuations.</p>
-
-            <h3>Contenu recommandé</h3>
-            <ul>
-              <li><strong>Protocoles :</strong> triage A/B/C, CPR, stabilisation.</li>
-              <li><strong>Équipement :</strong> defib, medkit, brancard.</li>
-              <li><strong>Formation :</strong> vidéos, entraînements et évaluations.</li>
-              <li><strong>Candidature :</strong> formulaires et certifications requises.</li>
-            </ul>
-
-            <div style="margin-top:12px" class="card">
-              <strong>Exemple d'équipement</strong>
-              <table><thead><tr><th>Équipement</th><th>Usage</th></tr></thead>
-              <tbody>
-                <tr><td>Defib</td><td>Réanimation</td></tr>
-                <tr><td>Medkit</td><td>Soins rapides</td></tr>
-              </tbody></table>
-            </div>
-
-            <div style="margin-top:12px" class="card">
-              <strong>Inscription formation</strong>
-              <form onsubmit="event.preventDefault(); alert('Inscription LAS envoyée (exemple)')">
-                <div style="display:flex;gap:8px">
-                  <input required placeholder="Pseudo" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
-                  <input required placeholder="Discord" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
-                </div>
-                <div style="margin-top:8px"><button class="btn primary" type="submit">S'inscrire</button></div>
-              </form>
-            </div>
-          </section>
-
-          <!-- KING PANEL -->
-          <section id="panel-king" class="panel" aria-labelledby="kingTitle">
-            <h2 class="section-title" id="kingTitle">Roi / Royauté</h2>
-            <p class="meta">Événements, protocole et interactions VIP.</p>
-
-            <h3>Contenu recommandé</h3>
-            <ul>
-              <li><strong>Lore & Rôle :</strong> histoire du personnage, étiquette.</li>
-              <li><strong>Événements :</strong> calendrier, planning, checklists cérémonie.</li>
-              <li><strong>Sécurité :</strong> procédures d'évacuation & garde rapprochée.</li>
-            </ul>
-
-            <div style="margin-top:12px" class="card">
-              <strong>Événements à prévoir</strong>
-              <ul class="meta">
-                <li>Parade annuelle</li>
-                <li>Réception VIP</li>
-                <li>Changement de garde (coordonné avec RG)</li>
-              </ul>
-            </div>
-          </section>
-
-          <!-- GUARD PANEL -->
-          <section id="panel-guard" class="panel" aria-labelledby="guardTitle">
-            <h2 class="section-title" id="guardTitle">Garde Royale (RG)</h2>
-            <p class="meta">Protection du palais, drill & cérémonies.</p>
-
-            <h3>Contenu recommandé</h3>
-            <ul>
-              <li><strong>Organisation :</strong> rangs, shifts, accès et permissions.</li>
-              <li><strong>Drill :</strong> exercices de parade, tests pratiques.</li>
-              <li><strong>Uniformes :</strong> règles d'apparence et assets recommandés.</li>
-            </ul>
-
-            <div style="margin-top:12px" class="card">
-              <strong>Candidature Garde Royale</strong>
-              <form onsubmit="event.preventDefault(); alert('Candidature RG envoyée (exemple)')">
-                <div style="display:flex;gap:8px;margin-bottom:8px">
-                  <input required placeholder="Pseudo" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
-                  <input required placeholder="Discord" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
-                </div>
-                <textarea placeholder="Motivation / Expérience" style="width:100%;min-height:80px;padding:8px;border-radius:8px;border:1px solid #eef3f8"></textarea>
-                <div style="margin-top:8px;text-align:right"><button class="btn primary" type="submit">Postuler</button></div>
-              </form>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <!-- right / sidebar -->
-      <aside>
-        <div class="card">
-          <h3 class="section-title">Ressources rapides</h3>
-          <p class="meta">
+      <nav class="main" role="navigation" aria-label="Main">
+        <a class="hide-mobile" href="#home" onclick="goHome()" data-i18n="navHome">Accueil</a>
+        <a href="
