@@ -83,6 +83,16 @@
     .link-btn{padding:10px 14px;border-radius:8px;background:linear-gradient(180deg,#fff,#f3f6fb);border:1px solid rgba(16,24,40,0.04);font-weight:700;cursor:pointer}
     [data-theme="dark"] .link-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
 
+    /* roles grid */
+    .roles-grid{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+    .role-card{flex:1 1 260px;background:linear-gradient(180deg,#fff,#f8fbff);border-radius:12px;padding:18px;border:1px solid rgba(16,24,40,0.04);box-shadow:0 8px 18px rgba(2,6,23,0.04)}
+    .role-card h4{margin:0 0 8px}
+
+    /* founder */
+    .founder-hero{display:flex;gap:20px;align-items:center;padding:24px;background:linear-gradient(180deg,#fff,#f3f6fb);border-radius:12px}
+    .founder-photo{width:160px;height:160px;border-radius:12px;overflow:hidden;flex:0 0 160px}
+    .founder-photo img{width:100%;height:100%;object-fit:cover;display:block}
+
     /* table */
     table{width:100%;border-collapse:collapse;margin-top:18px}
     th,td{padding:12px;border:1px solid rgba(16,24,40,0.04);text-align:left}
@@ -98,6 +108,7 @@
       .hero-inner{flex-direction:column-reverse}
       .hero-media{width:100%}
       .nav-links{display:none}
+      .founder-hero{flex-direction:column;align-items:flex-start}
     }
     @media (max-width:640px){
       .brand{font-size:22px}
@@ -136,10 +147,13 @@
       </div>
       <div class="nav-links" role="menubar" aria-label="menu">
         <a href="#home" data-i18n="navHome">Accueil</a>
+        <a href="#roles" data-i18n="navRoles">Rôles</a>
         <a href="#police" data-i18n="navPolice">Police (MPS)</a>
         <a href="#ambulance" data-i18n="navAmb">Ambulance (LAS)</a>
+        <a href="#royals" data-i18n="navRoyals">Rois & Famille</a>
         <a href="#royal-guard" data-i18n="navRG">Garde Royale (RG)</a>
         <a class="link-btn" href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener" data-i18n="playNow">Jouer maintenant</a>
+        <a href="#founder" class="link-btn" style="background:linear-gradient(180deg,#fff,#fff);">Fondateur</a>
       </div>
     </div>
   </nav>
@@ -177,6 +191,42 @@
       <a class="link-btn" href="https://buckingham-palace.fandom.com/wiki/%F0%9F%92%82_Buckingham_Palace_Wiki" target="_blank" rel="noopener" data-i18n="wikiLink">Wiki</a>
       <button class="link-btn" onclick="alert('Bienvenue dans le rôle-play !')" data-i18n="startAdventure">Commencer l'aventure</button>
     </div>
+  </section>
+
+  <!-- ROLES (nouveau) -->
+  <section id="roles" class="card" aria-labelledby="roles-title">
+    <h2 id="roles-title">Rôles — séparation claire</h2>
+    <p class="lead">Ici sont regroupés les rôles principaux — cliquez sur une carte pour aller à la section détaillée.</p>
+    <div class="roles-grid">
+      <div class="role-card">
+        <h4>Rois & Famille royale</h4>
+        <p>Rôles de la famille royale, protocoles, permissions d'accès au palais et activités cérémoniales.</p>
+        <p><a href="#royals" class="link-btn">Voir les Rois</a></p>
+      </div>
+      <div class="role-card">
+        <h4>Police (MPS)</h4>
+        <p>Tous les détails sur la police, l'équipement, les codes d'état et les commandes quick-chat.</p>
+        <p><a href="#police" class="link-btn">Voir la Police</a></p>
+      </div>
+      <div class="role-card">
+        <h4>Garde Royale (RG)</h4>
+        <p>Rôles liés à la garde du palais, armement et permissions spécifiques.</p>
+        <p><a href="#royal-guard" class="link-btn">Voir la Garde</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROYALS: nouveau contenu séparé -->
+  <section id="royals" class="card" aria-labelledby="royals-title">
+    <h2 id="royals-title">Rois & Famille royale</h2>
+    <p class="lead">Cette section liste les rôles et permissions propres à la famille royale et au personnel du palais.</p>
+    <ul class="clean">
+      <li><strong>Monarque :</strong> Accès complet aux zones royales, protocoles, événements spéciaux.</li>
+      <li><strong>Prince/Princesse :</strong> Accès restreint à certaines zones, participation aux cérémonies.</li>
+      <li><strong>Conseiller Royal :</strong> Rôle administratif, communications avec les divisions (police, garde, sécurité).</li>
+      <li><strong>Personnel du Palais :</strong> Staff, chambellans, agents d'accueil, soumis à règles strictes.</li>
+    </ul>
+    <p style="margin-top:12px;color:var(--muted)">Remarque : Les rôles royaux sont généralement limités et demandent souvent une approbation/qualification.</p>
   </section>
 
   <!-- POLICE -->
@@ -303,6 +353,22 @@
     <p data-i18n="rgDesc">La Garde Royale protège le palais et maintient l'ordre dans les zones royales. Rôles souvent restreints et soumis à qualification.</p>
   </section>
 
+  <!-- FOUNDER / FONDATEUR : nouvelle "page" (section pleine largeur) -->
+  <section id="founder" class="card" aria-labelledby="founder-title">
+    <h2 id="founder-title">Fondateur</h2>
+    <div class="founder-hero">
+      <div class="founder-photo">
+        <!-- L'image attendue: placez un fichier nommé Icon.png à la racine du site -->
+        <img src="Icon.png" alt="Photo du fondateur (Icon.png)" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <h3>À propos du créateur</h3>
+        <p class="lead">La création de ce site était surtout un projet pour m'amuser — j'ai conçu l'intégralité du design et de la structure. Toutes les illustrations et mises en page sont réalisées par moi. Pour les animations et certains effets visuels, je me suis aidé·e de l'IA.</p>
+        <p style="margin-top:8px;color:var(--muted)">Fonda soso_LeDev.</p>
+      </div>
+    </div>
+  </section>
+
   <footer>
     <div class="container">
       <p style="margin:0" data-i18n="footer">© 2025 Buckingham Palace Roleplay Guide — Design amélioré, animations et images intégrées.</p>
@@ -310,7 +376,7 @@
   </footer>
 
   <script>
-    // Translations object (FR and EN)
+    // Translations object (FR and EN) - ajouté quelques clés pour nav
     const translations = {
       fr: {
         pageTitle: "Buckingham Palace Roleplay — Guide et Informations",
@@ -318,8 +384,10 @@
         siteName: "Buckingham Palace RP",
         siteTag: "Guide & Informations",
         navHome: "Accueil",
+        navRoles: "Rôles",
         navPolice: "Police (MPS)",
         navAmb: "Ambulance (LAS)",
+        navRoyals: "Rois & Famille",
         navRG: "Garde Royale (RG)",
         playNow: "Jouer maintenant",
         heroTitle: "Buckingham Palace Roleplay sur Roblox",
@@ -408,8 +476,10 @@
         siteName: "Buckingham Palace RP",
         siteTag: "Guide & Information",
         navHome: "Home",
+        navRoles: "Roles",
         navPolice: "Police (MPS)",
         navAmb: "Ambulance (LAS)",
+        navRoyals: "Royals & Family",
         navRG: "Royal Guard (RG)",
         playNow: "Play now",
         heroTitle: "Buckingham Palace Roleplay on Roblox",
@@ -503,12 +573,9 @@
         if (!key) return;
         const value = map[key];
         if (value === undefined) return;
-        // use innerHTML for safety if contains markup
         el.innerHTML = value;
-        // also update document title if pageTitle
         if (key === 'pageTitle') document.title = value;
       });
-      // set lang attribute on html
       document.documentElement.lang = (lang === 'en') ? 'en' : 'fr';
     }
 
@@ -518,11 +585,9 @@
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('bp_theme', theme);
-      // update aria and label
       const isDark = theme === 'dark';
       themeSwitch.setAttribute('aria-checked', isDark);
       themeLabel.textContent = (currentLang === 'en') ? (isDark ? 'Dark Mode' : 'Light Mode') : (isDark ? 'Mode Obscur' : 'Mode Clair');
-      // move thumb via CSS handled by [data-theme] rule
     }
     themeSwitch.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
@@ -540,7 +605,6 @@
       applyTranslations(lang);
       langFr.setAttribute('aria-pressed', lang === 'fr');
       langEn.setAttribute('aria-pressed', lang === 'en');
-      // Update theme label text to match language
       const theme = document.documentElement.getAttribute('data-theme') || 'light';
       themeLabel.textContent = (lang === 'en') ? ((theme==='dark')?'Dark Mode':'Light Mode') : ((theme==='dark')?'Mode Obscur':'Mode Clair');
     }
@@ -549,10 +613,8 @@
 
     // initial settings
     (function init() {
-      // theme
       const savedTheme = localStorage.getItem('bp_theme') || 'light';
       setTheme(savedTheme);
-      // lang
       setLang(currentLang);
     })();
 
@@ -581,7 +643,6 @@
     let hi = 0;
     setInterval(() => {
       hi = (hi + 1) % heroImgs.length;
-      // simple fade swap
       const next = heroImgs[hi];
       const tmp = new Image();
       tmp.src = next;
@@ -590,10 +651,9 @@
 
     // open discord
     function openDiscord(){ window.open('https://discord.com/invite/buckingham','_blank','noopener'); }
-    document.getElementById('seeRoles').addEventListener('click', ()=> document.getElementById('police').scrollIntoView({behavior:'smooth'}));
+    document.getElementById('seeRoles').addEventListener('click', ()=> document.getElementById('roles').scrollIntoView({behavior:'smooth'}));
 
-    // friendly console
-    console.log('BP guide loaded — theme & language ready');
+    console.log('BP guide updated — rôles séparés & page fondateur ajoutée');
   </script>
 </body>
 </html>
