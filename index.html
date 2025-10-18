@@ -1,75 +1,167 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Reconnaissance faciale — Contrôle vocal</title>
-<style>
-  html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Inter,system-ui,Arial;overflow:hidden}
-  video,canvas{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover}
-  #status{position:fixed;left:12px;bottom:12px;background:rgba(0,0,0,0.5);color:#00ff99;padding:8px 10px;border-radius:10px;border:1px solid rgba(0,255,153,0.08);font-size:13px}
-  #transcript{position:fixed;left:12px;bottom:60px;color:#00ff99;opacity:0.9;font-size:13px;max-width:60vw;word-break:break-word}
-  #speech-bubble{position:fixed;left:50%;transform:translateX(-50%);bottom:120px;background:rgba(0,255,153,0.06);color:#00ff99;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,255,153,0.12);display:none;max-width:80%;text-align:center}
-  /* éléments cachés pour accessibilité tactile (on ne doit pas toucher) */
-  .hidden-ui{display:none}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buckingham Palace Roleplay - Guide et Informations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #0055a4;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #ffd700;
+        }
+        section {
+            padding: 20px;
+            margin: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        h1, h2, h3 {
+            color: #003366;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .animate-btn {
+            background-color: #0055a4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .animate-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline></video>
-  <canvas id="overlay"></canvas>
-  <div id="status">Initialisation…</div>
-  <div id="transcript"></div>
-  <div id="speech-bubble"></div>
-
-  <!-- face-api vladmandic -->
-  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
-
-  <script>
-  (async ()=>{
-
-    // === Configuration ===
-    const API_KEY_GROQ = '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'; // laissé côté client comme demandé
-    const activationPrefixes = ['krozen','frozen','crozen']; // commandes vocales commencent par l'un d'eux
-    const statusEl = document.getElementById('status');
-    const transcriptEl = document.getElementById('transcript');
-    const speechBubble = document.getElementById('speech-bubble');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('overlay');
-    const ctx = canvas.getContext('2d');
-
-    let isRunning = false;
-    let faceMatcher = null;
-    let labeledDescriptors = []; // {label, descriptors: [Float32Array,...]}
-    let detectionMode = 'tiny'; // tiny par défaut (rapide)
-    let detectionOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 });
-    let mediaRecorder = null;
-    let recordedBlobs = [];
-
-    // resize canvas to video when available
-    function resizeCanvas(){
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    // --- TTS helper ---
-    function speak(text){
-      try {
-        const s = new SpeechSynthesisUtterance(text);
-        s.lang = 'fr-FR';
-        speechSynthesis.cancel(); // avoid overlap
-        speechSynthesis.speak(s);
-      } catch(e){ console.warn('TTS failed', e); }
-      // show bubble briefly
-      speechBubble.textContent = text;
-      speechBubble.style.display = 'block';
-      clearTimeout(speechBubble._t);
-      speechBubble._t = setTimeout(()=> speechBubble.style.display = 'none', 6000);
-    }
-
-    // --- status helper ---
-    function setStatus(t){ statusEl.textContent = t; }
-
-    // === Load face-api models ===
-    async func
+    <header>
+        <h1>Buckingham Palace Roleplay sur Roblox</h1>
+        <p>Un jeu de rôle immersif basé sur les rues de Central London. Protégez le Roi ou la Reine, combattez le crime ou causez le chaos !</p>
+    </header>
+    <nav>
+        <a href="#home">Accueil</a>
+        <a href="#police">Police (MPS)</a>
+        <a href="#ambulance">Ambulance (LAS)</a>
+        <a href="#royal-guard">Garde Royale (RG)</a>
+    </nav>
+    <section id="home">
+        <h2>Accueil</h2>
+        <p>Buckingham Palace est un jeu Roblox centré sur le rôle-play dans le genre vie/life. Il se déroule à Westminster, London. Vous pouvez rejoindre en tant que garde royal, officier de police, criminel, ou paramédic.</p>
+        <p>Lien du jeu : <a href="https://www.roblox.com/games/13476966119/Buckingham-Palace">Jouer maintenant</a></p>
+        <p>Discord officiel : <a href="https://discord.com/invite/buckingham">Rejoindre</a></p>
+        <p>Wiki : <a href="https://buckingham-palace.fandom.com/wiki/%F0%9F%92%82_Buckingham_Palace_Wiki">Visiter</a></p>
+        <button class="animate-btn" onclick="alert('Bienvenue dans le rôle-play !')">Commencer l'aventure</button>
+    </section>
+    <section id="police">
+        <h2>Police - Metropolitan Police Service (MPS)</h2>
+        <h3>Standards Professionnels</h3>
+        <p>En tant que constable, adhérez à l'honnêteté, intégrité, respect et responsabilité.</p>
+        <h3>Réglementation du Kit</h3>
+        <p>Taser : Utiliser pour incapaciter suspects fuyant ou menaçants.</p>
+        <p>Baton : Pour la défense contre suspects non coopératifs.</p>
+        <p>Radio : Pour communications essentielles, codes d'état.</p>
+        <p>PAVA : Spray incapacitant pour défense.</p>
+        <p>Menottes : Pour retenir suspects résistants.</p>
+        <p>Armes à feu : Seulement pour menace imminente à la vie.</p>
+        <h3>Codes d'État</h3>
+        <ul>
+            <li>Status 0: Urgence</li>
+            <li>State 1: En service</li>
+            <li>State 2: En patrouille</li>
+            <li>State 3: Au poste</li>
+            <li>State 5: En route</li>
+            <li>State 6: Arrivé</li>
+            <li>State 9: Transport de prisonnier</li>
+            <li>State 11: Hors service</li>
+            <li>State 15: Reçu</li>
+            <li>State 16: Répéter le dernier</li>
+        </ul>
+        <h3>Commandes Quick-Chat</h3>
+        <table>
+            <tr><th>Commande</th><th>Message</th><th>Usage</th></tr>
+            <tr><td>/e rights</td><td>You do not have to say anything...</td><td>Lire les droits</td></tr>
+            <tr><td>/e s1</td><td>I will now be searching you under Section 1...</td><td>Recherche probable cause</td></tr>
+            <!-- Ajouter les autres -->
+        </table>
+        <h3>Divisions</h3>
+        <p>Divisions Primaires : Response Policing, Armed Policing, Close Protection, etc.</p>
+        <p>Divisions Spécialistes : MO7 (Taskforce), MO8 (RTPC), MO19 (SFC).</p>
+        <h3>Rangs</h3>
+        <p>Special constable = Taser</p>
+        <p>Constable = Speed gun</p>
+        <p>Senior Constable = PAVA</p>
+        <p>Sergeant = Medical bag</p>
+        <p>Inspector = Clamp</p>
+        <p>Chief Inspector = UK Transport Police</p>
+        <!-- Ajouter plus de détails du handbook -->
+    </section>
+    <section id="ambulance">
+        <h2>Ambulance - London Ambulance Service (LAS)</h2>
+        <p>LAS est une équipe payante (gamepass) permettant de soigner les joueurs blessés et de sauver les downed players.</p>
+        <p>Le manuel fournit des guidelines sur les rôles, structure de rangs, entraînement et usage d'équipement.</p>
+        <p>Requiert un gamepass de 350 Robux. Une des équipes les plus complexes.</p>
+        <!-- Ajouter plus si disponible -->
+    </section>
+    <section id="royal-guard">
+        <h2>Garde Royale (RG)</h2>
+        <p>Guardsman = M1911 + L85A2 (munitions)</p>
+        <p>Corporal = Permission d'ouvrir portes BP</p>
+    </section>
+    <footer>
+        <p>&copy; 2025 Buckingham Palace Roleplay Guide. Déposé sur GitHub.</p>
+    </footer>
+    <script>
+        // Simple JS pour animations supplémentaires si needed
+        console.log('Site chargé');
+    </script>
+</body>
+</html>
