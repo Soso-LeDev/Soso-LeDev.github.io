@@ -36,16 +36,23 @@
     nav.menu a{color:#dfe9f8;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;transition:all .18s}
     nav.menu a:hover{background:rgba(255,255,255,0.03);transform:translateY(-3px);color:var(--accent)}
     .cta-btn{background:var(--accent);color:#072036;padding:8px 12px;border-radius:8px;font-weight:700;box-shadow:0 6px 18px rgba(255,190,46,0.12);border:none}
-    /* HERO */
-    .hero{position:relative;display:grid;align-items:center;min-height:54vh;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.02)}
+    /* HERO + SLIDER */
+    .hero{position:relative;display:grid;align-items:center;min-height:56vh;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.02)}
     .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(3,8,20,0.35) 10%, rgba(3,8,20,0.6) 60%);pointer-events:none}
-    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 420px;gap:28px;padding:60px 24px}
-    .hero-visual{border-radius:18px;overflow:hidden;box-shadow:0 18px 60px rgba(2,6,23,0.6);min-height:320px;background:#0b2238}
-    .hero-visual img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.03);transition:transform 1.6s ease}
-    .hero-visual:hover img{transform:scale(1.06)}
+    .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 460px;gap:28px;padding:60px 24px;align-items:center}
+    .hero-visual{border-radius:18px;overflow:hidden;box-shadow:0 18px 60px rgba(2,6,23,0.6);min-height:360px;background:#0b2238;position:relative}
+    .slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease,transform .9s ease;transform:scale(1.02)}
+    .slide img{width:100%;height:100%;object-fit:cover;display:block}
+    .slide.active{opacity:1;transform:scale(1);z-index:2}
+    .slider-controls{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;pointer-events:auto;z-index:5}
+    .control-btn{background:rgba(0,0,0,0.45);border:none;color:#fff;padding:8px 12px;border-radius:10px;backdrop-filter: blur(6px);cursor:pointer}
+    .thumbs{display:flex;gap:8px;position:absolute;left:12px;bottom:62px;z-index:5}
+    .thumb{width:64px;height:36px;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(2,6,23,0.5);opacity:0.85;cursor:pointer;border:2px solid rgba(255,255,255,0.03)}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb.active{outline:3px solid var(--accent);opacity:1}
     .hero-copy{align-self:center;color:#f6fbff;padding:8px 12px}
     .eyebrow{display:inline-block;background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));padding:6px 10px;border-radius:999px;font-weight:700;color:var(--accent);font-size:12px;margin-bottom:12px}
-    .hero-copy h2{font-family:Playfair Display, serif;font-size:clamp(28px,4.6vw,42px);margin:6px 0 12px;line-height:1.02}
+    .hero-copy h2{font-family:Playfair Display, serif;font-size:clamp(28px,4.2vw,40px);margin:6px 0 12px;line-height:1.02}
     .hero-copy p.lead{color:var(--muted);margin:0 0 18px;font-size:15px;max-width:56ch}
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
     .btn-primary{background:var(--accent);color:#072036;padding:12px 18px;border:none;border-radius:10px;font-weight:800;cursor:pointer;box-shadow:0 10px 36px rgba(255,190,46,0.12)}
@@ -66,22 +73,18 @@
     .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
     /* Responsive */
     @media (max-width:980px){
-      .hero-inner{grid-template-columns:1fr;grid-auto-rows:auto}
-      .hero-visual{order:2}
+      .hero-inner{grid-template-columns:1fr;grid-auto-rows:auto;padding:36px 18px}
+      .hero-visual{order:2;min-height:280px}
       .hero-copy{order:1}
       .roles{grid-template-columns:repeat(2,1fr)}
     }
     @media (max-width:640px){
-      .nav-inner{padding:10px}
       nav.menu{display:none}
-      .hero-inner{padding:36px 14px}
       .roles{grid-template-columns:1fr;padding:24px 12px 56px}
-      .hero{min-height:48vh}
+      .hero{min-height:46vh}
+      .thumbs{display:none}
+      .hero-inner{gap:14px}
     }
-
-    /* small utilities */
-    .muted{color:var(--muted)}
-    .shadow-small{box-shadow:0 8px 20px rgba(2,6,23,0.25)}
     /* entrance animations */
     .fade-up{opacity:0;transform:translateY(14px);animation:fadeUp .7s ease forwards}
     @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
@@ -109,30 +112,42 @@
   </header>
 
   <main>
-    <!-- HERO
-         Remplace assets/hero.jpg par ton image (ou un URL direct)
-         Exemple : https://.../your-image.jpg
-    -->
     <section id="home" class="hero" aria-label="Visuel principal">
       <div class="hero-inner container">
         <div class="hero-copy fade-up" style="animation-delay:.15s">
           <span class="eyebrow">Serveur RP • Westminster</span>
           <h2>Buckingham Palace Roleplay — Entre prestige et chaos</h2>
-          <p class="lead">Protège le palais en tant que garde royal, maintiens l'ordre comme policier, sauve des vies avec l'ambulance ou choisis la voie du hors-la-loi — immersion forte, règles claires et communautés actives.</p>
+          <p class="lead">Protège le palais comme garde royal, maintiens l'ordre comme policier, sauve des vies en ambulance ou choisis la voie du hors-la-loi — immersion forte, règles claires et communauté active.</p>
           <div class="hero-actions">
             <button class="btn-primary" onclick="document.getElementById('roles').scrollIntoView({behavior:'smooth'})">Voir les rôles</button>
             <button class="btn-ghost" onclick="openDiscord()">Discord officiel</button>
           </div>
         </div>
 
-        <div class="hero-visual fade-up" style="animation-delay:.25s">
-          <!-- Changez le src ci-dessous -->
-          <img src="assets/hero.jpg" alt="Buckingham Palace - visuel" />
+        <div class="hero-visual fade-up" style="animation-delay:.25s" aria-hidden="false">
+          <!-- SLIDER : remplace directement les URLs ci-dessous par tes images si tu veux -->
+          <div class="slide active" data-index="0">
+            <img alt="Buckingham Palace - image 1" src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter">
+          </div>
+          <div class="slide" data-index="1">
+            <img alt="Buckingham Palace - image 2" src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter">
+          </div>
+
+          <!-- thumbnails (desktop) -->
+          <div class="thumbs" aria-hidden="true">
+            <div class="thumb active" data-index="0"><img alt="miniature 1" src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter"></div>
+            <div class="thumb" data-index="1"><img alt="miniature 2" src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter"></div>
+          </div>
+
+          <!-- controls -->
+          <div class="slider-controls">
+            <button class="control-btn" id="prevBtn" aria-label="Image précédente">◀</button>
+            <button class="control-btn" id="nextBtn" aria-label="Image suivante">▶</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ROLES -->
     <section id="roles" class="roles container" aria-label="Rôles disponibles">
       <article class="role-card fade-up" style="animation-delay:.1s">
         <div class="role-top">
@@ -191,7 +206,6 @@
       </article>
     </section>
 
-    <!-- RULES / LINKS -->
     <section id="rules" class="container" style="padding:22px 24px 64px">
       <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:stretch">
         <div style="flex:1;min-width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px)">
@@ -218,16 +232,41 @@
 
   <footer>
     <div class="container footer-inner">
-      <div>© 2025 Buckingham Palace Roleplay — Design par toi-même</div>
+      <div>© 2025 Buckingham Palace Roleplay — Design</div>
       <div class="muted">Made with ❤️ — Responsive • Accessible • Ready</div>
     </div>
   </footer>
 
   <script>
-    function openDiscord(){
-      window.open('https://discord.com/invite/buckingham','_blank','noopener');
-    }
-    // small reveal animations for role cards
+    // slider logic
+    (function(){
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const thumbs = Array.from(document.querySelectorAll('.thumb'));
+      const prev = document.getElementById('prevBtn');
+      const next = document.getElementById('nextBtn');
+      let idx = 0;
+      function show(i){
+        idx = (i + slides.length) % slides.length;
+        slides.forEach(s => s.classList.remove('active'));
+        thumbs.forEach(t => t.classList.remove('active'));
+        slides[idx].classList.add('active');
+        if(thumbs[idx]) thumbs[idx].classList.add('active');
+      }
+      prev.addEventListener('click', ()=> show(idx-1));
+      next.addEventListener('click', ()=> show(idx+1));
+      thumbs.forEach(t => t.addEventListener('click', ()=> show(Number(t.dataset.index))));
+      // auto rotate every 6s
+      let auto = setInterval(()=> show(idx+1), 6000);
+      // pause on hover
+      const hero = document.querySelector('.hero-visual');
+      hero.addEventListener('mouseenter', ()=> clearInterval(auto));
+      hero.addEventListener('mouseleave', ()=> { auto = setInterval(()=> show(idx+1), 6000); });
+      // init
+      show(0);
+    })();
+
+    // misc
+    function openDiscord(){ window.open('https://discord.com/invite/buckingham','_blank','noopener'); }
     document.addEventListener('DOMContentLoaded', () => {
       const els = document.querySelectorAll('.fade-up');
       els.forEach((el,i) => {
@@ -241,7 +280,7 @@
       });
     });
 
-    // Smooth scroll for anchors
+    // Smooth scroll anchors
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click', function(e){
         e.preventDefault();
