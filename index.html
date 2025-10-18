@@ -3,519 +3,285 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Buckingham Palace RP — Pages de rôle</title>
+<title>Buckingham Palace Roleplay — Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #f5f7fb;
-    --text: #0b1320;
+    --bg:#f6f8fb;
     --card:#ffffff;
     --muted:#6b7280;
-    --accent: #007bff; /* défaut */
-    --maxw:1100px;
+    --nav:#07102a;
+    --accent:#0a57d3; /* generic accent, changes with role */
+    --accent-2:#0646a8;
+    --glass: rgba(255,255,255,0.7);
+    --maxw:1150px;
+    --radius:14px;
+    --shadow: 0 10px 30px rgba(11,18,34,0.08);
   }
 
-  /* Role color schemes (used when data-role set on body) */
-  body[data-role="police"] { --accent: #0a3d91; --accent-2:#0056d6; }
-  body[data-role="medic"]  { --accent: #0a8f78; --accent-2:#25c2a3; }
-  body[data-role="king"]   { --accent: #b6860b; --accent-2:#ffd768; }
-  body[data-role="guard"]  { --accent: #a61b2b; --accent-2:#ff4b5c; }
+  /* role color themes applied by JS (data-role) */
+  body[data-role="police"]  { --accent:#0a57d3; --accent-2:#063fa7; }
+  body[data-role="medic"]   { --accent:#0bb08b; --accent-2:#058a66; }
+  body[data-role="king"]    { --accent:#b8860b; --accent-2:#7f5c05; }
+  body[data-role="guard"]   { --accent:#a61b2b; --accent-2:#740f18; }
 
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:var(--text);background:var(--bg)}
-  .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#0b1220;background:var(--bg);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 
-  /* Top nav */
-  header.top{background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent);border-bottom:1px solid rgba(10,10,12,0.04)}
-  .top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:var(--maxw);margin:0 auto;padding:12px 18px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:Playfair Display}
-  nav.role-nav{display:flex;gap:10px;align-items:center}
-  nav.role-nav a{padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--text);font-weight:700;border:1px solid transparent;transition:all .15s}
-  nav.role-nav a.active{background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));box-shadow:0 6px 18px rgba(2,6,23,0.06);border-color:rgba(0,0,0,0.03)}
-  .cta{background:var(--accent);color:#072036;padding:8px 12px;border-radius:8px;font-weight:800;text-decoration:none}
+  /* NAV */
+  .topbar{background:#fff;box-shadow:0 6px 20px rgba(11,18,34,0.04);position:sticky;top:0;z-index:90}
+  .top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:var(--maxw);margin:0 auto;padding:14px 20px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-family:Playfair Display;font-weight:700;font-size:18px;box-shadow:0 8px 24px rgba(10,12,32,0.08)}
+  .site-title{font-weight:700}
+  .site-sub{font-size:12px;color:var(--muted)}
+  nav.mainnav{display:flex;align-items:center;gap:12px}
+  nav.mainnav a{padding:8px 12px;border-radius:10px;text-decoration:none;color:#0b1220;font-weight:600;transition:all .14s}
+  nav.mainnav a:hover{transform:translateY(-3px);color:var(--accent)}
+  .play-btn{background:var(--accent);color:white;padding:8px 14px;border-radius:10px;font-weight:800;text-decoration:none;box-shadow:0 8px 22px rgba(10,12,32,0.08)}
 
-  /* Page layout */
-  main{padding:22px 18px}
-  .role-page{display:none}
-  .role-page.active{display:block}
+  /* HERO */
+  .hero{display:flex;gap:28px;align-items:center;padding:44px 0}
+  .hero-left{flex:1;min-width:260px}
+  .eyebrow{display:inline-block;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(10,12,32,0.04),rgba(10,12,32,0.02));font-weight:800;color:var(--accent);font-size:13px}
+  h1.hero-title{font-family:Playfair Display,serif;font-size:34px;margin:14px 0 8px;color:var(--nav)}
+  p.lead{color:var(--muted);max-width:56ch;margin:0 0 18px}
+  .hero-ctas{display:flex;gap:10px;align-items:center}
+  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
+  .btn.primary{background:var(--accent);color:white}
+  .btn.ghost{background:transparent;border:1px solid rgba(11,18,34,0.06)}
+  .hero-right{width:420px;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:white}
+  .hero-right img{width:100%;height:100%;object-fit:cover;display:block;min-height:240px}
 
-  .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
-  .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 10px 28px rgba(10,14,20,0.06)}
-  h1,h2{font-family:Playfair Display, serif;color:var(--accent)}
-  h3{margin:8px 0;color:var(--accent-2)}
+  /* MAIN content */
+  main{padding:18px 0 80px}
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:22px;max-width:var(--maxw);margin:0 auto;padding:10px}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .section-title{font-family:Playfair Display,serif;color:var(--accent);margin:0 0 8px}
 
-  /* Suggested content blocks */
-  .section-list{display:flex;flex-direction:column;gap:12px;margin-top:10px}
-  .block-title{font-weight:800}
-  .muted{color:var(--muted)}
+  /* roles list (tabs-like) */
+  .roles-nav{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .role-tab{padding:10px 14px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.4));border:1px solid rgba(11,18,34,0.04);cursor:pointer;font-weight:700}
+  .role-tab.active{box-shadow:0 10px 30px rgba(10,12,32,0.06);transform:translateY(-4px);border-color:rgba(0,0,0,0.06)}
 
-  table{width:100%;border-collapse:collapse;margin-top:10px}
+  /* page panels */
+  .panel{display:none}
+  .panel.active{display:block}
+  .grid-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
   th,td{padding:10px;border:1px solid #eef3f8;text-align:left}
   th{background:var(--accent);color:#fff}
 
-  /* gallery */
-  .gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
-  .gallery img{width:100%;height:110px;object-fit:cover;border-radius:8px;display:block}
+  /* gallery small */
+  .gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .gallery img{width:calc(50% - 4px);height:96px;object-fit:cover;border-radius:8px}
 
-  /* small form */
-  .form-row{display:flex;gap:8px}
-  .form-row input,.form-row textarea,select{flex:1;padding:8px;border-radius:8px;border:1px solid #e6eef6}
-  .submit-btn{background:var(--accent);color:#072036;padding:10px 14px;border-radius:8px;border:none;font-weight:800;cursor:pointer}
+  /* right column small helpers */
+  .meta{font-size:14px;color:var(--muted)}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(10,12,32,0.04);font-weight:700}
 
-  /* color strip on left of cards to visually accent each block */
-  .accent-strip{width:6px;border-radius:6px;background:linear-gradient(180deg,var(--accent),var(--accent-2));margin-right:12px}
+  /* footer */
+  footer{padding:18px 0;text-align:center;color:var(--muted)}
 
-  /* responsive */
-  @media (max-width:980px){
-    .grid{grid-template-columns:1fr; }
-    .gallery{grid-template-columns:repeat(3,1fr)}
+  /* CTA mobile fixed */
+  .cta-mobile{display:none;position:fixed;left:12px;right:12px;bottom:14px;background:var(--accent);color:white;padding:12px;border-radius:12px;font-weight:800;text-align:center;z-index:200}
+  @media (max-width:880px){ .layout{grid-template-columns:1fr} .hero-right{width:100%} .cta-mobile{display:block} nav.mainnav a.hide-mobile{display:none} }
+
+  /* small responsiveness */
+  @media (max-width:600px){
+    .hero{padding:24px 0}
+    h1.hero-title{font-size:24px}
+    .gallery img{width:calc(50% - 4px)}
   }
-
-  /* small helpers */
-  .inline-pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.04);font-weight:700}
-  footer{padding:18px;text-align:center;color:var(--muted);font-size:14px}
 </style>
 </head>
 <body data-role="police">
-  <header class="top" role="banner">
-    <div class="top-inner">
+  <!-- NAV -->
+  <div class="topbar">
+    <div class="top-inner container">
       <div class="brand">
         <div class="logo">BP</div>
         <div>
-          <div style="font-weight:800">Buckingham Palace RP</div>
-          <div style="font-size:13px;color:var(--muted)">Guide — Pages de rôle</div>
+          <div class="site-title">Buckingham Palace RP</div>
+          <div class="site-sub">Guide & Informations</div>
         </div>
       </div>
 
-      <nav class="role-nav" role="navigation" aria-label="Choix rôle">
-        <a href="#police" data-role="police" class="active">Police</a>
-        <a href="#medic"  data-role="medic">Médecin</a>
-        <a href="#king"   data-role="king">Roi / Royauté</a>
-        <a href="#guard"  data-role="guard">Garde Royale</a>
-        <a class="cta" href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener">Jouer maintenant</a>
+      <nav class="mainnav" aria-label="Navigation principale">
+        <a class="hide-mobile" href="#home" onclick="goHome()">Accueil</a>
+        <a href="#police" onclick="selectRole('police')">Police</a>
+        <a href="#medic" onclick="selectRole('medic')">Médecin</a>
+        <a href="#king" onclick="selectRole('king')">Roi</a>
+        <a href="#guard" onclick="selectRole('guard')">Garde Royale</a>
+        <a class="play-btn" href="https://www.roblox.com/games/13476966119/Buckingham-Palace" target="_blank" rel="noopener">Jouer maintenant</a>
       </nav>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero container" id="home">
+    <div class="hero-left">
+      <div class="eyebrow">Serveur RP — Westminster</div>
+      <h1 class="hero-title">Buckingham Palace Roleplay sur Roblox</h1>
+      <p class="lead">Protège la royauté, maintiens l'ordre ou choisis le chaos. Guides, procédures et candidatures pour chaque rôle — conçus pour faciliter la gestion du serveur et l'intégration des nouveaux.</p>
+      <div class="hero-ctas">
+        <button class="btn primary" onclick="scrollToSection('#police')">Voir les rôles</button>
+        <button class="btn ghost" onclick="openDiscord()">Discord officiel</button>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <!-- hero images rotate simply -->
+      <img id="heroImg" src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter" alt="Buckingham Palace">
     </div>
   </header>
 
-  <main class="container" id="main">
-    <!-- POLICE PAGE -->
-    <article id="police" class="role-page active" aria-labelledby="policeTitle">
-      <div class="grid">
-        <section class="card">
-          <h1 id="policeTitle">Police — Metropolitan Police Service (MPS)</h1>
-          <p class="muted">Page dédiée aux officiers — structure, procédures et ressources.</p>
+  <!-- MAIN -->
+  <main>
+    <div class="layout">
 
-          <!-- Suggested content blocks for Police -->
-          <div class="section-list">
-            <div class="card" style="display:flex;align-items:flex-start;gap:12px">
-              <div class="accent-strip" aria-hidden="true"></div>
-              <div>
-                <div class="block-title">1. Présentation du rôle</div>
-                <div class="muted">Brève description, responsabilités principales et objectifs (ex: maintenir la paix, enquêter, escorter VIP).</div>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px;align-items:flex-start">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">2. Procédures & Protocoles</div>
-                <ul class="muted">
-                  <li>Checklists d'intervention (arrivée sur scène, sécurisation, communication radio)</li>
-                  <li>Procédures d'arrestation (lecture des droits, fouille, escort)</li>
-                  <li>Règles d'engagement (tasers, usage de la force)</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">3. Kit & Équipement</div>
-                <p class="muted">Liste des items (tasers, bâtons, pava, radio, menottes, armes d'assaut) et conditions d'utilisation.</p>
-                <table>
-                  <thead><tr><th>Item</th><th>Disponibilité</th><th>Usage</th></tr></thead>
-                  <tbody>
-                    <tr><td>Taser</td><td>Après formation</td><td>Immobilisation non-létale</td></tr>
-                    <tr><td>PAVA</td><td>Senior</td><td>Subdue suspect</td></tr>
-                    <tr><td>Radio</td><td>Tous</td><td>Comms</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">4. Rangs & Progression</div>
-                <p class="muted">Explication des rangs, points requis, responsabilités par rang.</p>
-                <ul class="muted">
-                  <li>Trainee Constable → Special → Constable → Sergeant → Inspector → etc.</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">5. Formation & Quiz</div>
-                <p class="muted">Intégrer un quiz de qualification (ex: QCM), vidéo d'entraînement, calendrier des sessions.</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">6. Candidature / Postuler</div>
-                <p class="muted">Formulaire simple pour postuler à une position — stocker via Google Forms/Formspree ou back-end.</p>
-                <form onsubmit="event.preventDefault(); alert('Candidature envoyée (exemple)')">
-                  <div style="display:flex;gap:8px;margin-bottom:8px">
-                    <input required placeholder="Pseudo Roblox" />
-                    <input required placeholder="Discord (ex: user#0000)" />
-                  </div>
-                  <select required>
-                    <option value="">Position demandée</option>
-                    <option>Patrol / Response</option>
-                    <option>Armed Unit</option>
-                    <option>Close Protection</option>
-                  </select>
-                  <div style="margin-top:8px">
-                    <textarea placeholder="Pourquoi vous ? (1-2 phrases)" style="width:100%;min-height:70px;padding:8px;border-radius:8px;border:1px solid #eef3f8"></textarea>
-                  </div>
-                  <div style="margin-top:8px">
-                    <button class="submit-btn">Postuler</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px;align-items:flex-start">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">7. FAQ & Scénarios RP</div>
-                <p class="muted">Exemples de situations et comment les traiter en RP (poursuite, prise d'otage, fouille, signalement).</p>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- Right column: quick references -->
-        <aside>
-          <div class="card">
-            <h3>Ressources rapides</h3>
-            <p class="muted">Liens, cheat-sheet, codes état rapide.</p>
-            <div style="margin-top:8px">
-              <div class="inline-pill">State 0 — Urgence</div>
-              <div class="inline-pill" style="margin-left:8px">State 6 — Arrivé</div>
-            </div>
-            <hr style="margin:12px 0;border:none;border-top:1px solid #f1f5f9">
-            <div>
-              <strong>Contacts</strong>
-              <p class="muted" style="margin:4px 0">Discord: /invite/buckingham</p>
-              <p class="muted" style="margin:4px 0">Wiki: /buckingham-palace</p>
-            </div>
+      <!-- left / content -->
+      <div>
+        <div class="card">
+          <div class="roles-nav" role="tablist" aria-label="Sélection rôle">
+            <div class="role-tab active" data-role="police" onclick="selectRole('police')">Police</div>
+            <div class="role-tab" data-role="medic" onclick="selectRole('medic')">Médecin</div>
+            <div class="role-tab" data-role="king" onclick="selectRole('king')">Roi</div>
+            <div class="role-tab" data-role="guard" onclick="selectRole('guard')">Garde Royale</div>
           </div>
 
-          <div class="card" style="margin-top:16px">
-            <h3>Galerie / Inspirations</h3>
-            <div class="gallery">
-              <img src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter" alt="">
-              <img src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter" alt="">
-              <img src="https://tr.rbxcdn.com/180DAY-ade6ce7e69ebf46c36a9ff8a7eccad11/768/432/Image/Webp/noFilter" alt="">
-              <img src="https://tr.rbxcdn.com/180DAY-cf8c4baede730272ff127a53caad3614/768/432/Image/Webp/noFilter" alt="">
+          <!-- POLICE PANEL -->
+          <section id="panel-police" class="panel active" aria-labelledby="policeTitle">
+            <h2 class="section-title" id="policeTitle">Police — Metropolitan Police Service (MPS)</h2>
+            <p class="meta">Rôle : maintien de l'ordre, enquêtes, escorte VIP.</p>
+
+            <h3>Contenu recommandé</h3>
+            <ul>
+              <li><strong>Présentation :</strong> mission & responsabilités.</li>
+              <li><strong>Procédures :</strong> arrestation, fouille, codes d'état (State 0,1,2...).</li>
+              <li><strong>Kit :</strong> liste & conditions d'utilisation (taser, PAVA, baton).</li>
+              <li><strong>Rangs :</strong> progression & permissions.</li>
+              <li><strong>Formation :</strong> quiz, vidéos, sessions.</li>
+              <li><strong>Candidature :</strong> formulaire, critères d'acceptation.</li>
+            </ul>
+
+            <div style="margin-top:12px" class="card">
+              <strong>Exemples de codes d'état</strong>
+              <table><thead><tr><th>Code</th><th>Signification</th></tr></thead>
+              <tbody>
+                <tr><td>State 0</td><td>Urgence — assistance immédiate</td></tr>
+                <tr><td>State 5</td><td>En route</td></tr>
+                <tr><td>State 9</td><td>Transport de prisonnier</td></tr>
+              </tbody></table>
             </div>
-          </div>
-        </aside>
+
+            <div style="margin-top:12px" class="card">
+              <strong>Candidature / Postuler</strong>
+              <p class="meta">Formulaire basique — récupère pseudo et discord.</p>
+              <form onsubmit="event.preventDefault(); alert('Candidature Police envoyée (exemple)')">
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                  <input required placeholder="Pseudo Roblox" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
+                  <input required placeholder="Discord (user#0000)" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
+                </div>
+                <select required style="width:100%;padding:8px;border-radius:8px;border:1px solid #eef3f8;margin-bottom:8px">
+                  <option value="">Position demandée</option>
+                  <option>Patrol</option>
+                  <option>Armed Unit</option>
+                  <option>Close Protection</option>
+                </select>
+                <textarea placeholder="Pourquoi vous ? (1-2 lignes)" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eef3f8;min-height:80px"></textarea>
+                <div style="margin-top:8px;text-align:right"><button class="btn primary" type="submit">Postuler</button></div>
+              </form>
+            </div>
+          </section>
+
+          <!-- MEDIC PANEL -->
+          <section id="panel-medic" class="panel" aria-labelledby="medicTitle">
+            <h2 class="section-title" id="medicTitle">Médecin / Ambulance — LAS</h2>
+            <p class="meta">Soins avancés, triage et évacuations.</p>
+
+            <h3>Contenu recommandé</h3>
+            <ul>
+              <li><strong>Protocoles :</strong> triage A/B/C, CPR, stabilisation.</li>
+              <li><strong>Équipement :</strong> defib, medkit, brancard.</li>
+              <li><strong>Formation :</strong> vidéos, entraînements et évaluations.</li>
+              <li><strong>Candidature :</strong> formulaires et certifications requises.</li>
+            </ul>
+
+            <div style="margin-top:12px" class="card">
+              <strong>Exemple d'équipement</strong>
+              <table><thead><tr><th>Équipement</th><th>Usage</th></tr></thead>
+              <tbody>
+                <tr><td>Defib</td><td>Réanimation</td></tr>
+                <tr><td>Medkit</td><td>Soins rapides</td></tr>
+              </tbody></table>
+            </div>
+
+            <div style="margin-top:12px" class="card">
+              <strong>Inscription formation</strong>
+              <form onsubmit="event.preventDefault(); alert('Inscription LAS envoyée (exemple)')">
+                <div style="display:flex;gap:8px">
+                  <input required placeholder="Pseudo" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
+                  <input required placeholder="Discord" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
+                </div>
+                <div style="margin-top:8px"><button class="btn primary" type="submit">S'inscrire</button></div>
+              </form>
+            </div>
+          </section>
+
+          <!-- KING PANEL -->
+          <section id="panel-king" class="panel" aria-labelledby="kingTitle">
+            <h2 class="section-title" id="kingTitle">Roi / Royauté</h2>
+            <p class="meta">Événements, protocole et interactions VIP.</p>
+
+            <h3>Contenu recommandé</h3>
+            <ul>
+              <li><strong>Lore & Rôle :</strong> histoire du personnage, étiquette.</li>
+              <li><strong>Événements :</strong> calendrier, planning, checklists cérémonie.</li>
+              <li><strong>Sécurité :</strong> procédures d'évacuation & garde rapprochée.</li>
+            </ul>
+
+            <div style="margin-top:12px" class="card">
+              <strong>Événements à prévoir</strong>
+              <ul class="meta">
+                <li>Parade annuelle</li>
+                <li>Réception VIP</li>
+                <li>Changement de garde (coordonné avec RG)</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- GUARD PANEL -->
+          <section id="panel-guard" class="panel" aria-labelledby="guardTitle">
+            <h2 class="section-title" id="guardTitle">Garde Royale (RG)</h2>
+            <p class="meta">Protection du palais, drill & cérémonies.</p>
+
+            <h3>Contenu recommandé</h3>
+            <ul>
+              <li><strong>Organisation :</strong> rangs, shifts, accès et permissions.</li>
+              <li><strong>Drill :</strong> exercices de parade, tests pratiques.</li>
+              <li><strong>Uniformes :</strong> règles d'apparence et assets recommandés.</li>
+            </ul>
+
+            <div style="margin-top:12px" class="card">
+              <strong>Candidature Garde Royale</strong>
+              <form onsubmit="event.preventDefault(); alert('Candidature RG envoyée (exemple)')">
+                <div style="display:flex;gap:8px;margin-bottom:8px">
+                  <input required placeholder="Pseudo" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
+                  <input required placeholder="Discord" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef3f8">
+                </div>
+                <textarea placeholder="Motivation / Expérience" style="width:100%;min-height:80px;padding:8px;border-radius:8px;border:1px solid #eef3f8"></textarea>
+                <div style="margin-top:8px;text-align:right"><button class="btn primary" type="submit">Postuler</button></div>
+              </form>
+            </div>
+          </section>
+        </div>
       </div>
-    </article>
 
-    <!-- MEDIC PAGE -->
-    <article id="medic" class="role-page" aria-labelledby="medicTitle">
-      <div class="grid">
-        <section class="card">
-          <h1 id="medicTitle">Médecin / Ambulance — LAS</h1>
-          <p class="muted">Soins, triage et procédures médicales RP ; ressources de formation.</p>
-
-          <div class="section-list">
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">1. Présentation</div>
-                <div class="muted">Rôle, objectifs (sauver des vies, stabiliser et transporter).</div>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">2. Protocoles Médicaux</div>
-                <ul class="muted">
-                  <li>Triage (priorité) — catégories A/B/C</li>
-                  <li>Soins de base : bandages, splint, CPR (réanimation)</li>
-                  <li>Procédures pour downed players & extraction</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">3. Équipement & Véhicules</div>
-                <p class="muted">Ambulances, brancards, trousses médicales, défibrillateur.</p>
-                <table>
-                  <thead><tr><th>Équipement</th><th>Usage</th></tr></thead>
-                  <tbody>
-                    <tr><td>Defib</td><td>Réanimation</td></tr>
-                    <tr><td>Medkit</td><td>Soins rapides</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">4. Formation</div>
-                <p class="muted">Manuels, sessions pratiques, évaluations (sauvetage/CPR).</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">5. Postuler / Inscription</div>
-                <form onsubmit="event.preventDefault(); alert('Candidature médecin envoyée (exemple)')">
-                  <div class="form-row"><input required placeholder="Pseudo Roblox" /><input required placeholder="Discord" /></div>
-                  <div style="margin-top:8px">
-                    <select required>
-                      <option value="">Poste désiré</option>
-                      <option>Paramedic</option>
-                      <option>Field Medic</option>
-                      <option>Ambulance Driver</option>
-                    </select>
-                  </div>
-                  <div style="margin-top:8px"><textarea placeholder="Expérience / Certifications" style="min-height:70px"></textarea></div>
-                  <div style="margin-top:8px"><button class="submit-btn">S'inscrire</button></div>
-                </form>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">6. Cas pratiques & scénarios</div>
-                <p class="muted">Exemples : multi-victimes, extraction sous feu, évacuation VIP.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <aside>
-          <div class="card">
-            <h3>Ressources</h3>
-            <p class="muted">Lien manuel, checklist, vidéos.</p>
-            <div class="gallery" style="margin-top:10px">
-              <img src="https://via.placeholder.com/320x180?text=Ambulance" alt="">
-              <img src="https://via.placeholder.com/320x180?text=Medkit" alt="">
-              <img src="https://via.placeholder.com/320x180?text=CPR" alt="">
-            </div>
-          </div>
-
-          <div class="card" style="margin-top:16px">
-            <h3>Statut & Rôles</h3>
-            <p class="muted">Définir qui peut faire quoi (gamepass, formation, rangs).</p>
-          </div>
-        </aside>
-      </div>
-    </article>
-
-    <!-- KING PAGE -->
-    <article id="king" class="role-page" aria-labelledby="kingTitle">
-      <div class="grid">
-        <section class="card">
-          <h1 id="kingTitle">Roi / Royauté — rôle & événements</h1>
-          <p class="muted">Page dédiée au personnage royal, événements, protocoles cérémoniels et interactions.</p>
-
-          <div class="section-list">
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">1. Rôle & Lore</div>
-                <p class="muted">Présentation du monarque (backstory, statut, règles d'apparence RP).</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">2. Événements & Cérémonies</div>
-                <p class="muted">Listes d'événements planifiés (parade, changement de garde, réceptions).</p>
-                <ul class="muted">
-                  <li>Calendrier des événements publics</li>
-                  <li>Procédures VIP</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">3. Protocole & Sécurité</div>
-                <p class="muted">Comment gérer les menaces, evacuation, gestion médias.</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">4. Interactions Joueurs</div>
-                <p class="muted">Règles spéciales (ne pas attaquer le monarque en RP sans cause, etiquette pour saluer, etc.).</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">5. Éléments visuels & costumes</div>
-                <p class="muted">Suggestions d'assets: robes, sceptre, icônes, arrière-plans pour événements.</p>
-                <div class="muted" style="margin-top:8px">Palette recommandée : <strong style="color:var(--accent)">Or / Violet profond</strong></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <aside>
-          <div class="card">
-            <h3>Calendrier</h3>
-            <p class="muted">Ajouter un calendrier simple (Google Calendar embed ou liste).</p>
-          </div>
-
-          <div class="card" style="margin-top:16px">
-            <h3>Rituels</h3>
-            <p class="muted">Checklists de cérémonie, ordres du jour, participants requis.</p>
-          </div>
-        </aside>
-      </div>
-    </article>
-
-    <!-- GUARD PAGE -->
-    <article id="guard" class="role-page" aria-labelledby="guardTitle">
-      <div class="grid">
-        <section class="card">
-          <h1 id="guardTitle">Garde Royale (RG)</h1>
-          <p class="muted">Protège le palais, cérémonies, patrouilles et protocoles d'engagement.</p>
-
-          <div class="section-list">
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">1. Mission</div>
-                <p class="muted">Maintien de l'ordre dans les zones royales, escortes, garde cérémoniale.</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">2. Organisation interne</div>
-                <p class="muted">Structure (Guardsman → Corporal → Sergeant), shifts, rotations.</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">3. Formation & Drill</div>
-                <p class="muted">Manuels de drill, protocole de cérémonie, entraînements requis.</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">4. Permissions spéciales</div>
-                <p class="muted">Qui peut ouvrir portes BP, accès zones VIP, items exclusifs.</p>
-              </div>
-            </div>
-
-            <div class="card" style="display:flex;gap:12px">
-              <div class="accent-strip"></div>
-              <div>
-                <div class="block-title">5. Candidature / Tests</div>
-                <p class="muted">Test pratique (drill), épreuve théorique, interview.</p>
-                <form onsubmit="event.preventDefault(); alert('Candidature Garde Royale envoyée (exemple)')">
-                  <div style="display:flex;gap:8px"><input placeholder="Pseudo Roblox" required/><input placeholder="Discord" required/></div>
-                  <div style="margin-top:8px"><textarea placeholder="Motivation (2-3 lignes)"></textarea></div>
-                  <div style="margin-top:8px"><button class="submit-btn">Postuler</button></div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <aside>
-          <div class="card">
-            <h3>Uniformes & Équipement</h3>
-            <p class="muted">Preview des uniformes, règles d'apparence, équipement autorisé.</p>
-            <div class="gallery" style="margin-top:10px">
-              <img src="https://via.placeholder.com/320x180?text=Uniforme" alt="">
-              <img src="https://via.placeholder.com/320x180?text=Arme" alt="">
-              <img src="https://via.placeholder.com/320x180?text=Ceremony" alt="">
-            </div>
-          </div>
-
-          <div class="card" style="margin-top:16px">
-            <h3>Rendez-vous d'entraînement</h3>
-            <p class="muted">Planning des drills & instructeurs assignés.</p>
-          </div>
-        </aside>
-      </div>
-    </article>
-
-  </main>
-
-  <footer>
-    <div class="container">
-      © 2025 Buckingham Palace RP — Structure de pages & suggestions de contenu.
-    </div>
-  </footer>
-
-<script>
-  // Simple SPA navigation + color role switch
-  const links = document.querySelectorAll('nav.role-nav a[data-role]');
-  const pages = document.querySelectorAll('.role-page');
-
-  function setActiveRole(role){
-    // set body dataset to apply CSS variables
-    document.body.setAttribute('data-role', role);
-    // highlight nav
-    links.forEach(a => a.classList.toggle('active', a.dataset.role === role));
-    // show relevant page
-    pages.forEach(p => p.classList.toggle('active', p.id === role));
-    // update hash (so linkable)
-    history.replaceState(null, '', '#'+role);
-  }
-
-  links.forEach(a => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      const role = a.dataset.role;
-      setActiveRole(role);
-    });
-  });
-
-  // On load: open page by hash or default police
-  const initialRole = location.hash ? location.hash.replace('#','') : 'police';
-  setActiveRole(initialRole);
-
-  // keyboard nav: press 1-4 to switch quickly
-  window.addEventListener('keydown', (e) => {
-    if (['1','2','3','4'].includes(e.key)) {
-      const map = { '1':'police','2':'medic','3':'king','4':'guard' };
-      setActiveRole(map[e.key]);
-    }
-  });
-</script>
-</body>
-</html>
+      <!-- right / sidebar -->
+      <aside>
+        <div class="card">
+          <h3 class="section-title">Ressources rapides</h3>
+          <p class="meta">
