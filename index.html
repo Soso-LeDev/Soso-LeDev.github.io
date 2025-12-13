@@ -3,48 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mon site de media</title>
+  <title>Galerie Média</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Uploader vos photos ou vidéos</h1>
+  <div class="container">
+    <h1>Uploader vos photos ou vidéos</h1>
 
-  <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="media" accept="image/*,video/*" required>
-    <button type="submit">Uploader</button>
-  </form>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="media" accept="image/*,video/*" required>
+      <button type="submit">Uploader</button>
+    </form>
 
-  <h2>Galerie</h2>
-  <div id="gallery"></div>
+    <h2>Galerie</h2>
+    <div id="gallery" class="gallery"></div>
+  </div>
 
   <script>
     async function loadFiles() {
-      const res = await fetch('/files');
-      const files = await res.json();
-      const gallery = document.getElementById('gallery');
-      gallery.innerHTML = '';
+      try {
+        const res = await fetch('/files');
+        const files = await res.json();
+        const gallery = document.getElementById('gallery');
+        gallery.innerHTML = '';
 
-      files.forEach(file => {
-        const ext = file.split('.').pop().toLowerCase();
-        let element;
+        files.forEach(file => {
+          const ext = file.split('.').pop().toLowerCase();
+          let element;
 
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-          element = document.createElement('img');
-          element.src = `/uploads/${file}`;
-        } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
-          element = document.createElement('video');
-          element.src = `/uploads/${file}`;
-          element.controls = true;
-        }
+          if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+            element = document.createElement('img');
+            element.src = `/uploads/${file}`;
+          } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+            element = document.createElement('video');
+            element.src = `/uploads/${file}`;
+            element.controls = true;
+          }
 
-        if (element) {
-          element.className = 'media-item';
-          gallery.appendChild(element);
-        }
-      });
+          if (element) {
+            element.className = 'media-item';
+            gallery.appendChild(element);
+          }
+        });
+      } catch (err) {
+        console.error('Erreur chargement fichiers', err);
+      }
     }
 
     loadFiles();
+
+    // Recharge la galerie après un upload
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      const res = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        e.target.reset();
+        loadFiles();
+      } else {
+        alert('Erreur lors de l\'upload.');
+      }
+    });
   </script>
 </body>
 </html>
