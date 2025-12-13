@@ -8,65 +8,39 @@
 </head>
 <body>
   <div class="container">
-    <h1>Uploader vos photos ou vidéos</h1>
+    <h1>Galerie Média</h1>
+    <p>Ajoutez vos fichiers dans le dossier <code>media/</code> et ils apparaîtront ici.</p>
 
-    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="media" accept="image/*,video/*" required>
-      <button type="submit">Uploader</button>
-    </form>
-
-    <h2>Galerie</h2>
     <div id="gallery" class="gallery"></div>
   </div>
 
   <script>
-    async function loadFiles() {
-      try {
-        const res = await fetch('/files');
-        const files = await res.json();
-        const gallery = document.getElementById('gallery');
-        gallery.innerHTML = '';
+    // Liste des fichiers dans le dossier /media
+    const files = [
+      "media/photo1.jpg",
+      "media/photo2.png",
+      "media/video1.mp4"
+      // Ajoute ici les fichiers supplémentaires
+    ];
 
-        files.forEach(file => {
-          const ext = file.split('.').pop().toLowerCase();
-          let element;
+    const gallery = document.getElementById('gallery');
 
-          if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-            element = document.createElement('img');
-            element.src = `/uploads/${file}`;
-          } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
-            element = document.createElement('video');
-            element.src = `/uploads/${file}`;
-            element.controls = true;
-          }
+    files.forEach(file => {
+      const ext = file.split('.').pop().toLowerCase();
+      let element;
 
-          if (element) {
-            element.className = 'media-item';
-            gallery.appendChild(element);
-          }
-        });
-      } catch (err) {
-        console.error('Erreur chargement fichiers', err);
+      if (['jpg','jpeg','png','gif'].includes(ext)) {
+        element = document.createElement('img');
+        element.src = file;
+      } else if (['mp4','webm','ogg'].includes(ext)) {
+        element = document.createElement('video');
+        element.src = file;
+        element.controls = true;
       }
-    }
 
-    loadFiles();
-
-    // Recharge la galerie après un upload
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-
-      const res = await fetch('/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (res.ok) {
-        e.target.reset();
-        loadFiles();
-      } else {
-        alert('Erreur lors de l\'upload.');
+      if (element) {
+        element.className = 'media-item';
+        gallery.appendChild(element);
       }
     });
   </script>
