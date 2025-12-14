@@ -3,157 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio | Développeur</title>
-  <meta name="description" content="Portfolio de développeur – projets, builds, animations et compétences." />
+  <title>Soso_LeDev | Portfolio</title>
+  <meta name="description" content="Portfolio développeur – builds, animations, projets visuels." />
+
   <style>
     :root {
-      --bg: #0f1220;
-      --card: #171a2e;
-      --text: #e8eaf6;
-      --muted: #aab0ff;
-      --accent: #6c7cff;
-      --border: rgba(255,255,255,0.08);
+      --bg: #070812;
+      --bg-glow: #0e1030;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --text: #f4f6ff;
+      --muted: #b6bbff;
+      --accent: #8b9bff;
+      --pink: #ff6ec7;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
-      background: radial-gradient(1200px 600px at 10% -10%, #1b1f45, transparent), var(--bg);
+      font-family: "Segoe UI", system-ui, sans-serif;
       color: var(--text);
-      line-height: 1.6;
+      background:
+        radial-gradient(800px 400px at 80% -10%, #1a1f6b55, transparent),
+        radial-gradient(600px 300px at 10% 10%, #ff6ec733, transparent),
+        var(--bg);
+      overflow-x: hidden;
     }
 
     a { color: inherit; text-decoration: none; }
 
+    /* ===== HERO ===== */
     header {
-      padding: 64px 24px 48px;
-      max-width: 1100px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 24px;
+      max-width: 1200px;
       margin: auto;
+      position: relative;
+    }
+
+    .glow {
+      position: absolute;
+      inset: -40% -20% auto auto;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #6c7cff44, transparent 70%);
+      filter: blur(80px);
+      z-index: -1;
     }
 
     .badge {
       display: inline-block;
-      padding: 6px 12px;
+      padding: 8px 16px;
       border-radius: 999px;
-      background: rgba(108,124,255,0.15);
-      color: var(--accent);
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      color: #0a0b1a;
+      font-weight: 700;
+      width: fit-content;
+      margin-bottom: 24px;
+      box-shadow: 0 0 30px #6c7cff55;
     }
 
     h1 {
-      font-size: clamp(32px, 5vw, 56px);
-      line-height: 1.1;
-      margin-bottom: 16px;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     header p {
+      font-size: 20px;
       max-width: 700px;
-      color: #cfd3ff;
-      font-size: 18px;
+      color: var(--muted);
     }
 
-    nav {
-      margin-top: 32px;
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+    .scroll {
+      margin-top: 48px;
+      font-size: 14px;
+      opacity: 0.7;
     }
 
-    nav a {
-      padding: 10px 16px;
-      border-radius: 12px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      transition: 0.2s ease;
-    }
-
-    nav a:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-
+    /* ===== SECTIONS ===== */
     main {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: auto;
-      padding: 24px;
+      padding: 0 24px 120px;
       display: grid;
-      gap: 64px;
+      gap: 120px;
     }
 
     section h2 {
-      font-size: 28px;
+      font-size: 36px;
       margin-bottom: 16px;
     }
 
-    section p {
-      color: #cfd3ff;
-      max-width: 800px;
+    section > p {
+      color: var(--muted);
+      max-width: 700px;
+      margin-bottom: 40px;
     }
 
+    /* ===== PROJECT GRID ===== */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-      margin-top: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 28px;
     }
 
     .card {
+      position: relative;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 22px;
       overflow: hidden;
-      transition: 0.25s ease;
+      backdrop-filter: blur(12px);
+      transition: transform .35s ease, box-shadow .35s ease;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, #ffffff11, transparent);
+      opacity: 0;
+      transition: opacity .35s;
     }
 
     .card:hover {
-      transform: translateY(-6px);
-      border-color: var(--accent);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 30px 80px #00000088;
     }
 
-    .card img, .card video {
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .card img,
+    .card video {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
       display: block;
-      background: #0b0d1a;
+      background: #000;
     }
 
     .card-content {
-      padding: 16px;
+      padding: 18px 18px 22px;
     }
 
     .card-content h3 {
-      font-size: 18px;
-      margin-bottom: 8px;
+      font-size: 20px;
+      margin-bottom: 6px;
     }
 
     .card-content p {
       font-size: 14px;
-      color: #cfd3ff;
+      color: var(--muted);
     }
 
-    .tags {
-      margin-top: 12px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    /* ===== SKILLS ===== */
+    .skills {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
     }
 
-    .tag {
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
+    .skill {
+      padding: 24px;
+      border-radius: 22px;
+      background: linear-gradient(160deg, #ffffff12, #ffffff03);
+      border: 1px solid var(--border);
     }
 
+    .skill h3 {
+      margin-bottom: 8px;
+    }
+
+    .skill p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ===== FOOTER ===== */
     footer {
-      padding: 48px 24px;
+      padding: 60px 24px;
       border-top: 1px solid var(--border);
       text-align: center;
-      color: #b8beff;
+      color: var(--muted);
     }
 
     footer a {
@@ -162,110 +205,85 @@
     }
 
     @media (max-width: 600px) {
-      header { padding-top: 48px; }
-      nav { gap: 10px; }
+      header { min-height: auto; padding-top: 120px; }
     }
   </style>
 </head>
 <body>
 
-  <header id="top">
-    <span class="badge">Développeur</span>
-    <h1><strong>Soso_LeDev / Soso</strong></h1>
+<header id="top">
+  <div class="glow"></div>
+  <span class="badge">Développeur</span>
+  <h1>Soso_<span>LeDev</span></h1>
+  <p>
+    Je crée des expériences visuelles, des builds stylés et des animations.
+    Mon objectif : du code propre avec une vraie identité visuelle.
+  </p>
+  <div class="scroll">↓ Scroll</div>
+</header>
+
+<main>
+
+  <section>
+    <h2>Projets & Animations</h2>
     <p>
-      Je développe des applications, outils et interfaces modernes. 
-      Voici une sélection de mes projets, builds et animations.
+      Une sélection de mes créations. Pas de catégories : juste du visuel,
+      de la technique et du style.
     </p>
-    <nav>
-      <a href="#projets">Projets</a>
-      <a href="#skills">Compétences</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
 
-  <main>
+    <div class="grid">
+      <article class="card">
+        <img src="./media/projet1.png" alt="Projet" />
+        <div class="card-content">
+          <h3>Build UI</h3>
+          <p>Interface stylisée avec effets lumineux et transitions.</p>
+        </div>
+      </article>
 
-    <!-- PROJETS -->
-    <section id="projets">
-      <h2>Projets & Builds</h2>
-      <p>
-        Images et animations sont chargées depuis le dossier <strong>/media</strong>.
-      </p>
+      <article class="card">
+        <video src="./media/animation1.mp4" autoplay muted loop playsinline></video>
+        <div class="card-content">
+          <h3>Animation</h3>
+          <p>Animation fluide orientée esthétique anime.</p>
+        </div>
+      </article>
 
-      <div class="grid">
-        <!-- CARD IMAGE -->
-        <article class="card">
-          <img src="./media/projet1.png" alt="Projet 1" />
-          <div class="card-content">
-            <h3>Nom du projet</h3>
-            <p>Description courte du projet, objectif et techno principale.</p>
-            <div class="tags">
-              <span class="tag">Python</span>
-              <span class="tag">UI</span>
-            </div>
-          </div>
-        </article>
+      <!-- Duplique librement -->
+    </div>
+  </section>
 
-        <!-- CARD VIDEO / ANIMATION -->
-        <article class="card">
-          <video src="./media/animation1.mp4" autoplay muted loop playsinline></video>
-          <div class="card-content">
-            <h3>Animation / Build</h3>
-            <p>Démo visuelle ou animation d'interface.</p>
-            <div class="tags">
-              <span class="tag">HTML</span>
-              <span class="tag">CSS</span>
-            </div>
-          </div>
-        </article>
-
-        <!-- DUPLIQUE LES CARTES -->
+  <section>
+    <h2>Compétences</h2>
+    <div class="skills">
+      <div class="skill">
+        <h3>Frontend</h3>
+        <p>HTML, CSS avancé, animations, identité visuelle</p>
       </div>
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills">
-      <h2>Compétences</h2>
-      <div class="grid">
-        <div class="card">
-          <div class="card-content">
-            <h3>Frontend</h3>
-            <p>HTML, CSS, JavaScript, UI/UX, animations</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-content">
-            <h3>Backend</h3>
-            <p>Python, sockets, API, logique applicative</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-content">
-            <h3>Autres</h3>
-            <p>Linux, sécurité, scripts, automatisation</p>
-          </div>
-        </div>
+      <div class="skill">
+        <h3>Backend</h3>
+        <p>Python, logique applicative, sockets</p>
       </div>
-    </section>
+      <div class="skill">
+        <h3>Dev Roblox</h3>
+        <p>Build, scripts, animations, optimisation</p>
+      </div>
+    </div>
+  </section>
 
-    <!-- CONTACT -->
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>
-        Tu peux me contacter par mail ou via mes réseaux.
-      </p>
-      <p style="margin-top:16px">
-        📧 <a href="mailto:tonmail@email.com">tonmail@email.com</a><br />
-        💻 <a href="https://github.com/tonpseudo" target="_blank">GitHub</a>
-      </p>
-    </section>
+  <section>
+    <h2>Contact</h2>
+    <p>
+      📧 <a href="mailto:testsoso45@email.com">testsoso45@email.com</a><br>
+      💻 <a href="https://github.com/Soso-LeDev" target="_blank">GitHub</a>
+    </p>
+  </section>
 
-  </main>
+</main>
 
-  <footer>
-    <p>© 2025 — Portfolio Développeur • Fait en HTML/CSS</p>
-    <p><a href="#top">Retour en haut ↑</a></p>
-  </footer>
+<footer>
+  <p>© 2025 — Soso_LeDev • Portfolio</p>
+  <p><a href="#top">Retour en haut ↑</a></p>
+</footer>
 
 </body>
 </html>
