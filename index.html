@@ -210,7 +210,7 @@
   <main>
     <section>
       <h2>Mes Projets & Créations</h2>
-      <p>Tous mes builds et animations chargés automatiquement depuis le dossier media.</p>
+      <p>Mes builds Roblox et animations les plus récents.</p>
 
       <!-- Builds & Photos -->
       <h3 class="category-title">Builds & Photos</h3>
@@ -254,16 +254,15 @@
   </footer>
 
   <script>
-    // Liste complète de tous tes fichiers dans /media/ (à jour au 14 décembre 2025)
+    // Liste à jour de TOUS les fichiers actuellement dans /media/ (14 décembre 2025)
     const mediaFiles = [
-      "Capture d’écran 2025-12-13 192124.png",
-      "Capture d’écran 2025-12-14 132638.png",
-      "Capture d’écran 2025-12-14 132653.png",
-      "Capture d’écran 2025-12-14 132714.png",
-      "Enregistrement de l’écran 2025-11-03 192608.mp4",
-      "Enregistrement de l’écran 2025-12-13 134910.mp4",
-      "Enregistrement de l’écran 2025-12-14 114235.mp4",
-      "Enregistrement de l’écran 2025-12-14 125829.mp4",
+      "BuildDesert.png",
+      "BuildExemple.png",
+      "BuildHiver.png",
+      "Enregistrement de l'écran 2025-11-03 192608.mp4",
+      "Enregistrement de l'écran 2025-12-13 134910.mp4",
+      "Enregistrement de l'écran 2025-12-14 114235.mp4",
+      "Enregistrement de l'écran 2025-12-14 125829.mp4",
       "VID-20250613-WA0003(1).mp4"
     ];
 
@@ -275,31 +274,34 @@
       const card = document.createElement("article");
       card.className = "card";
 
-      // Titre propre (sans extension et avec espaces)
-      const cleanTitle = file
-        .split('.')[0]
+      // Titre joli : on enlève l'extension et on rend lisible
+      let title = file.split('.')[0]
         .replace(/[-_]/g, ' ')
-        .replace(/\d{8,}/g, match => {
-          // Formatage joli des dates/heures si besoin
-          return match;
-        });
+        .replace(/écran/g, 'Écran')
+        .replace(/Enregistrement de l'Écran/, 'Démo')
+        .replace(/VID-20250613-WA0003\(1\)/, 'Animation WhatsApp');
 
-      if (lowerFile.endsWith(".png") || lowerFile.endsWith(".jpg") || lowerFile.endsWith(".jpeg") || lowerFile.endsWith(".webp")) {
+      // Cas particuliers pour plus de propreté
+      if (file.startsWith("Build")) {
+        title = file.replace('.png', '');
+      }
+
+      if (lowerFile.endsWith(".png") || lowerFile.endsWith(".jpg") || lowerFile.endsWith(".jpeg")) {
         card.innerHTML = `
-          <img src="/media/${encodeURIComponent(file)}" alt="${file}" loading="lazy" />
+          <img src="/media/${encodeURIComponent(file)}" alt="${title}" loading="lazy" />
           <div class="card-content">
-            <h3>${cleanTitle}</h3>
-            <p>Capture d'écran / Build</p>
+            <h3>${title}</h3>
+            <p>Build Roblox</p>
           </div>
         `;
         photosGrid.appendChild(card);
       }
-      else if (lowerFile.endsWith(".mp4") || lowerFile.endsWith(".webm")) {
+      else if (lowerFile.endsWith(".mp4")) {
         card.innerHTML = `
           <video src="/media/${encodeURIComponent(file)}" autoplay muted loop playsinline loading="lazy"></video>
           <div class="card-content">
-            <h3>${cleanTitle}</h3>
-            <p>Animation / Enregistrement</p>
+            <h3>${title}</h3>
+            <p>Animation / Démo</p>
           </div>
         `;
         videosGrid.appendChild(card);
