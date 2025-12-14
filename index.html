@@ -210,13 +210,13 @@
   <main>
     <section>
       <h2>Mes Projets & Créations</h2>
-      <p>Tous mes builds et animations directement depuis le dossier media. Ajoute simplement tes fichiers, et ils apparaissent automatiquement !</p>
+      <p>Tous mes builds et animations chargés automatiquement depuis le dossier media.</p>
 
-      <!-- Builds & Photos (tout ce qui est .png ou .jpg) -->
+      <!-- Builds & Photos -->
       <h3 class="category-title">Builds & Photos</h3>
       <div class="grid" id="photos-grid"></div>
 
-      <!-- Animations & Vidéos (tout ce qui est .mp4) -->
+      <!-- Animations & Vidéos -->
       <h3 class="category-title">Animations & Vidéos</h3>
       <div class="grid" id="videos-grid"></div>
     </section>
@@ -253,19 +253,18 @@
     <p><a href="#top">Retour en haut ↑</a></p>
   </footer>
 
-  <!-- Script magique qui liste automatiquement tous les fichiers du dossier /media/ -->
   <script>
-    // Liste ici TOUS les noms de fichiers que tu as dans /media/
-    // Tu peux les copier-coller depuis ton dossier, c'est le seul endroit à modifier
+    // Liste complète de tous tes fichiers dans /media/ (à jour au 14 décembre 2025)
     const mediaFiles = [
-      "projet1.png",
-      "animation1.mp4",
-      "build2.png",
-      "anim_test.mp4",
-      "screenshot3.png",
-      "video_demo.mp4"
-      // Ajoute ou supprime des lignes ici à chaque nouveau fichier
-      // Exemple : "mon_nouveau_build.png",
+      "Capture d’écran 2025-12-13 192124.png",
+      "Capture d’écran 2025-12-14 132638.png",
+      "Capture d’écran 2025-12-14 132653.png",
+      "Capture d’écran 2025-12-14 132714.png",
+      "Enregistrement de l’écran 2025-11-03 192608.mp4",
+      "Enregistrement de l’écran 2025-12-13 134910.mp4",
+      "Enregistrement de l’écran 2025-12-14 114235.mp4",
+      "Enregistrement de l’écran 2025-12-14 125829.mp4",
+      "VID-20250613-WA0003(1).mp4"
     ];
 
     const photosGrid = document.getElementById("photos-grid");
@@ -276,24 +275,31 @@
       const card = document.createElement("article");
       card.className = "card";
 
+      // Titre propre (sans extension et avec espaces)
+      const cleanTitle = file
+        .split('.')[0]
+        .replace(/[-_]/g, ' ')
+        .replace(/\d{8,}/g, match => {
+          // Formatage joli des dates/heures si besoin
+          return match;
+        });
+
       if (lowerFile.endsWith(".png") || lowerFile.endsWith(".jpg") || lowerFile.endsWith(".jpeg") || lowerFile.endsWith(".webp")) {
-        // C'est une image → catégorie Photos
         card.innerHTML = `
-          <img src="/media/${file}" alt="${file}" loading="lazy" />
+          <img src="/media/${encodeURIComponent(file)}" alt="${file}" loading="lazy" />
           <div class="card-content">
-            <h3>${file.split('.')[0].replace(/_/g, ' ')}</h3>
-            <p>Build / Capture d'écran</p>
+            <h3>${cleanTitle}</h3>
+            <p>Capture d'écran / Build</p>
           </div>
         `;
         photosGrid.appendChild(card);
       }
       else if (lowerFile.endsWith(".mp4") || lowerFile.endsWith(".webm")) {
-        // C'est une vidéo → catégorie Vidéos
         card.innerHTML = `
-          <video src="/media/${file}" autoplay muted loop playsinline loading="lazy"></video>
+          <video src="/media/${encodeURIComponent(file)}" autoplay muted loop playsinline loading="lazy"></video>
           <div class="card-content">
-            <h3>${file.split('.')[0].replace(/_/g, ' ')}</h3>
-            <p>Animation / Démo vidéo</p>
+            <h3>${cleanTitle}</h3>
+            <p>Animation / Enregistrement</p>
           </div>
         `;
         videosGrid.appendChild(card);
