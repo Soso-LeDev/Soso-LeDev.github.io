@@ -29,7 +29,6 @@
     }
     a { color: inherit; text-decoration: none; }
     
-    /* ===== HERO ===== */
     header {
       min-height: 100vh;
       display: flex;
@@ -56,7 +55,6 @@
       background: linear-gradient(135deg, var(--accent), var(--pink));
       color: #0a0b1a;
       font-weight: 700;
-      width: fit-content;
       margin-bottom: 24px;
       box-shadow: 0 0 30px #6c7cff55;
     }
@@ -83,7 +81,6 @@
       opacity: 0.7;
     }
 
-    /* ===== SECTIONS ===== */
     main {
       max-width: 1200px;
       margin: auto;
@@ -101,7 +98,6 @@
       margin-bottom: 48px;
     }
 
-    /* Sous-titres des catégories */
     .category-title {
       font-size: 28px;
       margin: 60px 0 32px;
@@ -111,7 +107,6 @@
       background-clip: text;
     }
 
-    /* ===== PROJECT GRID ===== */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -163,7 +158,6 @@
       line-height: 1.4;
     }
 
-    /* ===== SKILLS ===== */
     .skills {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -184,7 +178,6 @@
       font-size: 15px;
     }
 
-    /* ===== FOOTER ===== */
     footer {
       padding: 80px 24px 60px;
       border-top: 1px solid var(--border);
@@ -199,7 +192,6 @@
     @media (max-width: 600px) {
       header { min-height: auto; padding-top: 140px; padding-bottom: 80px; }
       .grid { grid-template-columns: 1fr; }
-      .category-title { margin-top: 40px; }
     }
   </style>
 </head>
@@ -218,53 +210,15 @@
   <main>
     <section>
       <h2>Mes Projets & Créations</h2>
-      <p>Une sélection de mes travaux les plus aboutis, entre builds esthétiques et animations fluides.</p>
+      <p>Tous mes builds et animations directement depuis le dossier media. Ajoute simplement tes fichiers, et ils apparaissent automatiquement !</p>
 
-      <!-- === Builds & Photos === -->
+      <!-- Builds & Photos (tout ce qui est .png ou .jpg) -->
       <h3 class="category-title">Builds & Photos</h3>
-      <div class="grid">
-        <article class="card">
-          <img src="/media/projet1.png" alt="Build UI stylisé" />
-          <div class="card-content">
-            <h3>Build UI</h3>
-            <p>Interface moderne avec effets lumineux, glassmorphism et transitions fluides.</p>
-          </div>
-        </article>
+      <div class="grid" id="photos-grid"></div>
 
-        <!-- Ajoute ici d'autres images PNG/JPG -->
-        <!--
-        <article class="card">
-          <img src="/media/projet2.png" alt="Autre build" />
-          <div class="card-content">
-            <h3>Titre du projet</h3>
-            <p>Description courte et percutante.</p>
-          </div>
-        </article>
-        -->
-      </div>
-
-      <!-- === Animations & Vidéos === -->
+      <!-- Animations & Vidéos (tout ce qui est .mp4) -->
       <h3 class="category-title">Animations & Vidéos</h3>
-      <div class="grid">
-        <article class="card">
-          <video src="/media/animation1.mp4" autoplay muted loop playsinline></video>
-          <div class="card-content">
-            <h3>Animation Fluide</h3>
-            <p>Animation esthétique inspirée anime, avec particules et transitions douces.</p>
-          </div>
-        </article>
-
-        <!-- Ajoute ici d'autres vidéos MP4 -->
-        <!--
-        <article class="card">
-          <video src="/media/animation2.mp4" autoplay muted loop playsinline></video>
-          <div class="card-content">
-            <h3>Titre de l'animation</h3>
-            <p>Description de la vidéo.</p>
-          </div>
-        </article>
-        -->
-      </div>
+      <div class="grid" id="videos-grid"></div>
     </section>
 
     <section>
@@ -298,5 +252,53 @@
     <p>© 2025 — Soso_LeDev • Tous droits réservés</p>
     <p><a href="#top">Retour en haut ↑</a></p>
   </footer>
+
+  <!-- Script magique qui liste automatiquement tous les fichiers du dossier /media/ -->
+  <script>
+    // Liste ici TOUS les noms de fichiers que tu as dans /media/
+    // Tu peux les copier-coller depuis ton dossier, c'est le seul endroit à modifier
+    const mediaFiles = [
+      "projet1.png",
+      "animation1.mp4",
+      "build2.png",
+      "anim_test.mp4",
+      "screenshot3.png",
+      "video_demo.mp4"
+      // Ajoute ou supprime des lignes ici à chaque nouveau fichier
+      // Exemple : "mon_nouveau_build.png",
+    ];
+
+    const photosGrid = document.getElementById("photos-grid");
+    const videosGrid = document.getElementById("videos-grid");
+
+    mediaFiles.forEach(file => {
+      const lowerFile = file.toLowerCase();
+      const card = document.createElement("article");
+      card.className = "card";
+
+      if (lowerFile.endsWith(".png") || lowerFile.endsWith(".jpg") || lowerFile.endsWith(".jpeg") || lowerFile.endsWith(".webp")) {
+        // C'est une image → catégorie Photos
+        card.innerHTML = `
+          <img src="/media/${file}" alt="${file}" loading="lazy" />
+          <div class="card-content">
+            <h3>${file.split('.')[0].replace(/_/g, ' ')}</h3>
+            <p>Build / Capture d'écran</p>
+          </div>
+        `;
+        photosGrid.appendChild(card);
+      }
+      else if (lowerFile.endsWith(".mp4") || lowerFile.endsWith(".webm")) {
+        // C'est une vidéo → catégorie Vidéos
+        card.innerHTML = `
+          <video src="/media/${file}" autoplay muted loop playsinline loading="lazy"></video>
+          <div class="card-content">
+            <h3>${file.split('.')[0].replace(/_/g, ' ')}</h3>
+            <p>Animation / Démo vidéo</p>
+          </div>
+        `;
+        videosGrid.appendChild(card);
+      }
+    });
+  </script>
 </body>
 </html>
