@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Soso_LeDev | Portfolio</title>
   <meta name="description" content="Portfolio développeur – builds, animations, projets visuels." />
-
   <style>
     :root {
       --bg: #070812;
@@ -17,9 +16,7 @@
       --accent: #8b9bff;
       --pink: #ff6ec7;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: "Segoe UI", system-ui, sans-serif;
       color: var(--text);
@@ -28,10 +25,10 @@
         radial-gradient(600px 300px at 10% 10%, #ff6ec733, transparent),
         var(--bg);
       overflow-x: hidden;
+      line-height: 1.6;
     }
-
     a { color: inherit; text-decoration: none; }
-
+    
     /* ===== HERO ===== */
     header {
       min-height: 100vh;
@@ -43,7 +40,6 @@
       margin: auto;
       position: relative;
     }
-
     .glow {
       position: absolute;
       inset: -40% -20% auto auto;
@@ -53,7 +49,6 @@
       filter: blur(80px);
       z-index: -1;
     }
-
     .badge {
       display: inline-block;
       padding: 8px 16px;
@@ -65,25 +60,23 @@
       margin-bottom: 24px;
       box-shadow: 0 0 30px #6c7cff55;
     }
-
     h1 {
       font-size: clamp(40px, 6vw, 72px);
       line-height: 1.05;
       margin-bottom: 24px;
     }
-
     h1 span {
       background: linear-gradient(135deg, var(--accent), var(--pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
     header p {
       font-size: 20px;
       max-width: 700px;
       color: var(--muted);
+      margin-bottom: 32px;
     }
-
     .scroll {
       margin-top: 48px;
       font-size: 14px;
@@ -96,27 +89,34 @@
       margin: auto;
       padding: 0 24px 120px;
       display: grid;
-      gap: 120px;
+      gap: 140px;
     }
-
     section h2 {
       font-size: 36px;
       margin-bottom: 16px;
     }
-
     section > p {
       color: var(--muted);
       max-width: 700px;
-      margin-bottom: 40px;
+      margin-bottom: 48px;
+    }
+
+    /* Sous-titres des catégories */
+    .category-title {
+      font-size: 28px;
+      margin: 60px 0 32px;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     /* ===== PROJECT GRID ===== */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 28px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 32px;
     }
-
     .card {
       position: relative;
       background: var(--card);
@@ -126,7 +126,6 @@
       backdrop-filter: blur(12px);
       transition: transform .35s ease, box-shadow .35s ease;
     }
-
     .card::after {
       content: "";
       position: absolute;
@@ -134,156 +133,170 @@
       background: linear-gradient(120deg, transparent, #ffffff11, transparent);
       opacity: 0;
       transition: opacity .35s;
+      pointer-events: none;
     }
-
     .card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 30px 80px #00000088;
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 0 30px 80px #000000aa;
     }
-
     .card:hover::after {
       opacity: 1;
     }
-
     .card img,
     .card video {
       width: 100%;
-      height: 200px;
+      height: 220px;
       object-fit: cover;
       display: block;
       background: #000;
     }
-
     .card-content {
-      padding: 18px 18px 22px;
+      padding: 20px;
     }
-
     .card-content h3 {
       font-size: 20px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
-
     .card-content p {
       font-size: 14px;
       color: var(--muted);
+      line-height: 1.4;
     }
 
     /* ===== SKILLS ===== */
     .skills {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 28px;
     }
-
     .skill {
-      padding: 24px;
+      padding: 28px;
       border-radius: 22px;
       background: linear-gradient(160deg, #ffffff12, #ffffff03);
       border: 1px solid var(--border);
     }
-
     .skill h3 {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      font-size: 20px;
     }
-
     .skill p {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
     }
 
     /* ===== FOOTER ===== */
     footer {
-      padding: 60px 24px;
+      padding: 80px 24px 60px;
       border-top: 1px solid var(--border);
       text-align: center;
       color: var(--muted);
     }
-
     footer a {
       color: var(--accent);
       font-weight: 600;
     }
 
     @media (max-width: 600px) {
-      header { min-height: auto; padding-top: 120px; }
+      header { min-height: auto; padding-top: 140px; padding-bottom: 80px; }
+      .grid { grid-template-columns: 1fr; }
+      .category-title { margin-top: 40px; }
     }
   </style>
 </head>
 <body>
-
-<header id="top">
-  <div class="glow"></div>
-  <span class="badge">Développeur</span>
-  <h1>Soso_<span>LeDev</span></h1>
-  <p>
-    Je crée des expériences visuelles, des builds stylés et des animations.
-    Mon objectif : du code propre avec une vraie identité visuelle.
-  </p>
-  <div class="scroll">↓ Scroll</div>
-</header>
-
-<main>
-
-  <section>
-    <h2>Projets & Animations</h2>
+  <header id="top">
+    <div class="glow"></div>
+    <span class="badge">Développeur</span>
+    <h1>Soso_<span>LeDev</span></h1>
     <p>
-      Une sélection de mes créations. Pas de catégories : juste du visuel,
-      de la technique et du style.
+      Je crée des expériences visuelles, des builds stylés et des animations.<br>
+      Mon objectif : du code propre avec une vraie identité visuelle.
     </p>
+    <div class="scroll">↓ Scroll pour découvrir</div>
+  </header>
 
-    <div class="grid">
-      <article class="card">
-        <img src="./media/projet1.png" alt="Projet" />
-        <div class="card-content">
-          <h3>Build UI</h3>
-          <p>Interface stylisée avec effets lumineux et transitions.</p>
+  <main>
+    <section>
+      <h2>Mes Projets & Créations</h2>
+      <p>Une sélection de mes travaux les plus aboutis, entre builds esthétiques et animations fluides.</p>
+
+      <!-- === Builds & Photos === -->
+      <h3 class="category-title">Builds & Photos</h3>
+      <div class="grid">
+        <article class="card">
+          <img src="/media/projet1.png" alt="Build UI stylisé" />
+          <div class="card-content">
+            <h3>Build UI</h3>
+            <p>Interface moderne avec effets lumineux, glassmorphism et transitions fluides.</p>
+          </div>
+        </article>
+
+        <!-- Ajoute ici d'autres images PNG/JPG -->
+        <!--
+        <article class="card">
+          <img src="/media/projet2.png" alt="Autre build" />
+          <div class="card-content">
+            <h3>Titre du projet</h3>
+            <p>Description courte et percutante.</p>
+          </div>
+        </article>
+        -->
+      </div>
+
+      <!-- === Animations & Vidéos === -->
+      <h3 class="category-title">Animations & Vidéos</h3>
+      <div class="grid">
+        <article class="card">
+          <video src="/media/animation1.mp4" autoplay muted loop playsinline></video>
+          <div class="card-content">
+            <h3>Animation Fluide</h3>
+            <p>Animation esthétique inspirée anime, avec particules et transitions douces.</p>
+          </div>
+        </article>
+
+        <!-- Ajoute ici d'autres vidéos MP4 -->
+        <!--
+        <article class="card">
+          <video src="/media/animation2.mp4" autoplay muted loop playsinline></video>
+          <div class="card-content">
+            <h3>Titre de l'animation</h3>
+            <p>Description de la vidéo.</p>
+          </div>
+        </article>
+        -->
+      </div>
+    </section>
+
+    <section>
+      <h2>Compétences</h2>
+      <div class="skills">
+        <div class="skill">
+          <h3>Frontend</h3>
+          <p>HTML, CSS avancé, animations complexes, design visuel & identité de marque</p>
         </div>
-      </article>
-
-      <article class="card">
-        <video src="./media/animation1.mp4" autoplay muted loop playsinline></video>
-        <div class="card-content">
-          <h3>Animation</h3>
-          <p>Animation fluide orientée esthétique anime.</p>
+        <div class="skill">
+          <h3>Backend</h3>
+          <p>Python, logique applicative, sockets, APIs</p>
         </div>
-      </article>
-
-      <!-- Duplique librement -->
-    </div>
-  </section>
-
-  <section>
-    <h2>Compétences</h2>
-    <div class="skills">
-      <div class="skill">
-        <h3>Frontend</h3>
-        <p>HTML, CSS avancé, animations, identité visuelle</p>
+        <div class="skill">
+          <h3>Dev Roblox</h3>
+          <p>Builds esthétiques, scripting Lua, animations, optimisation performance</p>
+        </div>
       </div>
-      <div class="skill">
-        <h3>Backend</h3>
-        <p>Python, logique applicative, sockets</p>
-      </div>
-      <div class="skill">
-        <h3>Dev Roblox</h3>
-        <p>Build, scripts, animations, optimisation</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <h2>Contact</h2>
-    <p>
-      📧 <a href="mailto:testsoso45@email.com">testsoso45@email.com</a><br>
-      💻 <a href="https://github.com/Soso-LeDev" target="_blank">GitHub</a>
-    </p>
-  </section>
+    <section>
+      <h2>Contact</h2>
+      <p>
+        📧 <a href="mailto:testsoso45@email.com">testsoso45@email.com</a><br><br>
+        💻 <a href="https://github.com/Soso-LeDev" target="_blank">GitHub – Soso-LeDev</a>
+      </p>
+    </section>
+  </main>
 
-</main>
-
-<footer>
-  <p>© 2025 — Soso_LeDev • Portfolio</p>
-  <p><a href="#top">Retour en haut ↑</a></p>
-</footer>
-
+  <footer>
+    <p>© 2025 — Soso_LeDev • Tous droits réservés</p>
+    <p><a href="#top">Retour en haut ↑</a></p>
+  </footer>
 </body>
 </html>
