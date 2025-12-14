@@ -1,48 +1,271 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galerie Média</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio | Développeur</title>
+  <meta name="description" content="Portfolio de développeur – projets, builds, animations et compétences." />
+  <style>
+    :root {
+      --bg: #0f1220;
+      --card: #171a2e;
+      --text: #e8eaf6;
+      --muted: #aab0ff;
+      --accent: #6c7cff;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b1f45, transparent), var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      padding: 64px 24px 48px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(108,124,255,0.15);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    header p {
+      max-width: 700px;
+      color: #cfd3ff;
+      font-size: 18px;
+    }
+
+    nav {
+      margin-top: 32px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      transition: 0.2s ease;
+    }
+
+    nav a:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 24px;
+      display: grid;
+      gap: 64px;
+    }
+
+    section h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    section p {
+      color: #cfd3ff;
+      max-width: 800px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+    }
+
+    .card img, .card video {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background: #0b0d1a;
+    }
+
+    .card-content {
+      padding: 16px;
+    }
+
+    .card-content h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .card-content p {
+      font-size: 14px;
+      color: #cfd3ff;
+    }
+
+    .tags {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    footer {
+      padding: 48px 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: #b8beff;
+    }
+
+    footer a {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      header { padding-top: 48px; }
+      nav { gap: 10px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Galerie Média</h1>
-    <p>Ajoutez vos fichiers dans le dossier <code>media/</code> et ils apparaîtront ici.</p>
 
-    <div id="gallery" class="gallery"></div>
-  </div>
+  <header id="top">
+    <span class="badge">Développeur</span>
+    <h1>Salut, moi c'est <br><strong>Ton Nom</strong></h1>
+    <p>
+      Je développe des applications, outils et interfaces modernes. 
+      Voici une sélection de mes projets, builds et animations.
+    </p>
+    <nav>
+      <a href="#projets">Projets</a>
+      <a href="#skills">Compétences</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-  <script>
-    // Liste des fichiers dans le dossier /media
-    const files = [
-      "media/photo1.jpg",
-      "media/photo2.png",
-      "media/video1.mp4"
-      // Ajoute ici les fichiers supplémentaires
-    ];
+  <main>
 
-    const gallery = document.getElementById('gallery');
+    <!-- PROJETS -->
+    <section id="projets">
+      <h2>Projets & Builds</h2>
+      <p>
+        Images et animations sont chargées depuis le dossier <strong>/media</strong>.
+      </p>
 
-    files.forEach(file => {
-      const ext = file.split('.').pop().toLowerCase();
-      let element;
+      <div class="grid">
+        <!-- CARD IMAGE -->
+        <article class="card">
+          <img src="media/projet1.jpg" alt="Projet 1" />
+          <div class="card-content">
+            <h3>Nom du projet</h3>
+            <p>Description courte du projet, objectif et techno principale.</p>
+            <div class="tags">
+              <span class="tag">Python</span>
+              <span class="tag">UI</span>
+            </div>
+          </div>
+        </article>
 
-      if (['jpg','jpeg','png','gif'].includes(ext)) {
-        element = document.createElement('img');
-        element.src = file;
-      } else if (['mp4','webm','ogg'].includes(ext)) {
-        element = document.createElement('video');
-        element.src = file;
-        element.controls = true;
-      }
+        <!-- CARD VIDEO / ANIMATION -->
+        <article class="card">
+          <video src="media/animation1.mp4" autoplay muted loop></video>
+          <div class="card-content">
+            <h3>Animation / Build</h3>
+            <p>Démo visuelle ou animation d'interface.</p>
+            <div class="tags">
+              <span class="tag">HTML</span>
+              <span class="tag">CSS</span>
+            </div>
+          </div>
+        </article>
 
-      if (element) {
-        element.className = 'media-item';
-        gallery.appendChild(element);
-      }
-    });
-  </script>
+        <!-- DUPLIQUE LES CARTES -->
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <h2>Compétences</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="card-content">
+            <h3>Frontend</h3>
+            <p>HTML, CSS, JavaScript, UI/UX, animations</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <h3>Backend</h3>
+            <p>Python, sockets, API, logique applicative</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <h3>Autres</h3>
+            <p>Linux, sécurité, scripts, automatisation</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>
+        Tu peux me contacter par mail ou via mes réseaux.
+      </p>
+      <p style="margin-top:16px">
+        📧 <a href="mailto:tonmail@email.com">tonmail@email.com</a><br />
+        💻 <a href="https://github.com/tonpseudo" target="_blank">GitHub</a>
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© 2025 — Portfolio Développeur • Fait en HTML/CSS</p>
+    <p><a href="#top">Retour en haut ↑</a></p>
+  </footer>
+
 </body>
 </html>
