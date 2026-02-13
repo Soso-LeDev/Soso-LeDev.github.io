@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portfolio - Roblox Builder</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -16,12 +16,13 @@
 }
 
 body{
-    background:#0f0f14;
+    background:linear-gradient(135deg,#0f0f14,#1a1a25);
     color:white;
-    font-family:'Inter', sans-serif;
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
 }
 
-/* NAV */
+/* NAVBAR */
 
 nav{
     position:fixed;
@@ -30,21 +31,23 @@ nav{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    background:rgba(15,15,20,0.9);
-    backdrop-filter:blur(10px);
+    background:rgba(15,15,20,0.8);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,0.05);
     z-index:1000;
 }
 
 nav h1{
-    font-family:'Orbitron', sans-serif;
+    font-family:'Orbitron',sans-serif;
     font-size:22px;
     color:#ff2e63;
+    letter-spacing:2px;
 }
 
 nav ul{
+    list-style:none;
     display:flex;
     gap:30px;
-    list-style:none;
 }
 
 nav a{
@@ -66,9 +69,14 @@ nav a:hover{
     padding:0 8%;
 }
 
+.hero-content{
+    max-width:700px;
+}
+
 .hero h2{
-    font-size:60px;
-    font-family:'Orbitron', sans-serif;
+    font-size:70px;
+    font-family:'Orbitron',sans-serif;
+    line-height:1.1;
 }
 
 .hero span{
@@ -78,7 +86,24 @@ nav a:hover{
 .hero p{
     margin-top:20px;
     color:#aaa;
-    max-width:600px;
+    font-size:18px;
+}
+
+.hero button{
+    margin-top:40px;
+    padding:15px 40px;
+    border:none;
+    background:#ff2e63;
+    color:white;
+    font-weight:600;
+    border-radius:30px;
+    cursor:pointer;
+    transition:0.4s;
+}
+
+.hero button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 25px #ff2e63;
 }
 
 /* SECTIONS */
@@ -90,7 +115,7 @@ section{
 .section-title{
     font-size:40px;
     margin-bottom:60px;
-    font-family:'Orbitron', sans-serif;
+    font-family:'Orbitron',sans-serif;
     color:#ff2e63;
 }
 
@@ -98,29 +123,43 @@ section{
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:30px;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:40px;
 }
 
 /* CARD */
 
 .card{
-    background:#1a1a22;
+    background:rgba(255,255,255,0.03);
+    backdrop-filter:blur(10px);
     padding:15px;
-    border-radius:15px;
+    border-radius:20px;
     transition:0.4s;
-    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.05);
 }
 
 .card:hover{
     transform:translateY(-10px);
-    box-shadow:0 20px 40px rgba(0,0,0,0.6);
+    box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
 
 .card img,
 .card video{
     width:100%;
-    border-radius:10px;
+    border-radius:15px;
+}
+
+/* VIEW COUNTER */
+
+.counter{
+    margin-top:30px;
+    font-size:18px;
+    color:#aaa;
+}
+
+.counter span{
+    color:#ff2e63;
+    font-weight:600;
 }
 
 /* FOOTER */
@@ -130,6 +169,12 @@ footer{
     padding:40px;
     background:#14141b;
     color:#777;
+}
+
+@media(max-width:768px){
+    .hero h2{
+        font-size:45px;
+    }
 }
 
 </style>
@@ -147,20 +192,24 @@ footer{
 </nav>
 
 <div class="hero">
-    <div>
+    <div class="hero-content">
         <h2>Roblox <span>Builder</span></h2>
         <p>
             Builder sur Murder Tower.
-            Création d’environnements immersifs, maps stylisées et designs optimisés.
+            Création d’environnements immersifs et maps optimisées.
         </p>
+
+        <div class="counter">
+            👀 Vues du site : <span id="viewCount">Chargement...</span>
+        </div>
     </div>
 </div>
 
 <section id="about">
     <h2 class="section-title">À propos</h2>
     <p>
-        Je suis builder Roblox spécialisé dans les maps détaillées,
-        atmosphères immersives et level design optimisé pour performance.
+        Builder Roblox passionné par le level design,
+        la création d’ambiances immersives et la performance.
     </p>
 </section>
 
@@ -169,20 +218,16 @@ footer{
 
     <div class="grid">
 
-        <!-- IMAGE -->
         <div class="card">
-            <img src="images/build1.png" alt="Build 1">
+            <img src="images/build1.png" alt="">
         </div>
 
-        <!-- VIDEO -->
         <div class="card">
             <video controls>
                 <source src="videos/demo1.mp4" type="video/mp4">
             </video>
         </div>
 
-        <!-- AJOUTE AUTANT QUE TU VEUX -->
-        
     </div>
 </section>
 
@@ -192,8 +237,19 @@ footer{
 </section>
 
 <footer>
-    © 2026 - TonPseudo | Roblox Builder Portfolio
+    © 2026 - TonPseudo | Roblox Builder
 </footer>
+
+<!-- VIEW COUNTER SCRIPT -->
+
+<script>
+const namespace = "tonpseudo-portfolio-roblox";
+fetch(`https://api.countapi.xyz/hit/${namespace}/visits`)
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("viewCount").innerText = data.value;
+  });
+</script>
 
 </body>
 </html>
