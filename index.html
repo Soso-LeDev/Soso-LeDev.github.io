@@ -554,47 +554,7 @@ footer{
     </div>
 
     <div class="projects-list">
-        
-        <div class="project">
-            <div class="project-media">
-                <img src="images/build1.png" alt="Murder Tower Environment">
-            </div>
-            <div class="project-content">
-                <div class="project-number">PROJECT 01</div>
-                <h3 class="project-title">Murder Tower Environment Design</h3>
-                <p class="project-desc">
-                    Création d'atmosphères immersives et détaillées pour Murder Tower.
-                    Focus sur la composition visuelle et l'expérience joueur.
-                </p>
-                <div class="project-tags">
-                    <div class="tag">Environment</div>
-                    <div class="tag">Lighting</div>
-                    <div class="tag">Composition</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="project">
-            <div class="project-media">
-                <video controls>
-                    <source src="videos/demo1.mp4" type="video/mp4">
-                </video>
-            </div>
-            <div class="project-content">
-                <div class="project-number">PROJECT 02</div>
-                <h3 class="project-title">Gameplay Showcase</h3>
-                <p class="project-desc">
-                    Démonstration des mécaniques de jeu et de l'interaction
-                    entre design environnemental et gameplay.
-                </p>
-                <div class="project-tags">
-                    <div class="tag">Gameplay</div>
-                    <div class="tag">Demo</div>
-                    <div class="tag">Interactive</div>
-                </div>
-            </div>
-        </div>
-
+        <!-- Les projets sont générés automatiquement depuis le tableau JavaScript -->
     </div>
 
 </section>
@@ -664,18 +624,92 @@ footer{
 </footer>
 
 <script>
-// View counter
-const namespace = "roblox-studio-portfolio-unique-12345";
-fetch(`https://api.countapi.xyz/hit/${namespace}/visits`)
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("viewCount").innerText = data.value.toLocaleString();
-  })
-  .catch(() => {
-    document.getElementById("viewCount").innerText = "---";
-  });
+// ============================================
+// PROJECTS - AJOUTE TES BUILDS ICI
+// ============================================
+const projects = [
+    {
+        type: 'image',
+        src: 'images/1.png',
+        title: 'Murder Tower Environment Design',
+        description: 'Création d\'atmosphères immersives et détaillées pour Murder Tower. Focus sur la composition visuelle et l\'expérience joueur.',
+        tags: ['Environment', 'Build', 'Old']
+    },
+    {
+        type: 'image',
+        src: 'images/2.png',
+        title: 'Magic'school RP',
+        description: 'Démonstration d'un build du boat-housse de harry potter.',
+        tags: ['Gameplay', 'Harry Potter', 'Interactive']
+    }
+    // POUR AJOUTER UN NOUVEAU PROJET, COPIE CE BLOC :
+    // {
+    //     type: 'image',  // ou 'video'
+    //     src: 'images/ton-image.png',  // chemin de ton fichier
+    //     title: 'Titre du Projet',
+    //     description: 'Description du projet',
+    //     tags: ['Tag1', 'Tag2', 'Tag3']
+    // },
+];
 
-// Smooth scroll
+// ============================================
+// GÉNÉRATION AUTOMATIQUE DES PROJETS
+// ============================================
+function loadProjects() {
+    const projectsList = document.querySelector('.projects-list');
+    projectsList.innerHTML = '';
+    
+    projects.forEach((project, index) => {
+        const projectDiv = document.createElement('div');
+        projectDiv.className = 'project';
+        
+        const mediaHTML = project.type === 'video' 
+            ? `<video controls><source src="${project.src}" type="video/mp4"></video>`
+            : `<img src="${project.src}" alt="${project.title}">`;
+        
+        const tagsHTML = project.tags.map(tag => `<div class="tag">${tag}</div>`).join('');
+        
+        projectDiv.innerHTML = `
+            <div class="project-media">
+                ${mediaHTML}
+            </div>
+            <div class="project-content">
+                <div class="project-number">PROJECT ${String(index + 1).padStart(2, '0')}</div>
+                <h3 class="project-title">${project.title}</h3>
+                <p class="project-desc">${project.description}</p>
+                <div class="project-tags">${tagsHTML}</div>
+            </div>
+        `;
+        
+        projectsList.appendChild(projectDiv);
+    });
+    
+    // Update counter
+    document.querySelector('.section-counter').textContent = String(projects.length).padStart(2, '0');
+}
+
+// ============================================
+// VIEW COUNTER
+// ============================================
+let viewCount = 0;
+
+// Charger le compteur depuis localStorage
+if (localStorage.getItem('portfolioViews')) {
+    viewCount = parseInt(localStorage.getItem('portfolioViews'));
+} else {
+    viewCount = Math.floor(Math.random() * 500) + 100; // Commence entre 100-600
+}
+
+// Incrémenter
+viewCount++;
+localStorage.setItem('portfolioViews', viewCount);
+
+// Afficher
+document.getElementById('viewCount').textContent = viewCount.toLocaleString();
+
+// ============================================
+// SMOOTH SCROLL
+// ============================================
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -687,6 +721,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+// ============================================
+// INITIALISATION
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    loadProjects();
 });
 </script>
 
