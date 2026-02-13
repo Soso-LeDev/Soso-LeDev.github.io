@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio - Roblox Builder</title>
+<title>Studio Builder Portfolio</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -15,240 +15,679 @@
     box-sizing:border-box;
 }
 
+:root{
+    --bg: #0d0d0d;
+    --surface: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e0e0e0;
+    --text-dim: #707070;
+    --accent: #ff4d4d;
+}
+
 body{
-    background:linear-gradient(135deg,#0f0f14,#1a1a25);
-    color:white;
-    font-family:'Inter',sans-serif;
+    font-family:'Archivo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
     overflow-x:hidden;
 }
 
-/* NAVBAR */
+/* NAV */
 
 nav{
     position:fixed;
     width:100%;
-    padding:20px 8%;
+    padding:20px 5%;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    background:rgba(15,15,20,0.8);
-    backdrop-filter:blur(15px);
-    border-bottom:1px solid rgba(255,255,255,0.05);
+    background: var(--bg);
+    border-bottom:2px solid var(--border);
     z-index:1000;
 }
 
-nav h1{
-    font-family:'Orbitron',sans-serif;
-    font-size:22px;
-    color:#ff2e63;
-    letter-spacing:2px;
+.logo{
+    font-weight:900;
+    letter-spacing:-1px;
+    font-size:20px;
+    text-transform:uppercase;
 }
 
 nav ul{
-    list-style:none;
     display:flex;
-    gap:30px;
+    list-style:none;
+    gap:50px;
 }
 
 nav a{
     text-decoration:none;
-    color:#ccc;
-    transition:0.3s;
+    color: var(--text-dim);
+    font-size:14px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    transition:0.2s;
+    font-family: 'IBM Plex Mono', monospace;
 }
 
 nav a:hover{
-    color:#ff2e63;
+    color: var(--accent);
 }
 
 /* HERO */
 
 .hero{
-    height:100vh;
+    min-height:100vh;
     display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:100px 5% 60px;
+    border-bottom:2px solid var(--border);
+    position:relative;
+}
+
+.hero-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:80px;
     align-items:center;
-    padding:0 8%;
 }
 
-.hero-content{
-    max-width:700px;
+.hero-left h1{
+    font-size:clamp(60px, 9vw, 140px);
+    font-weight:900;
+    line-height:0.9;
+    letter-spacing:-3px;
+    margin-bottom:40px;
+    text-transform:uppercase;
 }
 
-.hero h2{
-    font-size:70px;
-    font-family:'Orbitron',sans-serif;
-    line-height:1.1;
+.hero-left .highlight{
+    color: var(--accent);
+    display:block;
 }
 
-.hero span{
-    color:#ff2e63;
+.hero-stats{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:40px;
+    margin-top:60px;
 }
 
-.hero p{
-    margin-top:20px;
-    color:#aaa;
-    font-size:18px;
+.stat{
+    border-left:3px solid var(--accent);
+    padding-left:20px;
 }
 
-.hero button{
-    margin-top:40px;
-    padding:15px 40px;
-    border:none;
-    background:#ff2e63;
-    color:white;
+.stat-number{
+    font-size:32px;
+    font-weight:900;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.stat-label{
+    font-size:12px;
+    color: var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-top:8px;
     font-weight:600;
-    border-radius:30px;
-    cursor:pointer;
-    transition:0.4s;
 }
 
-.hero button:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 25px #ff2e63;
+.hero-right{
+    position:relative;
 }
 
-/* SECTIONS */
+.hero-card{
+    background: var(--surface);
+    border:2px solid var(--border);
+    padding:40px;
+    position:relative;
+}
 
-section{
-    padding:120px 8%;
+.hero-card::before{
+    content:'';
+    position:absolute;
+    top:-2px;
+    left:-2px;
+    width:120px;
+    height:4px;
+    background: var(--accent);
+}
+
+.hero-card h3{
+    font-size:24px;
+    margin-bottom:20px;
+    font-weight:600;
+}
+
+.hero-card p{
+    color: var(--text-dim);
+    line-height:1.7;
+    font-size:16px;
+}
+
+/* WORK SECTION */
+
+.work{
+    padding:120px 5%;
+    border-bottom:2px solid var(--border);
+}
+
+.section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:80px;
+    padding-bottom:30px;
+    border-bottom:2px solid var(--border);
 }
 
 .section-title{
-    font-size:40px;
-    margin-bottom:60px;
-    font-family:'Orbitron',sans-serif;
-    color:#ff2e63;
+    font-size:clamp(40px, 6vw, 80px);
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:-2px;
 }
 
-/* GRID */
+.section-counter{
+    font-size:80px;
+    font-weight:900;
+    color: var(--border);
+    line-height:1;
+    font-family: 'IBM Plex Mono', monospace;
+}
 
-.grid{
+.projects-list{
+    display:flex;
+    flex-direction:column;
+    gap:60px;
+}
+
+.project{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:40px;
+    grid-template-columns:1.5fr 1fr;
+    gap:50px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:60px;
 }
 
-/* CARD */
-
-.card{
-    background:rgba(255,255,255,0.03);
-    backdrop-filter:blur(10px);
-    padding:15px;
-    border-radius:20px;
-    transition:0.4s;
-    border:1px solid rgba(255,255,255,0.05);
+.project:last-child{
+    border-bottom:none;
 }
 
-.card:hover{
-    transform:translateY(-10px);
-    box-shadow:0 20px 50px rgba(0,0,0,0.6);
+.project-media{
+    position:relative;
+    aspect-ratio:16/10;
+    overflow:hidden;
+    background: var(--surface);
+    border:2px solid var(--border);
 }
 
-.card img,
-.card video{
+.project img,
+.project video{
     width:100%;
-    border-radius:15px;
+    height:100%;
+    object-fit:cover;
+    transition:0.4s ease;
+    filter:grayscale(20%);
 }
 
-/* VIEW COUNTER */
-
-.counter{
-    margin-top:30px;
-    font-size:18px;
-    color:#aaa;
+.project:hover img,
+.project:hover video{
+    filter:grayscale(0%);
+    transform:scale(1.02);
 }
 
-.counter span{
-    color:#ff2e63;
+.project-content{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.project-number{
+    font-size:14px;
+    font-weight:900;
+    color: var(--accent);
+    margin-bottom:15px;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.project-title{
+    font-size:32px;
+    font-weight:900;
+    margin-bottom:20px;
+    line-height:1.2;
+}
+
+.project-desc{
+    color: var(--text-dim);
+    line-height:1.7;
+    font-size:16px;
+    margin-bottom:30px;
+}
+
+.project-tags{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.tag{
+    padding:6px 16px;
+    border:1px solid var(--border);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
     font-weight:600;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text-dim);
+}
+
+/* ABOUT */
+
+.about{
+    padding:120px 5%;
+    border-bottom:2px solid var(--border);
+}
+
+.about-grid{
+    display:grid;
+    grid-template-columns:1fr 1.5fr;
+    gap:100px;
+    margin-top:60px;
+}
+
+.about-left h2{
+    font-size:80px;
+    font-weight:900;
+    line-height:1;
+    text-transform:uppercase;
+    letter-spacing:-2px;
+}
+
+.about-right{
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+}
+
+.about-right p{
+    font-size:20px;
+    color: var(--text-dim);
+    line-height:1.7;
+}
+
+.skills-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:2px;
+    margin-top:60px;
+    border:2px solid var(--border);
+}
+
+.skill-item{
+    background: var(--surface);
+    padding:30px;
+    border:1px solid var(--border);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    font-size:14px;
+}
+
+/* CONTACT */
+
+.contact{
+    padding:120px 5%;
+}
+
+.contact-wrapper{
+    max-width:1400px;
+    margin:0 auto;
+}
+
+.contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border:2px solid var(--border);
+}
+
+.contact-left{
+    background: var(--surface);
+    padding:80px 60px;
+    border-right:2px solid var(--border);
+}
+
+.contact-left h3{
+    font-size:48px;
+    font-weight:900;
+    text-transform:uppercase;
+    line-height:1.1;
+    letter-spacing:-1px;
+    margin-bottom:40px;
+}
+
+.contact-method{
+    margin-bottom:40px;
+}
+
+.contact-label{
+    font-size:12px;
+    color: var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:10px;
+    font-weight:600;
+}
+
+.contact-value{
+    font-size:24px;
+    font-weight:600;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.contact-right{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:120px;
+    font-weight:900;
+    color: var(--border);
+    user-select:none;
 }
 
 /* FOOTER */
 
 footer{
-    text-align:center;
-    padding:40px;
-    background:#14141b;
-    color:#777;
+    padding:40px 5%;
+    border-top:2px solid var(--border);
+}
+
+.footer-grid{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.footer-left{
+    font-size:12px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.footer-right{
+    font-size:12px;
+    color: var(--text-dim);
+    font-weight:600;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1024px){
+    .hero-grid,
+    .about-grid,
+    .contact-grid{
+        grid-template-columns:1fr;
+        gap:60px;
+    }
+    
+    .contact-left{
+        border-right:none;
+        border-bottom:2px solid var(--border);
+    }
+    
+    .contact-right{
+        display:none;
+    }
+    
+    .project{
+        grid-template-columns:1fr;
+    }
 }
 
 @media(max-width:768px){
-    .hero h2{
-        font-size:45px;
+    nav ul{
+        gap:25px;
+    }
+    
+    .hero-left h1{
+        font-size:48px;
+    }
+    
+    .hero-stats{
+        grid-template-columns:1fr;
+        gap:30px;
+    }
+    
+    .section-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+    }
+    
+    .section-counter{
+        font-size:60px;
+    }
+    
+    .about-left h2{
+        font-size:48px;
+    }
+    
+    .skills-grid{
+        grid-template-columns:1fr;
+    }
+    
+    .contact-left h3{
+        font-size:36px;
+    }
+}
+
+/* ANIMATIONS */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 </style>
 </head>
-
 <body>
 
 <nav>
-    <h1>TonPseudo</h1>
+    <div class="logo">Tonpseudo</div>
     <ul>
-        <li><a href="#about">À propos</a></li>
-        <li><a href="#work">Mes Builds</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">Studio</a></li>
         <li><a href="#contact">Contact</a></li>
     </ul>
 </nav>
 
-<div class="hero">
-    <div class="hero-content">
-        <h2>Roblox <span>Builder</span></h2>
-        <p>
-            Builder sur Murder Tower.
-            Création d’environnements immersifs et maps optimisées.
-        </p>
-
-        <div class="counter">
-            👀 Vues du site : <span id="viewCount">Chargement...</span>
+<section class="hero">
+    <div class="hero-grid">
+        <div class="hero-left">
+            <h1>
+                Roblox<br>
+                <span class="highlight">Builder</span>
+            </h1>
+            
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-number"><span id="viewCount">...</span></div>
+                    <div class="stat-label">Portfolio Views</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">01</div>
+                    <div class="stat-label">Main Project</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">3D</div>
+                    <div class="stat-label">Level Design</div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
-<section id="about">
-    <h2 class="section-title">À propos</h2>
-    <p>
-        Builder Roblox passionné par le level design,
-        la création d’ambiances immersives et la performance.
-    </p>
-</section>
-
-<section id="work">
-    <h2 class="section-title">Mes Builds</h2>
-
-    <div class="grid">
-
-        <div class="card">
-            <img src="images/build1.png" alt="">
+        
+        <div class="hero-right">
+            <div class="hero-card">
+                <h3>Murder Tower</h3>
+                <p>
+                    Builder spécialisé dans la création d'environnements immersifs
+                    pour Murder Tower. Direction artistique, optimisation gameplay
+                    et composition visuelle.
+                </p>
+            </div>
         </div>
-
-        <div class="card">
-            <video controls>
-                <source src="videos/demo1.mp4" type="video/mp4">
-            </video>
-        </div>
-
     </div>
 </section>
 
-<section id="contact">
-    <h2 class="section-title">Contact</h2>
-    <p>Discord : TonPseudo#0000</p>
+<section id="work" class="work">
+    
+    <div class="section-header">
+        <h2 class="section-title">Selected Works</h2>
+        <div class="section-counter">02</div>
+    </div>
+
+    <div class="projects-list">
+        
+        <div class="project">
+            <div class="project-media">
+                <img src="images/build1.png" alt="Murder Tower Environment">
+            </div>
+            <div class="project-content">
+                <div class="project-number">PROJECT 01</div>
+                <h3 class="project-title">Murder Tower Environment Design</h3>
+                <p class="project-desc">
+                    Création d'atmosphères immersives et détaillées pour Murder Tower.
+                    Focus sur la composition visuelle et l'expérience joueur.
+                </p>
+                <div class="project-tags">
+                    <div class="tag">Environment</div>
+                    <div class="tag">Lighting</div>
+                    <div class="tag">Composition</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project">
+            <div class="project-media">
+                <video controls>
+                    <source src="videos/demo1.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="project-content">
+                <div class="project-number">PROJECT 02</div>
+                <h3 class="project-title">Gameplay Showcase</h3>
+                <p class="project-desc">
+                    Démonstration des mécaniques de jeu et de l'interaction
+                    entre design environnemental et gameplay.
+                </p>
+                <div class="project-tags">
+                    <div class="tag">Gameplay</div>
+                    <div class="tag">Demo</div>
+                    <div class="tag">Interactive</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<section id="about" class="about">
+    
+    <div class="section-header">
+        <h2 class="section-title">About Studio</h2>
+    </div>
+    
+    <div class="about-grid">
+        <div class="about-left">
+            <h2>Build.<br>Design.<br>Optimize.</h2>
+        </div>
+        <div class="about-right">
+            <p>
+                Builder spécialisé dans la création d'environnements Roblox détaillés
+                et optimisés pour le gameplay.
+            </p>
+            <p>
+                Mon approche combine vision artistique forte, attention aux détails
+                techniques et compréhension des besoins du joueur. Chaque environnement
+                est pensé pour raconter une histoire tout en servant l'expérience de jeu.
+            </p>
+        </div>
+    </div>
+    
+    <div class="skills-grid">
+        <div class="skill-item">Environment Design</div>
+        <div class="skill-item">Level Building</div>
+        <div class="skill-item">Lighting & Atmosphere</div>
+        <div class="skill-item">Performance Optimization</div>
+        <div class="skill-item">Visual Composition</div>
+        <div class="skill-item">Gameplay Flow</div>
+    </div>
+
+</section>
+
+<section id="contact" class="contact">
+    <div class="contact-wrapper">
+        <div class="contact-grid">
+            <div class="contact-left">
+                <h3>Let's work<br>together</h3>
+                
+                <div class="contact-method">
+                    <div class="contact-label">Discord</div>
+                    <div class="contact-value">TonPseudo#0000</div>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-label">Disponibilité</div>
+                    <div class="contact-value">Ouvert aux projets</div>
+                </div>
+            </div>
+            <div class="contact-right">
+                2026
+            </div>
+        </div>
+    </div>
 </section>
 
 <footer>
-    © 2026 - TonPseudo | Roblox Builder
+    <div class="footer-grid">
+        <div class="footer-left">© 2026 TONPSEUDO STUDIO</div>
+        <div class="footer-right">ROBLOX ENVIRONMENT BUILDER</div>
+    </div>
 </footer>
 
-<!-- VIEW COUNTER SCRIPT -->
-
 <script>
-const namespace = "tonpseudo-portfolio-roblox";
+// View counter
+const namespace = "roblox-studio-portfolio-unique-12345";
 fetch(`https://api.countapi.xyz/hit/${namespace}/visits`)
   .then(res => res.json())
   .then(data => {
-    document.getElementById("viewCount").innerText = data.value;
+    document.getElementById("viewCount").innerText = data.value.toLocaleString();
+  })
+  .catch(() => {
+    document.getElementById("viewCount").innerText = "---";
   });
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
 </script>
 
 </body>
