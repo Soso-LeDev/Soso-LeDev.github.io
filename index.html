@@ -717,7 +717,7 @@ let viewCount = 0;
 if (localStorage.getItem('portfolioViews')) {
     viewCount = parseInt(localStorage.getItem('portfolioViews'));
 } else {
-    viewCount = Math.floor(Math.random() * 500) + 100; // Commence entre 100-600
+    viewCount = Math.floor(Math.random() * 1) + 1; // Commence entre 100-600
 }
 
 // Incrémenter
