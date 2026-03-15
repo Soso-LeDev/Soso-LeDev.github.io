@@ -1,755 +1,736 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Studio Builder Portfolio</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🔮 Arcane Workspace</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* ═══════════ RESET & VARS ═══════════ */
+:root {
+  --bg:#06060f; --s1:#0e0e1c; --s2:#16162a; --s3:#1e1e38;
+  --bd:rgba(124,58,237,.18); --bd2:rgba(124,58,237,.32);
+  --acc:#7c3aed; --acc2:#a78bfa; --hot:#c084fc;
+  --grn:#34d399; --red:#f87171; --ylw:#fbbf24;
+  --txt:#e8e4f8; --mut:#6b6899; --mut2:#9590bb;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px}
 
-:root{
-    --bg: #0d0d0d;
-    --surface: #1a1a1a;
-    --border: #2a2a2a;
-    --text: #e0e0e0;
-    --text-dim: #707070;
-    --accent: #ff4d4d;
+/* ═══════════ ANIMATIONS ═══════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,20px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,-30px)}}
+@keyframes twinkle{from{opacity:.5}to{opacity:1}}
+.au{animation:fadeUp .35s ease both}
+.ai{animation:fadeIn .25s ease both}
+
+/* ═══════════ LOGIN PAGE ═══════════ */
+#login-page{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;position:relative;overflow:hidden;
 }
-
-body{
-    font-family:'Archivo', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x:hidden;
+.bg-grad{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(124,58,237,.13) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(167,139,250,.08) 0%,transparent 50%),
+             radial-gradient(ellipse at 60% 80%,rgba(192,132,252,.07) 0%,transparent 50%);
 }
-
-/* NAV */
-
-nav{
-    position:fixed;
-    width:100%;
-    padding:20px 5%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background: var(--bg);
-    border-bottom:2px solid var(--border);
-    z-index:1000;
+.stars{
+  position:fixed;inset:0;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 15% 25%,rgba(167,139,250,.7) 0%,transparent 100%),
+    radial-gradient(1px 1px at 80% 10%,rgba(167,139,250,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 50% 60%,rgba(167,139,250,.6) 0%,transparent 100%),
+    radial-gradient(1px 1px at 10% 80%,rgba(192,132,252,.4) 0%,transparent 100%),
+    radial-gradient(2px 2px at 70% 40%,rgba(192,132,252,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 35% 90%,rgba(167,139,250,.4) 0%,transparent 100%),
+    radial-gradient(2px 2px at 90% 70%,rgba(167,139,250,.6) 0%,transparent 100%);
+  animation:twinkle 3s ease-in-out infinite alternate;
 }
-
-.logo{
-    font-weight:900;
-    letter-spacing:-1px;
-    font-size:20px;
-    text-transform:uppercase;
+.orb{position:fixed;border-radius:50%;filter:blur(80px);z-index:0;pointer-events:none}
+.orb1{width:400px;height:400px;background:rgba(124,58,237,.14);top:-80px;left:-80px;animation:float1 9s ease-in-out infinite}
+.orb2{width:300px;height:300px;background:rgba(192,132,252,.09);bottom:-60px;right:-60px;animation:float2 11s ease-in-out infinite}
+.login-card{
+  position:relative;z-index:1;
+  background:rgba(14,14,28,.88);border:1px solid rgba(124,58,237,.3);
+  border-radius:22px;padding:3rem 2.5rem;width:100%;max-width:420px;
+  text-align:center;backdrop-filter:blur(20px);
+  box-shadow:0 0 60px rgba(124,58,237,.15),0 20px 60px rgba(0,0,0,.5);
+  animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both;
 }
-
-nav ul{
-    display:flex;
-    list-style:none;
-    gap:50px;
+.login-rune{font-size:3.5rem;display:inline-block;margin-bottom:1rem;filter:drop-shadow(0 0 12px rgba(192,132,252,.5))}
+.login-title{
+  font-family:'Cinzel',serif;font-size:1.75rem;font-weight:700;letter-spacing:.05em;
+  background:linear-gradient(135deg,var(--acc2),var(--hot));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem;
 }
-
-nav a{
-    text-decoration:none;
-    color: var(--text-dim);
-    font-size:14px;
-    font-weight:600;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    transition:0.2s;
-    font-family: 'IBM Plex Mono', monospace;
+.login-sub{font-size:13px;color:var(--mut);margin-bottom:2rem;line-height:1.6}
+.divider{width:60px;height:2px;margin:0 auto 2rem;background:linear-gradient(90deg,transparent,var(--acc),transparent)}
+.discord-btn{
+  display:inline-flex;align-items:center;gap:12px;
+  background:#5865F2;color:#fff;font-size:15px;font-weight:500;
+  padding:14px 28px;border-radius:12px;border:none;cursor:pointer;
+  text-decoration:none;font-family:'Inter',sans-serif;
+  transition:transform .15s,background .15s,box-shadow .15s;
+  box-shadow:0 4px 20px rgba(88,101,242,.35);
 }
+.discord-btn:hover{background:#4752c4;transform:translateY(-2px);box-shadow:0 8px 30px rgba(88,101,242,.5)}
+.login-err{margin-top:1rem;font-size:13px;color:var(--red);background:rgba(248,113,113,.08);padding:8px 14px;border-radius:8px;border:1px solid rgba(248,113,113,.2)}
+.login-footer{margin-top:2rem;font-size:12px;color:var(--mut);line-height:1.6}
 
-nav a:hover{
-    color: var(--accent);
+/* ═══════════ APP LAYOUT ═══════════ */
+#app-page{display:none;flex-direction:column;min-height:100vh}
+#app-page.show{display:flex}
+
+/* Header */
+#hdr{
+  height:56px;display:flex;align-items:center;padding:0 1.2rem;gap:.8rem;
+  background:rgba(6,6,15,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;
 }
+.app-logo{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:700;letter-spacing:.08em;background:linear-gradient(135deg,var(--acc2),var(--hot));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.spacer{flex:1}
+.online-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut2);background:var(--s1);border:1px solid var(--bd);padding:4px 12px;border-radius:20px}
+.odot{width:7px;height:7px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);padding:4px 12px 4px 4px;border-radius:20px;cursor:pointer;transition:.15s}
+.user-chip:hover{border-color:var(--bd2)}
+.user-chip img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.user-chip .uname{font-size:13px;font-weight:500}
+.urole{font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600}
+.role-admin{background:rgba(192,132,252,.2);color:var(--hot)}
+.role-dev{background:rgba(52,211,153,.15);color:var(--grn)}
+.role-viewer{background:rgba(107,104,153,.2);color:var(--mut2)}
+.logout-btn{background:none;border:none;color:var(--mut2);cursor:pointer;font-size:12px;padding:6px 10px;border-radius:8px;transition:.15s;font-family:'Inter',sans-serif}
+.logout-btn:hover{background:var(--s2);color:var(--txt)}
 
-/* HERO */
+/* Layout */
+#layout{display:flex;flex:1;min-height:calc(100vh - 56px)}
 
-.hero{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    padding:100px 5% 60px;
-    border-bottom:2px solid var(--border);
-    position:relative;
+/* Sidebar */
+#sidebar{
+  width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;padding:.8rem 0;
+  position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
 }
-
-.hero-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:80px;
-    align-items:center;
+.nav-sec{padding:0 .7rem;margin-bottom:1.2rem}
+.nav-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);padding:0 .5rem .5rem}
+.ni{
+  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;
+  cursor:pointer;font-size:13px;color:var(--mut2);transition:.15s;
+  border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;
 }
+.ni:hover{background:var(--s2);color:var(--txt)}
+.ni.on{background:rgba(124,58,237,.18);color:var(--acc2)}
+.ni-ico{font-size:.95rem;width:18px;text-align:center}
+.chat-badge{margin-left:auto;background:var(--acc);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;display:none}
+.online-sec{padding:.5rem .7rem}
+.ou{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:7px;font-size:12px;color:var(--mut2)}
+.ou img{width:22px;height:22px;border-radius:50%}
+.ou-dot{width:6px;height:6px;background:var(--grn);border-radius:50%;margin-left:auto}
 
-.hero-left h1{
-    font-size:clamp(60px, 9vw, 140px);
-    font-weight:900;
-    line-height:0.9;
-    letter-spacing:-3px;
-    margin-bottom:40px;
-    text-transform:uppercase;
+/* Content */
+#content{flex:1;overflow-y:auto;padding:1.5rem;min-width:0}
+.page{display:none}
+.page.on{display:block;animation:fadeUp .3s ease both}
+.pg-title{font-family:'Cinzel',serif;font-size:1.35rem;font-weight:600;letter-spacing:.05em;margin-bottom:1.3rem;display:flex;align-items:center;gap:10px}
+
+/* Card */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.25rem}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:#6d28d9}
+.btn-g{background:var(--s2);border:1px solid var(--bd2);color:var(--mut2)}.btn-g:hover{color:var(--txt);border-color:var(--acc)}
+.btn-d{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red)}.btn-d:hover{background:rgba(248,113,113,.2)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* Inputs */
+input[type=text],textarea,select{
+  background:var(--s2);border:1px solid var(--bd2);color:var(--txt);
+  border-radius:8px;padding:8px 12px;font-size:13px;
+  font-family:'Inter',sans-serif;outline:none;transition:border-color .15s;width:100%;
 }
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--acc)}
+input[type=text]::placeholder,textarea::placeholder{color:var(--mut)}
+textarea{resize:vertical;min-height:80px}
 
-.hero-left .highlight{
-    color: var(--accent);
-    display:block;
+/* Badges */
+.bdg{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.bdg-todo{background:rgba(107,104,153,.2);color:var(--mut2)}
+.bdg-doing{background:rgba(251,191,36,.12);color:var(--ylw)}
+.bdg-done{background:rgba(52,211,153,.12);color:var(--grn)}
+.bdg-high{background:rgba(248,113,113,.12);color:var(--red)}
+.bdg-normal{background:rgba(124,58,237,.12);color:var(--acc2)}
+.bdg-low{background:rgba(107,104,153,.15);color:var(--mut2)}
+
+/* ═══════════ KANBAN ═══════════ */
+.kb-board{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.kb-col{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1rem;min-height:400px}
+.kb-col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;font-size:13px;font-weight:600}
+.kb-col-title{display:flex;align-items:center;gap:7px}
+.kb-cnt{font-size:11px;background:var(--s2);border:1px solid var(--bd);padding:1px 8px;border-radius:10px;color:var(--mut2)}
+.kb-cards{display:flex;flex-direction:column;gap:8px;min-height:40px}
+.kc{
+  background:var(--s2);border:1px solid var(--bd);border-radius:10px;
+  padding:10px 12px;cursor:grab;transition:border-color .15s,transform .15s,box-shadow .15s;
+  animation:fadeUp .25s ease both;
 }
+.kc:hover{border-color:var(--bd2);box-shadow:0 4px 18px rgba(124,58,237,.15);transform:translateY(-2px)}
+.kc.dragging{opacity:.4;cursor:grabbing}
+.kc-title{font-size:13px;font-weight:500;margin-bottom:5px}
+.kc-desc{font-size:12px;color:var(--mut2);margin-bottom:7px;line-height:1.4}
+.kc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kc-assignee{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mut2)}
+.kc-assignee img{width:16px;height:16px;border-radius:50%}
+.kc-actions{display:flex;gap:3px;margin-left:auto}
+.kc-actions button{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.85rem;padding:2px 5px;border-radius:4px;transition:.1s}
+.kc-actions button:hover{color:var(--txt);background:var(--s3)}
+.drop-active{background:rgba(124,58,237,.07);border-color:var(--acc)!important}
 
-.hero-stats{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:40px;
-    margin-top:60px;
+/* ═══════════ TODO ═══════════ */
+.todo-row{display:flex;gap:8px;margin-bottom:1rem}
+.todo-list{display:flex;flex-direction:column;gap:6px}
+.todo-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;
+  transition:.15s;animation:fadeUp .2s ease both;
 }
-
-.stat{
-    border-left:3px solid var(--accent);
-    padding-left:20px;
+.todo-item.done .todo-txt{text-decoration:line-through;color:var(--mut)}
+.chk{
+  width:18px;height:18px;border-radius:5px;border:1.5px solid var(--bd2);
+  background:none;cursor:pointer;flex-shrink:0;transition:.15s;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
 }
+.chk.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.todo-txt{flex:1;font-size:13px}
+.todo-del{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.9rem;padding:2px 5px;border-radius:4px;transition:.1s}
+.todo-del:hover{color:var(--red)}
 
-.stat-number{
-    font-size:32px;
-    font-weight:900;
-    color: var(--accent);
-    font-family: 'IBM Plex Mono', monospace;
+/* ═══════════ CHAT ═══════════ */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 165px);min-height:380px}
+.chat-msgs{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;
+  padding:.5rem;background:var(--s1);border:1px solid var(--bd);border-radius:12px 12px 0 0;
 }
-
-.stat-label{
-    font-size:12px;
-    color: var(--text-dim);
-    text-transform:uppercase;
-    letter-spacing:1px;
-    margin-top:8px;
-    font-weight:600;
+.chat-msg{display:flex;gap:10px;padding:6px 8px;border-radius:8px;transition:background .1s}
+.chat-msg:hover{background:var(--s2)}
+.chat-msg img{width:32px;height:32px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.chat-body{flex:1;min-width:0}
+.chat-hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+.chat-name{font-size:13px;font-weight:600;color:var(--acc2)}
+.chat-time{font-size:11px;color:var(--mut)}
+.chat-txt{font-size:13px;line-height:1.5;word-break:break-word}
+.chat-input-row{
+  display:flex;gap:8px;background:var(--s2);border:1px solid var(--bd);
+  border-top:none;border-radius:0 0 12px 12px;padding:.8rem;
 }
+.chat-input-row input{flex:1}
 
-.hero-right{
-    position:relative;
+/* ═══════════ WIKI ═══════════ */
+.wiki-layout{display:grid;grid-template-columns:200px 1fr;gap:1rem}
+.wiki-sb{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1rem}
+.wiki-pages{list-style:none;display:flex;flex-direction:column;gap:3px;margin-top:.5rem}
+.wiki-li{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 9px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--mut2);transition:.12s;
 }
+.wiki-li:hover{background:var(--s2);color:var(--txt)}
+.wiki-li.on{background:rgba(124,58,237,.15);color:var(--acc2)}
+.wiki-del-btn{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.8rem;opacity:0;transition:.1s;padding:2px 4px;border-radius:3px}
+.wiki-li:hover .wiki-del-btn{opacity:1}
+.wiki-del-btn:hover{color:var(--red)}
+.wiki-ed{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.25rem}
+.wiki-ed input{font-size:1.05rem;font-weight:600;margin-bottom:.8rem}
+.wiki-ed textarea{min-height:360px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:13px;line-height:1.6}
+.wiki-tools{display:flex;gap:8px;margin-bottom:.8rem}
 
-.hero-card{
-    background: var(--surface);
-    border:2px solid var(--border);
-    padding:40px;
-    position:relative;
+/* ═══════════ MEMBERS ═══════════ */
+.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.mc-card{
+  background:var(--s1);border:1px solid var(--bd);border-radius:12px;
+  padding:1rem;display:flex;align-items:center;gap:12px;animation:fadeUp .25s ease both;
 }
+.mc-card img{width:44px;height:44px;border-radius:50%;flex-shrink:0}
+.mc-info{flex:1;min-width:0}
+.mc-name{font-size:14px;font-weight:600}
+.mc-id{font-size:11px;color:var(--mut);font-family:monospace}
+.role-sel{background:var(--s2);border:1px solid var(--bd2);color:var(--txt);border-radius:7px;padding:4px 8px;font-size:12px;cursor:pointer;width:auto}
 
-.hero-card::before{
-    content:'';
-    position:absolute;
-    top:-2px;
-    left:-2px;
-    width:120px;
-    height:4px;
-    background: var(--accent);
-}
+/* ═══════════ MODAL ═══════════ */
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(6,6,15,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+.modal-ov.open{display:flex;animation:fadeIn .2s ease}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:16px;padding:1.5rem;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:fadeUp .25s ease both}
+.modal h3{font-family:'Cinzel',serif;font-size:1.1rem;margin-bottom:1.2rem}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:1.2rem}
+.fg{margin-bottom:.9rem}
+.flbl{font-size:12px;color:var(--mut2);margin-bottom:5px;display:block;font-weight:500}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-.hero-card h3{
-    font-size:24px;
-    margin-bottom:20px;
-    font-weight:600;
-}
-
-.hero-card p{
-    color: var(--text-dim);
-    line-height:1.7;
-    font-size:16px;
-}
-
-/* WORK SECTION */
-
-.work{
-    padding:120px 5%;
-    border-bottom:2px solid var(--border);
-}
-
-.section-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    margin-bottom:80px;
-    padding-bottom:30px;
-    border-bottom:2px solid var(--border);
-}
-
-.section-title{
-    font-size:clamp(40px, 6vw, 80px);
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:-2px;
-}
-
-.section-counter{
-    font-size:80px;
-    font-weight:900;
-    color: var(--border);
-    line-height:1;
-    font-family: 'IBM Plex Mono', monospace;
-}
-
-.projects-list{
-    display:flex;
-    flex-direction:column;
-    gap:60px;
-}
-
-.project{
-    display:grid;
-    grid-template-columns:1.5fr 1fr;
-    gap:50px;
-    border-bottom:1px solid var(--border);
-    padding-bottom:60px;
-}
-
-.project:last-child{
-    border-bottom:none;
-}
-
-.project-media{
-    position:relative;
-    aspect-ratio:16/10;
-    overflow:hidden;
-    background: var(--surface);
-    border:2px solid var(--border);
-}
-
-.project img,
-.project video{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    transition:0.4s ease;
-    filter:grayscale(20%);
-}
-
-.project:hover img,
-.project:hover video{
-    filter:grayscale(0%);
-    transform:scale(1.02);
-}
-
-.project-content{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-}
-
-.project-number{
-    font-size:14px;
-    font-weight:900;
-    color: var(--accent);
-    margin-bottom:15px;
-    font-family: 'IBM Plex Mono', monospace;
-}
-
-.project-title{
-    font-size:32px;
-    font-weight:900;
-    margin-bottom:20px;
-    line-height:1.2;
-}
-
-.project-desc{
-    color: var(--text-dim);
-    line-height:1.7;
-    font-size:16px;
-    margin-bottom:30px;
-}
-
-.project-tags{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-}
-
-.tag{
-    padding:6px 16px;
-    border:1px solid var(--border);
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    font-weight:600;
-    font-family: 'IBM Plex Mono', monospace;
-    color: var(--text-dim);
-}
-
-/* ABOUT */
-
-.about{
-    padding:120px 5%;
-    border-bottom:2px solid var(--border);
-}
-
-.about-grid{
-    display:grid;
-    grid-template-columns:1fr 1.5fr;
-    gap:100px;
-    margin-top:60px;
-}
-
-.about-left h2{
-    font-size:80px;
-    font-weight:900;
-    line-height:1;
-    text-transform:uppercase;
-    letter-spacing:-2px;
-}
-
-.about-right{
-    display:flex;
-    flex-direction:column;
-    gap:30px;
-}
-
-.about-right p{
-    font-size:20px;
-    color: var(--text-dim);
-    line-height:1.7;
-}
-
-.skills-grid{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:2px;
-    margin-top:60px;
-    border:2px solid var(--border);
-}
-
-.skill-item{
-    background: var(--surface);
-    padding:30px;
-    border:1px solid var(--border);
-    font-weight:600;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    font-size:14px;
-}
-
-/* CONTACT */
-
-.contact{
-    padding:120px 5%;
-}
-
-.contact-wrapper{
-    max-width:1400px;
-    margin:0 auto;
-}
-
-.contact-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    border:2px solid var(--border);
-}
-
-.contact-left{
-    background: var(--surface);
-    padding:80px 60px;
-    border-right:2px solid var(--border);
-}
-
-.contact-left h3{
-    font-size:48px;
-    font-weight:900;
-    text-transform:uppercase;
-    line-height:1.1;
-    letter-spacing:-1px;
-    margin-bottom:40px;
-}
-
-.contact-method{
-    margin-bottom:40px;
-}
-
-.contact-label{
-    font-size:12px;
-    color: var(--text-dim);
-    text-transform:uppercase;
-    letter-spacing:1px;
-    margin-bottom:10px;
-    font-weight:600;
-}
-
-.contact-value{
-    font-size:24px;
-    font-weight:600;
-    color: var(--accent);
-    font-family: 'IBM Plex Mono', monospace;
-}
-
-.contact-right{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:120px;
-    font-weight:900;
-    color: var(--border);
-    user-select:none;
-}
-
-/* FOOTER */
-
-footer{
-    padding:40px 5%;
-    border-top:2px solid var(--border);
-}
-
-.footer-grid{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.footer-left{
-    font-size:12px;
-    color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-}
-
-.footer-right{
-    font-size:12px;
-    color: var(--text-dim);
-    font-weight:600;
-}
-
-/* RESPONSIVE */
-
-@media(max-width:1024px){
-    .hero-grid,
-    .about-grid,
-    .contact-grid{
-        grid-template-columns:1fr;
-        gap:60px;
-    }
-    
-    .contact-left{
-        border-right:none;
-        border-bottom:2px solid var(--border);
-    }
-    
-    .contact-right{
-        display:none;
-    }
-    
-    .project{
-        grid-template-columns:1fr;
-    }
-}
-
-@media(max-width:768px){
-    nav ul{
-        gap:25px;
-    }
-    
-    .hero-left h1{
-        font-size:48px;
-    }
-    
-    .hero-stats{
-        grid-template-columns:1fr;
-        gap:30px;
-    }
-    
-    .section-header{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:20px;
-    }
-    
-    .section-counter{
-        font-size:60px;
-    }
-    
-    .about-left h2{
-        font-size:48px;
-    }
-    
-    .skills-grid{
-        grid-template-columns:1fr;
-    }
-    
-    .contact-left h3{
-        font-size:36px;
-    }
-}
-
-/* ANIMATIONS */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* ═══════════ MISC ═══════════ */
+.spinner{width:24px;height:24px;border:2px solid var(--s3);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:2.5rem auto;display:block}
+.empty{text-align:center;padding:3rem 1rem;color:var(--mut)}
+.empty .ei{font-size:2.5rem;margin-bottom:.8rem}
+.empty p{font-size:13px;line-height:1.5}
 </style>
 </head>
 <body>
 
-<nav>
-    <div class="logo">Soso</div>
-    <ul>
-        <li><a href="#work">Work</a></li>
-        <li><a href="#about">Studio</a></li>
-        <li><a href="#contact">Contact</a></li>
-    </ul>
-</nav>
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="login-page">
+  <div class="bg-grad"></div>
+  <div class="stars"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="login-card">
+    <div class="login-rune">🔮</div>
+    <div class="login-title">Arcane Workspace</div>
+    <p class="login-sub">Espace de travail pour l'équipe dev<br>du jeu de magie Roblox</p>
+    <div class="divider"></div>
+    <a class="discord-btn" href="/auth/login">
+      <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="white">
+        <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+      </svg>
+      Connexion avec Discord
+    </a>
+    <div id="login-err" style="display:none" class="login-err"></div>
+    <p class="login-footer">Seuls les membres autorisés peuvent accéder.</p>
+  </div>
+</div>
 
-<section class="hero">
-    <div class="hero-grid">
-        <div class="hero-left">
-            <h1>
-                Roblox<br>
-                <span class="highlight">Builder</span>
-            </h1>
-            
-            <div class="hero-stats">
-                <div class="stat">
-                    <div class="stat-number"><span id="viewCount">...</span></div>
-                    <div class="stat-label">Portfolio Views</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">01</div>
-                    <div class="stat-label">Main Project</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">3D</div>
-                    <div class="stat-label">Level Design</div>
-                </div>
-            </div>
+<!-- ═══════════ APP ═══════════ -->
+<div id="app-page">
+
+  <div id="hdr">
+    <span style="font-size:1.2rem">🔮</span>
+    <span class="app-logo">Arcane Workspace</span>
+    <div class="spacer"></div>
+    <div class="online-pill"><div class="odot"></div><span id="online-cnt">0 en ligne</span></div>
+    <div class="user-chip" onclick="goPage('members')">
+      <img id="hdr-av" src="" alt=""/>
+      <span class="uname" id="hdr-name"></span>
+      <span class="bdg urole" id="hdr-role"></span>
+    </div>
+    <button class="logout-btn" onclick="location.href='/auth/logout'">Déconnexion</button>
+  </div>
+
+  <div id="layout">
+    <aside id="sidebar">
+      <div class="nav-sec">
+        <div class="nav-lbl">Navigation</div>
+        <button class="ni on" data-pg="kanban" onclick="goPage('kanban')"><span class="ni-ico">📋</span> Kanban</button>
+        <button class="ni" data-pg="todo"   onclick="goPage('todo')"><span class="ni-ico">✅</span> Mes tâches</button>
+        <button class="ni" data-pg="chat"   onclick="goPage('chat')">
+          <span class="ni-ico">💬</span> Chat
+          <span id="chat-bdg" class="chat-badge"></span>
+        </button>
+        <button class="ni" data-pg="wiki"   onclick="goPage('wiki')"><span class="ni-ico">📚</span> Wiki</button>
+      </div>
+      <div id="admin-nav" class="nav-sec" style="display:none">
+        <div class="nav-lbl">Admin</div>
+        <button class="ni" data-pg="members" onclick="goPage('members')"><span class="ni-ico">👥</span> Membres</button>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">En ligne</div>
+        <div id="ou-list" class="online-sec"></div>
+      </div>
+    </aside>
+
+    <main id="content">
+
+      <!-- KANBAN -->
+      <div id="page-kanban" class="page on">
+        <div class="pg-title">📋 Kanban</div>
+        <button class="btn btn-p" style="margin-bottom:1rem" onclick="openModal()">+ Nouvelle tâche</button>
+        <div class="kb-board">
+          <div class="kb-col" data-status="todo">
+            <div class="kb-col-hdr"><div class="kb-col-title">📝 À faire</div><span class="kb-cnt" id="cnt-todo">0</span></div>
+            <div class="kb-cards" id="col-todo"></div>
+          </div>
+          <div class="kb-col" data-status="doing">
+            <div class="kb-col-hdr"><div class="kb-col-title">⚡ En cours</div><span class="kb-cnt" id="cnt-doing">0</span></div>
+            <div class="kb-cards" id="col-doing"></div>
+          </div>
+          <div class="kb-col" data-status="done">
+            <div class="kb-col-hdr"><div class="kb-col-title">✨ Terminé</div><span class="kb-cnt" id="cnt-done">0</span></div>
+            <div class="kb-cards" id="col-done"></div>
+          </div>
         </div>
-        
-        <div class="hero-right">
-            <div class="hero-card">
-                <h3>Murder Tower</h3>
-                <p>
-                    Builder spécialisé dans la création d'environnements immersifs
-                    pour Murder Tower. Developer Management Magic's School RP.
-                </p>
-            </div>
+      </div>
+
+      <!-- TODO -->
+      <div id="page-todo" class="page">
+        <div class="pg-title">✅ Mes tâches</div>
+        <div class="card" style="max-width:580px">
+          <div class="todo-row">
+            <input type="text" id="todo-in" placeholder="Nouvelle tâche…" onkeydown="if(event.key==='Enter')addTodo()"/>
+            <button class="btn btn-p" onclick="addTodo()">Ajouter</button>
+          </div>
+          <div class="todo-list" id="todo-list"></div>
         </div>
-    </div>
-</section>
+      </div>
 
-<section id="work" class="work">
-    
-    <div class="section-header">
-        <h2 class="section-title">Selected Works</h2>
-        <div class="section-counter">02</div>
-    </div>
-
-    <div class="projects-list">
-        <!-- Les projets sont générés automatiquement depuis le tableau JavaScript -->
-    </div>
-
-</section>
-
-<section id="about" class="about">
-    
-    <div class="section-header">
-        <h2 class="section-title">About Studio</h2>
-    </div>
-    
-    <div class="about-grid">
-        <div class="about-left">
-            <h2>Build.<br>Design.<br>Optimize.</h2>
+      <!-- CHAT -->
+      <div id="page-chat" class="page">
+        <div class="pg-title">💬 Chat d'équipe</div>
+        <div class="chat-wrap">
+          <div class="chat-msgs" id="chat-msgs"></div>
+          <div class="chat-input-row">
+            <input type="text" id="chat-in" placeholder="Message…" onkeydown="if(event.key==='Enter')sendChat()" maxlength="500"/>
+            <button class="btn btn-p" onclick="sendChat()">Envoyer</button>
+          </div>
         </div>
-        <div class="about-right">
-            <p>
-                Builder spécialisé dans la création d'environnements Roblox détaillés
-                et optimisés pour le gameplay.
-            </p>
-            <p>
-                Mon approche combine vision artistique forte, attention aux détails
-                techniques et compréhension des besoins du joueur. Chaque environnement
-                est pensé pour raconter une histoire tout en servant l'expérience de jeu.
-            </p>
+      </div>
+
+      <!-- WIKI -->
+      <div id="page-wiki" class="page">
+        <div class="pg-title">📚 Wiki</div>
+        <div class="wiki-layout">
+          <div class="wiki-sb">
+            <div style="font-size:12px;font-weight:600;color:var(--mut2);text-transform:uppercase;letter-spacing:.06em">Pages</div>
+            <button class="btn btn-p btn-sm" style="width:100%;margin-top:.7rem" onclick="newWiki()">+ Nouvelle page</button>
+            <ul class="wiki-pages" id="wiki-list"></ul>
+          </div>
+          <div class="wiki-ed" id="wiki-ed">
+            <div class="empty"><div class="ei">📖</div><p>Sélectionne une page ou crée-en une.</p></div>
+          </div>
         </div>
-    </div>
-    
-    <div class="skills-grid">
-        <div class="skill-item">Environment Design</div>
-        <div class="skill-item">Level Building</div>
-        <div class="skill-item">Lighting & Atmosphere</div>
-        <div class="skill-item">Performance Optimization</div>
-        <div class="skill-item">Visual Composition</div>
-        <div class="skill-item">Gameplay Flow</div>
-    </div>
+      </div>
 
-</section>
+      <!-- MEMBERS -->
+      <div id="page-members" class="page">
+        <div class="pg-title">👥 Membres</div>
+        <div class="members-grid" id="members-grid"></div>
+      </div>
 
-<section id="contact" class="contact">
-    <div class="contact-wrapper">
-        <div class="contact-grid">
-            <div class="contact-left">
-                <h3>Let's work<br>together</h3>
-                
-                <div class="contact-method">
-                    <div class="contact-label">Discord</div>
-                    <div class="contact-value">soso-18308</div>
-                </div>
-                
-                <div class="contact-method">
-                    <div class="contact-label">Disponibilité</div>
-                    <div class="contact-value">Ouvert aux projets</div>
-                </div>
-            </div>
-            <div class="contact-right">
-                2026
-            </div>
-        </div>
-    </div>
-</section>
+    </main>
+  </div>
+</div>
 
-<footer>
-    <div class="footer-grid">
-        <div class="footer-left">© 2026 soso_LeDev</div>
-        <div class="footer-right">ROBLOX ENVIRONMENT BUILDER</div>
+<!-- MODAL kanban -->
+<div class="modal-ov" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modal-title">✨ Nouvelle tâche</h3>
+    <div class="fg"><label class="flbl">Titre *</label><input type="text" id="m-title" placeholder="Titre…"/></div>
+    <div class="fg"><label class="flbl">Description</label><textarea id="m-desc" placeholder="Détails…"></textarea></div>
+    <div class="two-col">
+      <div class="fg"><label class="flbl">Statut</label>
+        <select id="m-status"><option value="todo">À faire</option><option value="doing">En cours</option><option value="done">Terminé</option></select>
+      </div>
+      <div class="fg"><label class="flbl">Priorité</label>
+        <select id="m-prio"><option value="normal">Normale</option><option value="high">Haute 🔴</option><option value="low">Basse</option></select>
+      </div>
     </div>
-</footer>
+    <div class="fg"><label class="flbl">Assigner à</label><select id="m-assign"><option value="">— Personne —</option></select></div>
+    <div class="modal-foot">
+      <button class="btn btn-g" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-p" onclick="saveCard()">Enregistrer</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// ============================================
-// PROJECTS - AJOUTE TES BUILDS ICI
-// ============================================
-const projects = [
-    {
-        type: 'image',
-        src: 'images/1.png',
-        title: 'Murder Tower Environment Design',
-        description: 'Création d\'atmosphères immersives et détaillées pour Murder Tower. Focus sur la composition visuelle et l\'expérience joueur.',
-        tags: ['Murder Tower', 'Build', 'Old']
-    },
-    {
-        type: 'image',
-        src: 'images/2.png',
-        title: 'Magic School RP',
-        description: 'Démonstration d\'un build du boat-housse de Magic School RP.',
-        tags: ['Build', 'Harry Potter', 'Interactive']
-    },
-    {
-        type: 'image',
-        src: 'images/3.png',
-        title: 'Magic School RP',
-        description: 'Démonstration du chateau de Magic School RP.',
-        tags: ['Build', 'Harry Potter', 'Interactive']
-    },
-    {
-        type: 'image',
-        src: 'images/4.png',
-        title: 'MAPS',
-        description: 'Démonstration d\'une maps de style old.',
-        tags: ['Build', 'old', 'Maps']
-    },
-    {
-        type: 'image',
-        src: 'images/5.png',
-        title: 'OLD',
-        description: 'Démonstration d\'un build de style old.',
-        tags: ['Build', 'old', 'Farmer']
+/* ══════════════════════════
+   STATE
+══════════════════════════ */
+let ME = null, WS = null, users = [], editId = null, wikiId = null, chatUnread = 0, curPage = "kanban";
+let dragId = null;
+
+/* ══════════════════════════
+   BOOT
+══════════════════════════ */
+(async () => {
+  // Show login or app based on URL
+  if (location.pathname === "/app") {
+    ME = await get("/api/me");
+    if (!ME) { location.href = "/"; return; }
+    showApp();
+    users = await get("/api/users");
+    fillAssignees();
+    await Promise.all([loadKanban(), loadTodos(), loadChat(), loadWikiList()]);
+    if (ME.role === "admin") loadMembers();
+    initWS();
+  } else {
+    // Login page
+    const p = new URLSearchParams(location.search);
+    if (p.get("error")) {
+      const msgs = { not_allowed:"Ton compte n'est pas autorisé.", auth_failed:"Erreur Discord. Réessaie.", no_code:"Code manquant." };
+      const el = document.getElementById("login-err");
+      el.textContent = msgs[p.get("error")] || "Erreur inconnue.";
+      el.style.display = "block";
     }
-    // POUR AJOUTER UN NOUVEAU PROJET, COPIE CE BLOC :
-    // {
-    //     type: 'image',  // ou 'video'
-    //     src: 'images/ton-image.png',  // chemin de ton fichier
-    //     title: 'Titre du Projet',
-    //     description: 'Description du projet',
-    //     tags: ['Tag1', 'Tag2', 'Tag3']
-    // },
-];
+  }
+})();
 
-// ============================================
-// GÉNÉRATION AUTOMATIQUE DES PROJETS
-// ============================================
-function loadProjects() {
-    const projectsList = document.querySelector('.projects-list');
-    projectsList.innerHTML = '';
-    
-    projects.forEach((project, index) => {
-        const projectDiv = document.createElement('div');
-        projectDiv.className = 'project';
-        
-        const mediaHTML = project.type === 'video' 
-            ? `<video controls><source src="${project.src}" type="video/mp4"></video>`
-            : `<img src="${project.src}" alt="${project.title}">`;
-        
-        const tagsHTML = project.tags.map(tag => `<div class="tag">${tag}</div>`).join('');
-        
-        projectDiv.innerHTML = `
-            <div class="project-media">
-                ${mediaHTML}
-            </div>
-            <div class="project-content">
-                <div class="project-number">PROJECT ${String(index + 1).padStart(2, '0')}</div>
-                <h3 class="project-title">${project.title}</h3>
-                <p class="project-desc">${project.description}</p>
-                <div class="project-tags">${tagsHTML}</div>
-            </div>
-        `;
-        
-        projectsList.appendChild(projectDiv);
-    });
-    
-    // Update counter
-    document.querySelector('.section-counter').textContent = String(projects.length).padStart(2, '0');
+function showApp() {
+  document.getElementById("login-page").style.display = "none";
+  document.getElementById("app-page").classList.add("show");
+  document.getElementById("hdr-av").src      = ME.avatar;
+  document.getElementById("hdr-name").textContent = ME.username;
+  const r = document.getElementById("hdr-role");
+  r.textContent = ME.role; r.classList.add("role-" + ME.role);
+  if (ME.role === "admin") document.getElementById("admin-nav").style.display = "";
 }
 
-// ============================================
-// VIEW COUNTER
-// ============================================
-let viewCount = 0;
+/* ══════════════════════════
+   API
+══════════════════════════ */
+async function get(url)          { return fetch(url).then(r=>r.json()); }
+async function post(url, body)   { return fetch(url,{method:"POST",  headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
+async function patch(url, body)  { return fetch(url,{method:"PATCH", headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
+async function put(url, body)    { return fetch(url,{method:"PUT",   headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
+async function del(url)          { return fetch(url,{method:"DELETE"}).then(r=>r.json()); }
 
-// Charger le compteur depuis localStorage
-if (localStorage.getItem('portfolioViews')) {
-    viewCount = parseInt(localStorage.getItem('portfolioViews'));
-} else {
-    viewCount = Math.floor(Math.random() * 1) + 1; // Commence entre 100-600
+/* ══════════════════════════
+   NAV
+══════════════════════════ */
+function goPage(p) {
+  document.querySelectorAll(".page").forEach(el=>el.classList.remove("on"));
+  document.querySelectorAll(".ni").forEach(el=>el.classList.remove("on"));
+  document.getElementById("page-"+p)?.classList.add("on");
+  document.querySelector(`[data-pg="${p}"]`)?.classList.add("on");
+  curPage = p;
+  if (p==="chat") { chatUnread=0; updBadge(); scrollChat(); }
+  if (p==="members") loadMembers();
 }
 
-// Incrémenter
-viewCount++;
-localStorage.setItem('portfolioViews', viewCount);
+/* ══════════════════════════
+   WEBSOCKET
+══════════════════════════ */
+function initWS() {
+  const proto = location.protocol==="https:"?"wss:":"ws:";
+  WS = new WebSocket(`${proto}//${location.host}`);
+  WS.onopen = ()=> WS.send(JSON.stringify({type:"auth",userId:ME.id,username:ME.username,avatar:ME.avatar}));
+  WS.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.type==="online")     renderOnline(m.users);
+    if (m.type==="chat_msg")   appendMsg(m.msg);
+    if (m.type==="kanban_reload") loadKanban();
+    if (m.type==="wiki_reload")   loadWikiList();
+    if (m.type==="user_updated")  { get("/api/users").then(u=>{users=u;fillAssignees();if(curPage==="members")loadMembers();}); }
+  };
+  WS.onclose = ()=>setTimeout(initWS,3000);
+}
+function renderOnline(list) {
+  const u = [...new Map(list.map(x=>[x.id,x])).values()];
+  document.getElementById("online-cnt").textContent = u.length+" en ligne";
+  document.getElementById("ou-list").innerHTML = u.map(x=>
+    `<div class="ou"><img src="${x.avatar}" alt=""><span>${esc(x.username)}</span><div class="ou-dot"></div></div>`
+  ).join("");
+}
 
-// Afficher
-document.getElementById('viewCount').textContent = viewCount.toLocaleString();
-
-// ============================================
-// SMOOTH SCROLL
-// ============================================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+/* ══════════════════════════
+   KANBAN
+══════════════════════════ */
+async function loadKanban() {
+  const cards = await get("/api/kanban");
+  ["todo","doing","done"].forEach(s=>{document.getElementById("col-"+s).innerHTML="";});
+  cards.forEach(renderCard);
+  updCounts();
+  initDrag();
+}
+function renderCard(c) {
+  const assignee = users.find(u=>u.id===c.assignee_id);
+  const can = ME.role==="admin"||ME.role==="dev";
+  const el = document.createElement("div");
+  el.className = "kc"; el.id = "kc-"+c.id;
+  el.draggable = can;
+  el.innerHTML = `
+    <div class="kc-title">${esc(c.title)}</div>
+    ${c.description?`<div class="kc-desc">${esc(c.description)}</div>`:""}
+    <div class="kc-meta">
+      <span class="bdg bdg-${c.priority}">${c.priority==="high"?"🔴 Haute":c.priority==="low"?"Basse":"Normale"}</span>
+      ${assignee?`<div class="kc-assignee"><img src="${assignee.avatar}"> ${esc(assignee.username)}</div>`:""}
+      ${can?`<div class="kc-actions"><button onclick="openModal('${c.id}')">✏️</button><button onclick="delCard('${c.id}')">🗑️</button></div>`:""}
+    </div>`;
+  el.addEventListener("dragstart",()=>{dragId=c.id;el.classList.add("dragging")});
+  el.addEventListener("dragend",()=>{dragId=null;el.classList.remove("dragging");document.querySelectorAll(".drop-active").forEach(x=>x.classList.remove("drop-active"))});
+  document.getElementById("col-"+c.status).appendChild(el);
+}
+function updCounts() {
+  ["todo","doing","done"].forEach(s=>document.getElementById("cnt-"+s).textContent=document.getElementById("col-"+s).children.length);
+}
+function initDrag() {
+  document.querySelectorAll(".kb-cards").forEach(z=>{
+    z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("drop-active")});
+    z.addEventListener("dragleave",()=>z.classList.remove("drop-active"));
+    z.addEventListener("drop",async e=>{
+      e.preventDefault();z.classList.remove("drop-active");
+      if(!dragId)return;
+      const status=z.closest(".kb-col").dataset.status;
+      z.appendChild(document.getElementById("kc-"+dragId));
+      updCounts();
+      await patch(`/api/kanban/${dragId}`,{status});
     });
-});
+  });
+}
+function openModal(id) {
+  editId = id||null;
+  document.getElementById("modal-title").textContent = id?"✏️ Modifier":"✨ Nouvelle tâche";
+  ["m-title","m-desc"].forEach(i=>document.getElementById(i).value="");
+  document.getElementById("m-status").value="todo";
+  document.getElementById("m-prio").value="normal";
+  document.getElementById("m-assign").value="";
+  if (id) {
+    const el=document.getElementById("kc-"+id);
+    if(el){
+      document.getElementById("m-title").value=el.querySelector(".kc-title")?.textContent||"";
+      document.getElementById("m-desc").value=el.querySelector(".kc-desc")?.textContent||"";
+      ["todo","doing","done"].forEach(s=>{if(document.getElementById("col-"+s).contains(el))document.getElementById("m-status").value=s;});
+    }
+  }
+  document.getElementById("modal").classList.add("open");
+  document.getElementById("m-title").focus();
+}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+async function saveCard() {
+  const d={title:document.getElementById("m-title").value.trim(),description:document.getElementById("m-desc").value.trim(),status:document.getElementById("m-status").value,priority:document.getElementById("m-prio").value,assignee_id:document.getElementById("m-assign").value||null};
+  if(!d.title){alert("Titre requis");return}
+  editId ? await patch(`/api/kanban/${editId}`,d) : await post("/api/kanban",d);
+  closeModal();
+}
+async function delCard(id){if(confirm("Supprimer ?"))await del(`/api/kanban/${id}`)}
+function fillAssignees(){
+  const s=document.getElementById("m-assign");
+  s.innerHTML=`<option value="">— Personne —</option>`+users.map(u=>`<option value="${u.id}">${esc(u.username)}</option>`).join("");
+}
 
-// ============================================
-// INITIALISATION
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    loadProjects();
-});
+/* ══════════════════════════
+   TODO
+══════════════════════════ */
+async function loadTodos() {
+  const todos = await get("/api/todos");
+  const list = document.getElementById("todo-list");
+  list.innerHTML = todos.length ? todos.map(todoHTML).join("") : empty("✅","Aucune tâche. Ajoutes-en une !");
+}
+function todoHTML(t){
+  return`<div class="todo-item ${t.done?"done":""}" id="td-${t.id}">
+    <button class="chk ${t.done?"on":""}" onclick="toggleTodo('${t.id}')">${t.done?"✓":""}</button>
+    <span class="todo-txt">${esc(t.text)}</span>
+    <button class="todo-del" onclick="delTodo('${t.id}')">✕</button>
+  </div>`;
+}
+async function addTodo(){
+  const inp=document.getElementById("todo-in"), text=inp.value.trim();
+  if(!text)return; inp.value="";
+  const t=await post("/api/todos",{text});
+  const list=document.getElementById("todo-list");
+  if(list.querySelector(".empty"))list.innerHTML="";
+  list.insertAdjacentHTML("beforeend",todoHTML(t));
+}
+async function toggleTodo(id){
+  await patch(`/api/todos/${id}`,{});
+  const item=document.getElementById("td-"+id), chk=item.querySelector(".chk");
+  item.classList.toggle("done"); chk.classList.toggle("on");
+  chk.textContent=chk.classList.contains("on")?"✓":"";
+}
+async function delTodo(id){await del(`/api/todos/${id}`);document.getElementById("td-"+id)?.remove()}
+
+/* ══════════════════════════
+   CHAT
+══════════════════════════ */
+async function loadChat(){
+  const msgs=await get("/api/chat");
+  document.getElementById("chat-msgs").innerHTML=msgs.map(msgHTML).join("");
+  scrollChat();
+}
+function msgHTML(m){
+  const t=new Date(m.created_at*1000).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  return`<div class="chat-msg"><img src="${m.avatar}" alt=""><div class="chat-body"><div class="chat-hdr"><span class="chat-name">${esc(m.username)}</span><span class="chat-time">${t}</span></div><div class="chat-txt">${esc(m.text)}</div></div></div>`;
+}
+function appendMsg(m){
+  document.getElementById("chat-msgs").insertAdjacentHTML("beforeend",msgHTML(m));
+  if(curPage==="chat") scrollChat();
+  else{chatUnread++;updBadge();}
+}
+function scrollChat(){const b=document.getElementById("chat-msgs");b.scrollTop=b.scrollHeight}
+function updBadge(){const b=document.getElementById("chat-bdg");b.textContent=chatUnread;b.style.display=chatUnread?"":"none"}
+function sendChat(){
+  const inp=document.getElementById("chat-in"),text=inp.value.trim();
+  if(!text||!WS||WS.readyState!==1)return;
+  WS.send(JSON.stringify({type:"chat",text})); inp.value="";
+}
+
+/* ══════════════════════════
+   WIKI
+══════════════════════════ */
+async function loadWikiList(){
+  const pages=await get("/api/wiki");
+  document.getElementById("wiki-list").innerHTML=pages.length
+    ?pages.map(p=>`<li class="wiki-li ${wikiId===p.id?"on":""}" id="wl-${p.id}" onclick="loadWikiPage('${p.id}')">
+      📄 ${esc(p.title)}
+      ${ME.role==="admin"?`<button class="wiki-del-btn" onclick="delWiki(event,'${p.id}')">✕</button>`:""}
+    </li>`).join("")
+    :`<li style="font-size:12px;color:var(--mut);padding:6px">Aucune page</li>`;
+}
+async function loadWikiPage(id){
+  wikiId=id;
+  document.querySelectorAll(".wiki-li").forEach(l=>l.classList.remove("on"));
+  document.getElementById("wl-"+id)?.classList.add("on");
+  const p=await get(`/api/wiki/${id}`);
+  const can=ME.role==="admin"||ME.role==="dev";
+  document.getElementById("wiki-ed").innerHTML=`
+    <div class="wiki-tools">${can?`<button class="btn btn-p btn-sm" onclick="saveWiki()">💾 Sauvegarder</button>`:""}</div>
+    <div class="fg"><input type="text" id="w-title" value="${esc(p.title)}" ${can?"":"readonly"}/></div>
+    <div class="fg"><textarea id="w-content" ${can?"":"readonly"}>${esc(p.content)}</textarea></div>`;
+}
+function newWiki(){
+  wikiId="new";
+  document.querySelectorAll(".wiki-li").forEach(l=>l.classList.remove("on"));
+  document.getElementById("wiki-ed").innerHTML=`
+    <div class="wiki-tools"><button class="btn btn-p btn-sm" onclick="saveWiki()">💾 Sauvegarder</button></div>
+    <div class="fg"><input type="text" id="w-title" placeholder="Titre de la page"/></div>
+    <div class="fg"><textarea id="w-content" placeholder="Contenu…"></textarea></div>`;
+  document.getElementById("w-title").focus();
+}
+async function saveWiki(){
+  const title=document.getElementById("w-title")?.value.trim();
+  const content=document.getElementById("w-content")?.value||"";
+  if(!title){alert("Titre requis");return}
+  const p=await put(`/api/wiki/${wikiId||"new"}`,{title,content});
+  wikiId=p.id; await loadWikiList();
+  document.querySelectorAll(".wiki-li").forEach(l=>l.classList.remove("on"));
+  document.getElementById("wl-"+p.id)?.classList.add("on");
+}
+async function delWiki(e,id){
+  e.stopPropagation();
+  if(!confirm("Supprimer cette page ?"))return;
+  await del(`/api/wiki/${id}`);
+  if(wikiId===id){wikiId=null;document.getElementById("wiki-ed").innerHTML=`<div class="empty"><div class="ei">📖</div><p>Sélectionne une page.</p></div>`;}
+  await loadWikiList();
+}
+
+/* ══════════════════════════
+   MEMBERS
+══════════════════════════ */
+async function loadMembers(){
+  users=await get("/api/users");
+  document.getElementById("members-grid").innerHTML=users.map(u=>`
+    <div class="mc-card">
+      <img src="${u.avatar}" alt="">
+      <div class="mc-info"><div class="mc-name">${esc(u.username)}</div><div class="mc-id">${u.id}</div></div>
+      ${ME.role==="admin"&&u.id!==ME.id
+        ?`<select class="role-sel" onchange="setRole('${u.id}',this.value)">
+            <option value="admin"  ${u.role==="admin" ?"selected":""}>👑 Admin</option>
+            <option value="dev"    ${u.role==="dev"   ?"selected":""}>⚡ Dev</option>
+            <option value="viewer" ${u.role==="viewer"?"selected":""}>👁 Viewer</option>
+          </select>`
+        :`<span class="bdg urole role-${u.role}">${u.role}</span>`}
+    </div>`).join("");
+}
+async function setRole(id,r){await patch(`/api/users/${id}/role`,{role:r}).catch(e=>alert(e.message))}
+
+/* ══════════════════════════
+   UTILS
+══════════════════════════ */
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function empty(icon,txt){return`<div class="empty"><div class="ei">${icon}</div><p>${txt}</p></div>`}
 </script>
-
 </body>
 </html>
