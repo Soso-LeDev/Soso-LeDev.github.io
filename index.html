@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>🔮 Arcane Workspace</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -13,10 +13,12 @@
   --acc:#7c3aed; --acc2:#a78bfa; --hot:#c084fc;
   --grn:#34d399; --red:#f87171; --ylw:#fbbf24;
   --txt:#e8e4f8; --mut:#6b6899; --mut2:#9590bb;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;min-height:100dvh;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px}
 
 /* ═══════════ ANIMATIONS ═══════════ */
@@ -27,13 +29,16 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
 @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,20px)}}
 @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,-30px)}}
 @keyframes twinkle{from{opacity:.5}to{opacity:1}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-100%)}to{opacity:1;transform:none}}
 .au{animation:fadeUp .35s ease both}
 .ai{animation:fadeIn .25s ease both}
 
 /* ═══════════ LOGIN PAGE ═══════════ */
 #login-page{
   display:flex;align-items:center;justify-content:center;
-  min-height:100vh;position:relative;overflow:hidden;
+  min-height:100vh;min-height:100dvh;position:relative;overflow:hidden;
+  padding:1rem;
 }
 .bg-grad{
   position:fixed;inset:0;z-index:0;
@@ -59,7 +64,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
 .login-card{
   position:relative;z-index:1;
   background:rgba(14,14,28,.88);border:1px solid rgba(124,58,237,.3);
-  border-radius:22px;padding:3rem 2.5rem;width:100%;max-width:420px;
+  border-radius:22px;padding:2.5rem 2rem;width:100%;max-width:420px;
   text-align:center;backdrop-filter:blur(20px);
   box-shadow:0 0 60px rgba(124,58,237,.15),0 20px 60px rgba(0,0,0,.5);
   animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both;
@@ -81,85 +86,103 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
   box-shadow:0 4px 20px rgba(88,101,242,.35);
 }
 .discord-btn:hover{background:#4752c4;transform:translateY(-2px);box-shadow:0 8px 30px rgba(88,101,242,.5)}
+.discord-btn:active{transform:translateY(0);background:#4752c4}
 .login-err{margin-top:1rem;font-size:13px;color:var(--red);background:rgba(248,113,113,.08);padding:8px 14px;border-radius:8px;border:1px solid rgba(248,113,113,.2)}
 .login-footer{margin-top:2rem;font-size:12px;color:var(--mut);line-height:1.6}
 
 /* ═══════════ APP LAYOUT ═══════════ */
-#app-page{display:none;flex-direction:column;min-height:100vh}
+#app-page{display:none;flex-direction:column;min-height:100vh;min-height:100dvh}
 #app-page.show{display:flex}
 
 /* Header */
 #hdr{
-  height:56px;display:flex;align-items:center;padding:0 1.2rem;gap:.8rem;
-  background:rgba(6,6,15,.92);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;
+  height:56px;display:flex;align-items:center;padding:0 1rem;gap:.7rem;
+  background:rgba(6,6,15,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:200;
+  padding-top:var(--safe-top);
 }
-.app-logo{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:700;letter-spacing:.08em;background:linear-gradient(135deg,var(--acc2),var(--hot));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.app-logo{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;letter-spacing:.08em;background:linear-gradient(135deg,var(--acc2),var(--hot));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
 .spacer{flex:1}
-.online-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut2);background:var(--s1);border:1px solid var(--bd);padding:4px 12px;border-radius:20px}
-.odot{width:7px;height:7px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite}
-.user-chip{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);padding:4px 12px 4px 4px;border-radius:20px;cursor:pointer;transition:.15s}
+.online-pill{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mut2);background:var(--s1);border:1px solid var(--bd);padding:4px 10px;border-radius:20px;white-space:nowrap}
+.odot{width:7px;height:7px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+.user-chip{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bd);padding:3px 10px 3px 3px;border-radius:20px;cursor:pointer;transition:.15s}
 .user-chip:hover{border-color:var(--bd2)}
-.user-chip img{width:28px;height:28px;border-radius:50%;object-fit:cover}
-.user-chip .uname{font-size:13px;font-weight:500}
+.user-chip img{width:26px;height:26px;border-radius:50%;object-fit:cover}
+.user-chip .uname{font-size:12px;font-weight:500;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .urole{font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600}
 .role-admin{background:rgba(192,132,252,.2);color:var(--hot)}
 .role-dev{background:rgba(52,211,153,.15);color:var(--grn)}
 .role-viewer{background:rgba(107,104,153,.2);color:var(--mut2)}
-.logout-btn{background:none;border:none;color:var(--mut2);cursor:pointer;font-size:12px;padding:6px 10px;border-radius:8px;transition:.15s;font-family:'Inter',sans-serif}
+.logout-btn{background:none;border:none;color:var(--mut2);cursor:pointer;font-size:11px;padding:6px 8px;border-radius:8px;transition:.15s;font-family:'Inter',sans-serif;white-space:nowrap}
 .logout-btn:hover{background:var(--s2);color:var(--txt)}
+.menu-btn{
+  display:none;background:none;border:none;color:var(--txt);cursor:pointer;
+  padding:6px;border-radius:8px;font-size:1.2rem;transition:.15s;
+  flex-shrink:0;
+}
+.menu-btn:hover{background:var(--s2)}
 
 /* Layout */
-#layout{display:flex;flex:1;min-height:calc(100vh - 56px)}
+#layout{display:flex;flex:1;min-height:0}
 
 /* Sidebar */
 #sidebar{
   width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--bd);
   display:flex;flex-direction:column;padding:.8rem 0;
-  position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
+  position:sticky;top:56px;height:calc(100vh - 56px);height:calc(100dvh - 56px);overflow-y:auto;
+  transition:transform .3s cubic-bezier(.16,1,.3,1);
 }
 .nav-sec{padding:0 .7rem;margin-bottom:1.2rem}
 .nav-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);padding:0 .5rem .5rem}
 .ni{
-  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;
+  display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:8px;
   cursor:pointer;font-size:13px;color:var(--mut2);transition:.15s;
   border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;
+  min-height:40px;
 }
 .ni:hover{background:var(--s2);color:var(--txt)}
 .ni.on{background:rgba(124,58,237,.18);color:var(--acc2)}
-.ni-ico{font-size:.95rem;width:18px;text-align:center}
+.ni-ico{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
 .chat-badge{margin-left:auto;background:var(--acc);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;display:none}
 .online-sec{padding:.5rem .7rem}
 .ou{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:7px;font-size:12px;color:var(--mut2)}
-.ou img{width:22px;height:22px;border-radius:50%}
-.ou-dot{width:6px;height:6px;background:var(--grn);border-radius:50%;margin-left:auto}
+.ou img{width:22px;height:22px;border-radius:50%;flex-shrink:0}
+.ou-dot{width:6px;height:6px;background:var(--grn);border-radius:50%;margin-left:auto;flex-shrink:0}
+
+/* Sidebar overlay mobile */
+#sidebar-overlay{
+  display:none;position:fixed;inset:0;z-index:150;background:rgba(6,6,15,.7);backdrop-filter:blur(4px);
+}
 
 /* Content */
-#content{flex:1;overflow-y:auto;padding:1.5rem;min-width:0}
+#content{flex:1;overflow-y:auto;padding:1.2rem;min-width:0}
 .page{display:none}
 .page.on{display:block;animation:fadeUp .3s ease both}
-.pg-title{font-family:'Cinzel',serif;font-size:1.35rem;font-weight:600;letter-spacing:.05em;margin-bottom:1.3rem;display:flex;align-items:center;gap:10px}
+.pg-title{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:600;letter-spacing:.05em;margin-bottom:1.2rem;display:flex;align-items:center;gap:10px}
 
 /* Card */
-.card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.25rem}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.1rem}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s}
-.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:#6d28d9}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s;touch-action:manipulation;min-height:38px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:#6d28d9}.btn-p:active{background:#5b21b6}
 .btn-g{background:var(--s2);border:1px solid var(--bd2);color:var(--mut2)}.btn-g:hover{color:var(--txt);border-color:var(--acc)}
 .btn-d{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red)}.btn-d:hover{background:rgba(248,113,113,.2)}
-.btn-sm{padding:5px 11px;font-size:12px}
+.btn-sm{padding:5px 11px;font-size:12px;min-height:30px}
 .btn:disabled{opacity:.4;cursor:default}
 
 /* Inputs */
 input[type=text],textarea,select{
   background:var(--s2);border:1px solid var(--bd2);color:var(--txt);
-  border-radius:8px;padding:8px 12px;font-size:13px;
+  border-radius:8px;padding:9px 12px;font-size:14px;
   font-family:'Inter',sans-serif;outline:none;transition:border-color .15s;width:100%;
+  -webkit-appearance:none;appearance:none;
 }
 input[type=text]:focus,textarea:focus,select:focus{border-color:var(--acc)}
 input[type=text]::placeholder,textarea::placeholder{color:var(--mut)}
-textarea{resize:vertical;min-height:80px}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239590bb' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select option{background:var(--s3)}
 
 /* Badges */
 .bdg{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
@@ -170,9 +193,50 @@ textarea{resize:vertical;min-height:80px}
 .bdg-normal{background:rgba(124,58,237,.12);color:var(--acc2)}
 .bdg-low{background:rgba(107,104,153,.15);color:var(--mut2)}
 
+/* ═══════════ AUTOCORRECT TOOLTIP ═══════════ */
+.ac-wrapper{position:relative;flex:1}
+.ac-suggestions{
+  position:absolute;bottom:calc(100% + 8px);left:0;right:0;z-index:1000;
+  background:var(--s1);border:1px solid var(--bd2);border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(124,58,237,.1);
+  overflow:hidden;animation:slideDown .18s ease both;
+  max-height:200px;overflow-y:auto;
+}
+.ac-suggestions.above{bottom:calc(100% + 8px);top:auto}
+.ac-suggestions.below{top:calc(100% + 8px);bottom:auto}
+.ac-header{
+  padding:6px 10px;font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--mut);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:6px;
+}
+.ac-header-ico{font-size:.9rem}
+.ac-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;cursor:pointer;transition:.1s;font-size:13px;
+  border-bottom:1px solid rgba(124,58,237,.06);
+}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover{background:rgba(124,58,237,.12)}
+.ac-item:active{background:rgba(124,58,237,.2)}
+.ac-wrong{color:var(--red);text-decoration:line-through;font-size:11px;opacity:.7;margin-left:8px;flex-shrink:0}
+.ac-correct{color:var(--acc2);font-weight:500}
+.ac-arrow{color:var(--mut);margin:0 6px;font-size:.8rem}
+.ac-dismiss{
+  display:flex;align-items:center;justify-content:center;
+  padding:7px;cursor:pointer;transition:.1s;font-size:.75rem;color:var(--mut);
+  border-top:1px solid var(--bd);background:rgba(0,0,0,.2);
+}
+.ac-dismiss:hover{color:var(--txt);background:rgba(124,58,237,.1)}
+
+/* inline error highlight dans textarea */
+.ac-highlight{
+  color:var(--red);text-decoration:underline wavy var(--red);
+  text-decoration-skip-ink:none;
+}
+
 /* ═══════════ KANBAN ═══════════ */
-.kb-board{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.kb-col{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1rem;min-height:400px}
+.kb-board{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.kb-col{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:.9rem;min-height:200px}
 .kb-col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;font-size:13px;font-weight:600}
 .kb-col-title{display:flex;align-items:center;gap:7px}
 .kb-cnt{font-size:11px;background:var(--s2);border:1px solid var(--bd);padding:1px 8px;border-radius:10px;color:var(--mut2)}
@@ -190,7 +254,7 @@ textarea{resize:vertical;min-height:80px}
 .kc-assignee{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mut2)}
 .kc-assignee img{width:16px;height:16px;border-radius:50%}
 .kc-actions{display:flex;gap:3px;margin-left:auto}
-.kc-actions button{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.85rem;padding:2px 5px;border-radius:4px;transition:.1s}
+.kc-actions button{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.85rem;padding:4px 6px;border-radius:4px;transition:.1s;min-height:28px;min-width:28px;display:flex;align-items:center;justify-content:center}
 .kc-actions button:hover{color:var(--txt);background:var(--s3)}
 .drop-active{background:rgba(124,58,237,.07);border-color:var(--acc)!important}
 
@@ -204,34 +268,37 @@ textarea{resize:vertical;min-height:80px}
 }
 .todo-item.done .todo-txt{text-decoration:line-through;color:var(--mut)}
 .chk{
-  width:18px;height:18px;border-radius:5px;border:1.5px solid var(--bd2);
+  width:22px;height:22px;border-radius:5px;border:1.5px solid var(--bd2);
   background:none;cursor:pointer;flex-shrink:0;transition:.15s;
   display:flex;align-items:center;justify-content:center;font-size:11px;
+  touch-action:manipulation;
 }
 .chk.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.todo-txt{flex:1;font-size:13px}
-.todo-del{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.9rem;padding:2px 5px;border-radius:4px;transition:.1s}
+.todo-txt{flex:1;font-size:13px;word-break:break-word}
+.todo-del{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.9rem;padding:4px 6px;border-radius:4px;transition:.1s;min-height:28px;min-width:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .todo-del:hover{color:var(--red)}
 
 /* ═══════════ CHAT ═══════════ */
-.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 165px);min-height:380px}
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 165px);height:calc(100dvh - 165px);min-height:300px}
 .chat-msgs{
   flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;
   padding:.5rem;background:var(--s1);border:1px solid var(--bd);border-radius:12px 12px 0 0;
+  -webkit-overflow-scrolling:touch;
 }
 .chat-msg{display:flex;gap:10px;padding:6px 8px;border-radius:8px;transition:background .1s}
 .chat-msg:hover{background:var(--s2)}
 .chat-msg img{width:32px;height:32px;border-radius:50%;flex-shrink:0;margin-top:2px}
 .chat-body{flex:1;min-width:0}
-.chat-hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+.chat-hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:2px;flex-wrap:wrap}
 .chat-name{font-size:13px;font-weight:600;color:var(--acc2)}
 .chat-time{font-size:11px;color:var(--mut)}
 .chat-txt{font-size:13px;line-height:1.5;word-break:break-word}
 .chat-input-row{
   display:flex;gap:8px;background:var(--s2);border:1px solid var(--bd);
-  border-top:none;border-radius:0 0 12px 12px;padding:.8rem;
+  border-top:none;border-radius:0 0 12px 12px;padding:.7rem;align-items:flex-start;
+  padding-bottom:calc(.7rem + var(--safe-bottom));
+  position:relative;
 }
-.chat-input-row input{flex:1}
 
 /* ═══════════ WIKI ═══════════ */
 .wiki-layout{display:grid;grid-template-columns:200px 1fr;gap:1rem}
@@ -239,34 +306,67 @@ textarea{resize:vertical;min-height:80px}
 .wiki-pages{list-style:none;display:flex;flex-direction:column;gap:3px;margin-top:.5rem}
 .wiki-li{
   display:flex;align-items:center;justify-content:space-between;
-  padding:7px 9px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--mut2);transition:.12s;
+  padding:8px 9px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--mut2);transition:.12s;
+  min-height:36px;
 }
 .wiki-li:hover{background:var(--s2);color:var(--txt)}
 .wiki-li.on{background:rgba(124,58,237,.15);color:var(--acc2)}
-.wiki-del-btn{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.8rem;opacity:0;transition:.1s;padding:2px 4px;border-radius:3px}
+.wiki-del-btn{background:none;border:none;cursor:pointer;color:var(--mut);font-size:.8rem;opacity:0;transition:.1s;padding:4px;border-radius:3px;min-width:24px;min-height:24px;display:flex;align-items:center;justify-content:center}
 .wiki-li:hover .wiki-del-btn{opacity:1}
 .wiki-del-btn:hover{color:var(--red)}
-.wiki-ed{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.25rem}
-.wiki-ed input{font-size:1.05rem;font-weight:600;margin-bottom:.8rem}
-.wiki-ed textarea{min-height:360px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:13px;line-height:1.6}
+.wiki-ed{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.1rem;position:relative}
+.wiki-ed input{font-size:1rem;font-weight:600;margin-bottom:.8rem}
+.wiki-ed textarea{min-height:340px;font-size:13px;line-height:1.6}
 .wiki-tools{display:flex;gap:8px;margin-bottom:.8rem}
 
 /* ═══════════ MEMBERS ═══════════ */
-.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .mc-card{
   background:var(--s1);border:1px solid var(--bd);border-radius:12px;
   padding:1rem;display:flex;align-items:center;gap:12px;animation:fadeUp .25s ease both;
 }
 .mc-card img{width:44px;height:44px;border-radius:50%;flex-shrink:0}
 .mc-info{flex:1;min-width:0}
-.mc-name{font-size:14px;font-weight:600}
-.mc-id{font-size:11px;color:var(--mut);font-family:monospace}
-.role-sel{background:var(--s2);border:1px solid var(--bd2);color:var(--txt);border-radius:7px;padding:4px 8px;font-size:12px;cursor:pointer;width:auto}
+.mc-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mc-id{font-size:11px;color:var(--mut);font-family:monospace;overflow:hidden;text-overflow:ellipsis}
+.role-sel{background:var(--s2);border:1px solid var(--bd2);color:var(--txt);border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer;width:auto;flex-shrink:0}
+
+/* ═══════════ BOTTOM NAV MOBILE ═══════════ */
+#bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(6,6,15,.97);backdrop-filter:blur(20px);
+  border-top:1px solid var(--bd);
+  padding:.4rem .5rem;padding-bottom:calc(.4rem + var(--safe-bottom));
+  flex-direction:row;align-items:center;justify-content:space-around;
+}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;padding:.35rem .5rem;border-radius:10px;
+  font-size:10px;color:var(--mut2);transition:.15s;min-width:52px;
+  background:none;border:none;font-family:'Inter',sans-serif;
+  position:relative;
+}
+.bn-item.on{color:var(--acc2)}
+.bn-item:active{background:var(--s2)}
+.bn-ico{font-size:1.3rem;display:block}
+.bn-lbl{font-size:9px;font-weight:500;white-space:nowrap}
+.bn-badge{
+  position:absolute;top:3px;right:10px;
+  background:var(--acc);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;
+  display:none;
+}
 
 /* ═══════════ MODAL ═══════════ */
-.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(6,6,15,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(6,6,15,.82);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
 .modal-ov.open{display:flex;animation:fadeIn .2s ease}
-.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:16px;padding:1.5rem;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:fadeUp .25s ease both}
+.modal{
+  background:var(--s1);border:1px solid var(--bd2);border-radius:16px 16px 0 0;
+  padding:1.5rem;width:100%;max-width:520px;
+  box-shadow:0 -20px 60px rgba(0,0,0,.6);
+  animation:fadeUp .25s ease both;
+  max-height:90vh;max-height:90dvh;overflow-y:auto;
+  padding-bottom:calc(1.5rem + var(--safe-bottom));
+}
 .modal h3{font-family:'Cinzel',serif;font-size:1.1rem;margin-bottom:1.2rem}
 .modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:1.2rem}
 .fg{margin-bottom:.9rem}
@@ -278,6 +378,44 @@ textarea{resize:vertical;min-height:80px}
 .empty{text-align:center;padding:3rem 1rem;color:var(--mut)}
 .empty .ei{font-size:2.5rem;margin-bottom:.8rem}
 .empty p{font-size:13px;line-height:1.5}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:768px){
+  .menu-btn{display:flex}
+  .online-pill{display:none}
+  .logout-btn{display:none}
+  
+  #sidebar{
+    position:fixed;top:56px;left:0;bottom:0;z-index:160;
+    height:calc(100vh - 56px);height:calc(100dvh - 56px);
+    transform:translateX(-100%);
+    box-shadow:4px 0 20px rgba(0,0,0,.5);
+  }
+  #sidebar.open{transform:none;animation:slideRight .3s cubic-bezier(.16,1,.3,1) both}
+  #sidebar-overlay.show{display:block;animation:fadeIn .2s ease both}
+  
+  #content{padding:.9rem .75rem}
+  #bottom-nav{display:flex}
+  
+  .kb-board{grid-template-columns:1fr;gap:.75rem}
+  .wiki-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .two-col{grid-template-columns:1fr}
+  .members-grid{grid-template-columns:1fr}
+  
+  .chat-wrap{height:calc(100vh - 195px);height:calc(100dvh - 195px)}
+  
+  /* Bottom nav space */
+  #content{padding-bottom:calc(.9rem + 65px)}
+  
+  /* modal full mobile */
+  .modal{border-radius:16px 16px 0 0}
+}
+
+@media(max-width:400px){
+  .app-logo{font-size:.85rem}
+  .user-chip .uname{max-width:55px}
+  #content{padding:.75rem .6rem}
+}
 </style>
 </head>
 <body>
@@ -308,7 +446,8 @@ textarea{resize:vertical;min-height:80px}
 <div id="app-page">
 
   <div id="hdr">
-    <span style="font-size:1.2rem">🔮</span>
+    <button class="menu-btn" id="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <span style="font-size:1.1rem">🔮</span>
     <span class="app-logo">Arcane Workspace</span>
     <div class="spacer"></div>
     <div class="online-pill"><div class="odot"></div><span id="online-cnt">0 en ligne</span></div>
@@ -321,20 +460,24 @@ textarea{resize:vertical;min-height:80px}
   </div>
 
   <div id="layout">
+
+    <!-- Sidebar overlay -->
+    <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
     <aside id="sidebar">
       <div class="nav-sec">
         <div class="nav-lbl">Navigation</div>
-        <button class="ni on" data-pg="kanban" onclick="goPage('kanban')"><span class="ni-ico">📋</span> Kanban</button>
-        <button class="ni" data-pg="todo"   onclick="goPage('todo')"><span class="ni-ico">✅</span> Mes tâches</button>
-        <button class="ni" data-pg="chat"   onclick="goPage('chat')">
+        <button class="ni on" data-pg="kanban" onclick="goPage('kanban');closeSidebar()"><span class="ni-ico">📋</span> Kanban</button>
+        <button class="ni" data-pg="todo"   onclick="goPage('todo');closeSidebar()"><span class="ni-ico">✅</span> Mes tâches</button>
+        <button class="ni" data-pg="chat"   onclick="goPage('chat');closeSidebar()">
           <span class="ni-ico">💬</span> Chat
           <span id="chat-bdg" class="chat-badge"></span>
         </button>
-        <button class="ni" data-pg="wiki"   onclick="goPage('wiki')"><span class="ni-ico">📚</span> Wiki</button>
+        <button class="ni" data-pg="wiki"   onclick="goPage('wiki');closeSidebar()"><span class="ni-ico">📚</span> Wiki</button>
       </div>
       <div id="admin-nav" class="nav-sec" style="display:none">
         <div class="nav-lbl">Admin</div>
-        <button class="ni" data-pg="members" onclick="goPage('members')"><span class="ni-ico">👥</span> Membres</button>
+        <button class="ni" data-pg="members" onclick="goPage('members');closeSidebar()"><span class="ni-ico">👥</span> Membres</button>
       </div>
       <div class="nav-sec">
         <div class="nav-lbl">En ligne</div>
@@ -369,7 +512,9 @@ textarea{resize:vertical;min-height:80px}
         <div class="pg-title">✅ Mes tâches</div>
         <div class="card" style="max-width:580px">
           <div class="todo-row">
-            <input type="text" id="todo-in" placeholder="Nouvelle tâche…" onkeydown="if(event.key==='Enter')addTodo()"/>
+            <div class="ac-wrapper" id="acw-todo">
+              <input type="text" id="todo-in" placeholder="Nouvelle tâche…" onkeydown="if(event.key==='Enter')addTodo()" autocomplete="off" autocorrect="off" spellcheck="false"/>
+            </div>
             <button class="btn btn-p" onclick="addTodo()">Ajouter</button>
           </div>
           <div class="todo-list" id="todo-list"></div>
@@ -382,8 +527,10 @@ textarea{resize:vertical;min-height:80px}
         <div class="chat-wrap">
           <div class="chat-msgs" id="chat-msgs"></div>
           <div class="chat-input-row">
-            <input type="text" id="chat-in" placeholder="Message…" onkeydown="if(event.key==='Enter')sendChat()" maxlength="500"/>
-            <button class="btn btn-p" onclick="sendChat()">Envoyer</button>
+            <div class="ac-wrapper" id="acw-chat">
+              <input type="text" id="chat-in" placeholder="Message…" onkeydown="handleChatKey(event)" maxlength="500" autocomplete="off" autocorrect="off" spellcheck="false"/>
+            </div>
+            <button class="btn btn-p" onclick="sendChat()">↗</button>
           </div>
         </div>
       </div>
@@ -411,14 +558,42 @@ textarea{resize:vertical;min-height:80px}
 
     </main>
   </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav id="bottom-nav">
+    <button class="bn-item on" data-pg="kanban" onclick="goPage('kanban')">
+      <span class="bn-ico">📋</span><span class="bn-lbl">Kanban</span>
+    </button>
+    <button class="bn-item" data-pg="todo" onclick="goPage('todo')">
+      <span class="bn-ico">✅</span><span class="bn-lbl">Tâches</span>
+    </button>
+    <button class="bn-item" data-pg="chat" onclick="goPage('chat')">
+      <span class="bn-ico">💬</span><span class="bn-lbl">Chat</span>
+      <span class="bn-badge" id="bn-badge-chat"></span>
+    </button>
+    <button class="bn-item" data-pg="wiki" onclick="goPage('wiki')">
+      <span class="bn-ico">📚</span><span class="bn-lbl">Wiki</span>
+    </button>
+    <button class="bn-item" data-pg="members" onclick="goPage('members')">
+      <span class="bn-ico">👥</span><span class="bn-lbl">Membres</span>
+    </button>
+  </nav>
 </div>
 
 <!-- MODAL kanban -->
 <div class="modal-ov" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3 id="modal-title">✨ Nouvelle tâche</h3>
-    <div class="fg"><label class="flbl">Titre *</label><input type="text" id="m-title" placeholder="Titre…"/></div>
-    <div class="fg"><label class="flbl">Description</label><textarea id="m-desc" placeholder="Détails…"></textarea></div>
+    <div class="fg"><label class="flbl">Titre *</label>
+      <div class="ac-wrapper" id="acw-modal">
+        <input type="text" id="m-title" placeholder="Titre…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      </div>
+    </div>
+    <div class="fg"><label class="flbl">Description</label>
+      <div class="ac-wrapper" id="acw-modal-desc">
+        <textarea id="m-desc" placeholder="Détails…" autocorrect="off" spellcheck="false"></textarea>
+      </div>
+    </div>
     <div class="two-col">
       <div class="fg"><label class="flbl">Statut</label>
         <select id="m-status"><option value="todo">À faire</option><option value="doing">En cours</option><option value="done">Terminé</option></select>
@@ -443,10 +618,27 @@ let ME = null, WS = null, users = [], editId = null, wikiId = null, chatUnread =
 let dragId = null;
 
 /* ══════════════════════════
+   MOBILE SIDEBAR
+══════════════════════════ */
+function toggleSidebar() {
+  const sb = document.getElementById("sidebar");
+  const ov = document.getElementById("sidebar-overlay");
+  const isOpen = sb.classList.contains("open");
+  if (isOpen) { closeSidebar(); } else {
+    sb.classList.add("open"); ov.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebar-overlay").classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+/* ══════════════════════════
    BOOT
 ══════════════════════════ */
 (async () => {
-  // Show login or app based on URL
   if (location.pathname === "/app") {
     ME = await get("/api/me");
     if (!ME) { location.href = "/"; return; }
@@ -457,7 +649,6 @@ let dragId = null;
     if (ME.role === "admin") loadMembers();
     initWS();
   } else {
-    // Login page
     const p = new URLSearchParams(location.search);
     if (p.get("error")) {
       const msgs = { not_allowed:"Ton compte n'est pas autorisé.", auth_failed:"Erreur Discord. Réessaie.", no_code:"Code manquant." };
@@ -471,33 +662,35 @@ let dragId = null;
 function showApp() {
   document.getElementById("login-page").style.display = "none";
   document.getElementById("app-page").classList.add("show");
-  document.getElementById("hdr-av").src      = ME.avatar;
+  document.getElementById("hdr-av").src = ME.avatar;
   document.getElementById("hdr-name").textContent = ME.username;
   const r = document.getElementById("hdr-role");
   r.textContent = ME.role; r.classList.add("role-" + ME.role);
   if (ME.role === "admin") document.getElementById("admin-nav").style.display = "";
+  initAutocorrect();
 }
 
 /* ══════════════════════════
    API
 ══════════════════════════ */
-async function get(url)          { return fetch(url).then(r=>r.json()); }
-async function post(url, body)   { return fetch(url,{method:"POST",  headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
-async function patch(url, body)  { return fetch(url,{method:"PATCH", headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
-async function put(url, body)    { return fetch(url,{method:"PUT",   headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
-async function del(url)          { return fetch(url,{method:"DELETE"}).then(r=>r.json()); }
+async function get(url)        { return fetch(url).then(r=>r.json()); }
+async function post(url, body) { return fetch(url,{method:"POST",  headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
+async function patch(url,body) { return fetch(url,{method:"PATCH", headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
+async function put(url, body)  { return fetch(url,{method:"PUT",   headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()); }
+async function del(url)        { return fetch(url,{method:"DELETE"}).then(r=>r.json()); }
 
 /* ══════════════════════════
    NAV
 ══════════════════════════ */
 function goPage(p) {
   document.querySelectorAll(".page").forEach(el=>el.classList.remove("on"));
-  document.querySelectorAll(".ni").forEach(el=>el.classList.remove("on"));
+  document.querySelectorAll(".ni,.bn-item").forEach(el=>el.classList.remove("on"));
   document.getElementById("page-"+p)?.classList.add("on");
-  document.querySelector(`[data-pg="${p}"]`)?.classList.add("on");
+  document.querySelectorAll(`[data-pg="${p}"]`).forEach(el=>el.classList.add("on"));
   curPage = p;
   if (p==="chat") { chatUnread=0; updBadge(); scrollChat(); }
   if (p==="members") loadMembers();
+  dismissAC();
 }
 
 /* ══════════════════════════
@@ -509,11 +702,11 @@ function initWS() {
   WS.onopen = ()=> WS.send(JSON.stringify({type:"auth",userId:ME.id,username:ME.username,avatar:ME.avatar}));
   WS.onmessage = e => {
     const m = JSON.parse(e.data);
-    if (m.type==="online")     renderOnline(m.users);
-    if (m.type==="chat_msg")   appendMsg(m.msg);
+    if (m.type==="online")       renderOnline(m.users);
+    if (m.type==="chat_msg")     appendMsg(m.msg);
     if (m.type==="kanban_reload") loadKanban();
     if (m.type==="wiki_reload")   loadWikiList();
-    if (m.type==="user_updated")  { get("/api/users").then(u=>{users=u;fillAssignees();if(curPage==="members")loadMembers();}); }
+    if (m.type==="user_updated") { get("/api/users").then(u=>{users=u;fillAssignees();if(curPage==="members")loadMembers();}); }
   };
   WS.onclose = ()=>setTimeout(initWS,3000);
 }
@@ -523,6 +716,262 @@ function renderOnline(list) {
   document.getElementById("ou-list").innerHTML = u.map(x=>
     `<div class="ou"><img src="${x.avatar}" alt=""><span>${esc(x.username)}</span><div class="ou-dot"></div></div>`
   ).join("");
+}
+
+/* ══════════════════════════════════════════
+   AUTOCORRECTEUR FRANÇAIS
+   Fonctionne sur tous les champs texte
+══════════════════════════════════════════ */
+const FR_DICT = {
+  // articles / déterminants
+  "la":"la","le":"le","les":"les","un":"un","une":"une","des":"des","du":"du","de":"de",
+  // erreurs fréquentes fr
+  "sa":"ça","ca":"ça","Ca":"Ça","SA":"ÇA",
+  "a":"à","A":"À",
+  "ou":"où","OU":"OÙ",
+  "la":"là","La":"Là",
+  // confusions
+  "ses":"ses","ces":"ces","c'es":"c'est","cest":"c'est","cai":"c'est",
+  "est":"est","et":"et","en":"en",
+  "on":"on","ont":"ont",
+  "son":"son","sont":"sont",
+  // mots mal orthographiés courants
+  "bonjour":"bonjour","Bonjour":"Bonjour",
+  "mersi":"merci","merci":"merci",
+  "pck":"parce que","pcq":"parce que","parce-que":"parce que",
+  "pk":"pourquoi","pq":"pourquoi","pourquoi":"pourquoi",
+  "bcp":"beaucoup","bocoup":"beaucoup","beaucop":"beaucoup","beaucoups":"beaucoup",
+  "tro":"trop","trop":"trop",
+  "tlm":"tout le monde","tlem":"tout le monde",
+  "vs":"vous","vou":"vous","voux":"vous",
+  "ns":"nous","nou":"nous",
+  "kel":"quel","kelle":"quelle","quele":"quelle",
+  "koi":"quoi","kooi":"quoi","koui":"quoi",
+  "jsui":"je suis","jsuis":"je suis","jesuis":"je suis",
+  "jai":"j'ai","jai":"j'ai",
+  "ya":"il y a","yà":"il y a","y a":"il y a",
+  "kan":"quand","qand":"quand","qunad":"quand",
+  "mnt":"maintenant","mainenant":"maintenant","maintnant":"maintenant",
+  "pr":"pour","pou":"pour",
+  "svp":"s'il vous plaît","stp":"s'il te plaît",
+  "ofc":"bien sûr","ofcours":"bien sûr",
+  "ok":"OK","oké":"OK","oker":"OK",
+  "non":"non","nan":"non","nope":"non",
+  "oui":"oui","oui":"oui","wi":"oui","OUI":"oui",
+  "tt":"tout","tou":"tout",
+  "qqch":"quelque chose","qqchose":"quelque chose","quelquechose":"quelque chose",
+  "qquun":"quelqu'un","quelqun":"quelqu'un","quelqu'un":"quelqu'un",
+  "avk":"avec","avek":"avec","avc":"avec",
+  "ss":"sans","san":"sans",
+  "ms":"mais","mai":"mais","mé":"mais",
+  "dc":"donc","donk":"donc","donc":"donc",
+  "suis":"suis","sui":"suis",
+  "faire":"faire","fair":"faire","fer":"faire",
+  "travaill":"travailler","travail":"travail","travaille":"travaille",
+  "fini":"fini","finit":"finit","finni":"fini",
+  "commence":"commence","comence":"commence","commense":"commence",
+  "probleme":"problème","problème":"problème","probléme":"problème","prob":"problème",
+  "erreur":"erreur","eurreur":"erreur","ereur":"erreur",
+  "verif":"vérif","verifier":"vérifier","vérifié":"vérifié",
+  "ajouter":"ajouter","ajouté":"ajouté","ajouté":"ajouté",
+  "supprime":"supprime","supprimer":"supprimer","suprimer":"supprimer",
+  "modifier":"modifier","modifié":"modifié","modifer":"modifier",
+  "creer":"créer","créer":"créer","créé":"créé",
+  "mise":"mise","mis":"mis",
+  "jour":"jour","jours":"jours",
+  "version":"version","vesion":"version","versoin":"version",
+  "update":"update","miseajour":"mise à jour",
+  "bug":"bug","bugg":"bug","bugs":"bugs",
+  "fix":"fix","fixe":"fixe","fixer":"fixer",
+  "code":"code","kode":"code",
+  "map":"map","mappe":"map",
+  "spawn":"spawn","spaw":"spawn",
+  "roblox":"Roblox","roblo":"Roblox","rblx":"Roblox",
+  "magie":"magie","mage":"mage","sort":"sort","sorts":"sorts",
+  "donjon":"donjon","dungon":"donjon","dungeon":"donjon",
+  "joueur":"joueur","jouer":"jouer",
+  "serveur":"serveur","server":"serveur","serv":"serveur",
+  "discord":"Discord","discors":"Discord","discrod":"Discord",
+  "mission":"mission","misssion":"mission","mision":"mission",
+  "quête":"quête","quete":"quête","quest":"quête",
+  "niveau":"niveau","nivau":"niveau","niveaux":"niveaux",
+  "personnage":"personnage","perso":"perso","personnge":"personnage",
+  "inventaire":"inventaire","inventaire":"inventaire","invantaire":"inventaire",
+  "équipe":"équipe","equipe":"équipe","team":"équipe",
+  "tache":"tâche","tâche":"tâche","taches":"tâches","tâches":"tâches",
+  "termine":"terminé","terminer":"terminer","terminée":"terminée",
+};
+
+// Lore / termes de jeu spécifiques (ne jamais corriger)
+const LORE_TERMS = new Set([
+  "arcane","roblox","mage","sort","sorts","donjon","spawn","map","buff","nerf","cooldown",
+  "hp","mp","xp","pvp","pve","npc","aoe","dot","cc","aggro","loot","drop","farm","grind",
+  "boss","mob","mob","raid","guild","clan","crafting","forge","build","tier","meta",
+  "lua","script","module","remote","bindable","datastoreservice","tweenservice",
+  "humanoidrootpart","baseplate","starterpack","toolbox","gamepass","devproduct",
+  "discord","github","trello","figma","json","http","api","webhook",
+]);
+
+let acActive = null; // { input, suggestions }
+
+function getFrenchSuggestions(text) {
+  if (!text || text.length < 2) return [];
+  const words = text.split(/\s+/);
+  const lastWord = words[words.length - 1];
+  if (!lastWord || lastWord.length < 2) return [];
+
+  const lw = lastWord.toLowerCase().replace(/[.,!?;:'"]/g,'');
+  if (LORE_TERMS.has(lw) || LORE_TERMS.has(lastWord)) return [];
+
+  const suggestions = [];
+
+  // Correction directe dans le dictionnaire
+  if (FR_DICT[lastWord] && FR_DICT[lastWord] !== lastWord) {
+    suggestions.push({ wrong: lastWord, correct: FR_DICT[lastWord], type: 'direct' });
+  } else if (FR_DICT[lw] && FR_DICT[lw] !== lw) {
+    suggestions.push({ wrong: lastWord, correct: FR_DICT[lw], type: 'direct' });
+  }
+
+  // Distance de Levenshtein simplifiée pour les mots courants
+  if (suggestions.length === 0 && lastWord.length >= 4) {
+    const commonWords = Object.keys(FR_DICT);
+    for (const w of commonWords) {
+      if (Math.abs(w.length - lastWord.length) <= 2) {
+        const dist = levenshtein(lw, w.toLowerCase());
+        if (dist === 1 && FR_DICT[w] && !LORE_TERMS.has(w)) {
+          suggestions.push({ wrong: lastWord, correct: FR_DICT[w] || w, type: 'levenshtein' });
+          if (suggestions.length >= 3) break;
+        }
+      }
+    }
+  }
+
+  return suggestions;
+}
+
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const m = [];
+  for (let i = 0; i <= b.length; i++) m[i] = [i];
+  for (let j = 0; j <= a.length; j++) m[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      m[i][j] = b[i-1] === a[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j-1]+1, m[i][j-1]+1, m[i-1][j]+1);
+    }
+  }
+  return m[b.length][a.length];
+}
+
+function applyCorrection(input, wrong, correct) {
+  const val = input.value;
+  const words = val.split(/(\s+)/);
+  let replaced = false;
+  for (let i = words.length - 1; i >= 0; i--) {
+    const clean = words[i].replace(/[.,!?;:'"]/g,'');
+    if (!replaced && (words[i] === wrong || clean === wrong.toLowerCase())) {
+      words[i] = words[i].replace(clean, correct);
+      replaced = true;
+      break;
+    }
+  }
+  input.value = replaced ? words.join('') : val;
+  dismissAC();
+  input.focus();
+  // Trigger update après correction
+  input.dispatchEvent(new Event('input'));
+}
+
+function dismissAC() {
+  document.querySelectorAll('.ac-suggestions').forEach(el => el.remove());
+  acActive = null;
+}
+
+function showACSuggestions(wrapper, input, suggestions) {
+  // Retire l'ancien
+  wrapper.querySelectorAll('.ac-suggestions').forEach(e => e.remove());
+  if (!suggestions.length) return;
+
+  const box = document.createElement('div');
+  box.className = 'ac-suggestions';
+  box.innerHTML = `
+    <div class="ac-header"><span class="ac-header-ico">✏️</span> Corrections suggérées</div>
+    ${suggestions.map(s => `
+      <div class="ac-item" onclick="applyCorrection(document.getElementById('${input.id}'),'${esc(s.wrong)}','${esc(s.correct)}')">
+        <span class="ac-correct">${esc(s.correct)}</span>
+        <span><span class="ac-arrow">←</span><span class="ac-wrong">${esc(s.wrong)}</span></span>
+      </div>
+    `).join('')}
+    <div class="ac-dismiss" onclick="dismissAC()">✕ Ignorer</div>
+  `;
+  wrapper.appendChild(box);
+  acActive = { input, suggestions };
+}
+
+let acTimer = null;
+
+function bindAC(inputEl, wrapperId) {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper || !inputEl) return;
+
+  inputEl.addEventListener('input', () => {
+    clearTimeout(acTimer);
+    acTimer = setTimeout(() => {
+      const s = getFrenchSuggestions(inputEl.value);
+      if (s.length) showACSuggestions(wrapper, inputEl, s);
+      else wrapper.querySelectorAll('.ac-suggestions').forEach(e => e.remove());
+    }, 600);
+  });
+
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') dismissAC();
+    if (e.key === 'Tab' && acActive && acActive.input === inputEl) {
+      e.preventDefault();
+      const s = acActive.suggestions[0];
+      applyCorrection(inputEl, s.wrong, s.correct);
+    }
+  });
+
+  inputEl.addEventListener('blur', () => {
+    setTimeout(dismissAC, 200);
+  });
+}
+
+function initAutocorrect() {
+  // Chat
+  bindAC(document.getElementById('chat-in'), 'acw-chat');
+  // Todo
+  bindAC(document.getElementById('todo-in'), 'acw-todo');
+  // Modal titre & desc
+  bindAC(document.getElementById('m-title'), 'acw-modal');
+  bindAC(document.getElementById('m-desc'), 'acw-modal-desc');
+}
+
+// Rebind quand le wiki crée dynamiquement des champs
+function bindWikiAC() {
+  setTimeout(() => {
+    const wTitle = document.getElementById('w-title');
+    const wContent = document.getElementById('w-content');
+    const wEd = document.getElementById('wiki-ed');
+    if (!wTitle || !wEd) return;
+
+    // On crée des wrappers AC dynamiques pour le wiki
+    if (wTitle && !wTitle.closest('.ac-wrapper')) {
+      const wr1 = document.createElement('div');
+      wr1.className = 'ac-wrapper'; wr1.id = 'acw-wiki-title';
+      wTitle.parentNode.insertBefore(wr1, wTitle);
+      wr1.appendChild(wTitle);
+      bindAC(wTitle, 'acw-wiki-title');
+    }
+    if (wContent && !wContent.closest('.ac-wrapper')) {
+      const wr2 = document.createElement('div');
+      wr2.className = 'ac-wrapper'; wr2.id = 'acw-wiki-content';
+      wContent.parentNode.insertBefore(wr2, wContent);
+      wr2.appendChild(wContent);
+      bindAC(wContent, 'acw-wiki-content');
+    }
+  }, 50);
 }
 
 /* ══════════════════════════
@@ -588,7 +1037,7 @@ function openModal(id) {
   document.getElementById("modal").classList.add("open");
   document.getElementById("m-title").focus();
 }
-function closeModal(){document.getElementById("modal").classList.remove("open")}
+function closeModal(){document.getElementById("modal").classList.remove("open");dismissAC();}
 async function saveCard() {
   const d={title:document.getElementById("m-title").value.trim(),description:document.getElementById("m-desc").value.trim(),status:document.getElementById("m-status").value,priority:document.getElementById("m-prio").value,assignee_id:document.getElementById("m-assign").value||null};
   if(!d.title){alert("Titre requis");return}
@@ -618,7 +1067,7 @@ function todoHTML(t){
 }
 async function addTodo(){
   const inp=document.getElementById("todo-in"), text=inp.value.trim();
-  if(!text)return; inp.value="";
+  if(!text)return; inp.value=""; dismissAC();
   const t=await post("/api/todos",{text});
   const list=document.getElementById("todo-list");
   if(list.querySelector(".empty"))list.innerHTML="";
@@ -650,11 +1099,19 @@ function appendMsg(m){
   else{chatUnread++;updBadge();}
 }
 function scrollChat(){const b=document.getElementById("chat-msgs");b.scrollTop=b.scrollHeight}
-function updBadge(){const b=document.getElementById("chat-bdg");b.textContent=chatUnread;b.style.display=chatUnread?"":"none"}
+function updBadge(){
+  const b=document.getElementById("chat-bdg");
+  const b2=document.getElementById("bn-badge-chat");
+  [b,b2].forEach(el=>{if(el){el.textContent=chatUnread;el.style.display=chatUnread?"":"none";}});
+}
+function handleChatKey(e){
+  if(e.key==='Enter' && !e.shiftKey){e.preventDefault();sendChat();}
+  if(e.key==='Escape') dismissAC();
+}
 function sendChat(){
   const inp=document.getElementById("chat-in"),text=inp.value.trim();
   if(!text||!WS||WS.readyState!==1)return;
-  WS.send(JSON.stringify({type:"chat",text})); inp.value="";
+  WS.send(JSON.stringify({type:"chat",text})); inp.value=""; dismissAC();
 }
 
 /* ══════════════════════════
@@ -677,17 +1134,19 @@ async function loadWikiPage(id){
   const can=ME.role==="admin"||ME.role==="dev";
   document.getElementById("wiki-ed").innerHTML=`
     <div class="wiki-tools">${can?`<button class="btn btn-p btn-sm" onclick="saveWiki()">💾 Sauvegarder</button>`:""}</div>
-    <div class="fg"><input type="text" id="w-title" value="${esc(p.title)}" ${can?"":"readonly"}/></div>
-    <div class="fg"><textarea id="w-content" ${can?"":"readonly"}>${esc(p.content)}</textarea></div>`;
+    <div class="fg"><input type="text" id="w-title" value="${esc(p.title)}" ${can?"":"readonly"} autocorrect="off" spellcheck="false"/></div>
+    <div class="fg"><textarea id="w-content" ${can?"":"readonly"} autocorrect="off" spellcheck="false">${esc(p.content)}</textarea></div>`;
+  bindWikiAC();
 }
 function newWiki(){
   wikiId="new";
   document.querySelectorAll(".wiki-li").forEach(l=>l.classList.remove("on"));
   document.getElementById("wiki-ed").innerHTML=`
     <div class="wiki-tools"><button class="btn btn-p btn-sm" onclick="saveWiki()">💾 Sauvegarder</button></div>
-    <div class="fg"><input type="text" id="w-title" placeholder="Titre de la page"/></div>
-    <div class="fg"><textarea id="w-content" placeholder="Contenu…"></textarea></div>`;
+    <div class="fg"><input type="text" id="w-title" placeholder="Titre de la page" autocorrect="off" spellcheck="false"/></div>
+    <div class="fg"><textarea id="w-content" placeholder="Contenu…" autocorrect="off" spellcheck="false"></textarea></div>`;
   document.getElementById("w-title").focus();
+  bindWikiAC();
 }
 async function saveWiki(){
   const title=document.getElementById("w-title")?.value.trim();
@@ -731,6 +1190,16 @@ async function setRole(id,r){await patch(`/api/users/${id}/role`,{role:r}).catch
 ══════════════════════════ */
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function empty(icon,txt){return`<div class="empty"><div class="ei">${icon}</div><p>${txt}</p></div>`}
+
+/* Fermer AC en cliquant ailleurs */
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.ac-wrapper') && !e.target.closest('.ac-suggestions')) dismissAC();
+});
+
+/* Keyboard ESC global */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { dismissAC(); closeSidebar(); }
+});
 </script>
 </body>
 </html>
